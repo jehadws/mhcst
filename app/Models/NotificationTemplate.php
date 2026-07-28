@@ -1,0 +1,14 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class NotificationTemplate extends Model
+{
+    /** @use HasFactory<\Database\Factories\NotificationTemplateFactory> */
+    use HasFactory;
+
+    protected $fillable = ['name', 'channel', 'trigger_event', 'subject', 'body'];
+}
