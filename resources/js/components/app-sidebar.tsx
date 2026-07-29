@@ -77,7 +77,7 @@ export function AppSidebar() {
                     label="Settings"
                     items={[
                         { title: 'Users', url: '/dashboard/users/list', icon: Users },
-                        { title: 'Site Settings', url: '/dashboard/site-settings/list', icon: Settings },
+                        { title: 'Site Settings', url: '/dashboard/settings/site-content', icon: Settings },
                     ]}
                 />
             </SidebarContent>
