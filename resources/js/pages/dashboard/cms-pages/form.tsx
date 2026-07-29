@@ -34,7 +34,7 @@ export default function CmsPageFormPage({ page }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={isEditing ? 'تعديل صفحة' : 'صفحة جديدة'} />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4 max-w-3xl mx-auto">
+      <div className="flex h-full flex-1 flex-col gap-4 p-4">
         <Card>
           <CardHeader><CardTitle>{isEditing ? 'تعديل الصفحة' : 'صفحة جديدة'}</CardTitle></CardHeader>
           <CardContent>

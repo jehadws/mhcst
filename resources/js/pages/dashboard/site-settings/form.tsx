@@ -39,7 +39,7 @@ export default function SiteSettingFormPage({ setting }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={isEditing ? 'تعديل إعداد' : 'إضافة إعداد'} />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4 max-w-2xl mx-auto">
+      <div className="flex h-full flex-1 flex-col gap-4 p-4">
         <Card>
           <CardHeader><CardTitle>{isEditing ? 'تعديل الإعداد' : 'إعداد جديد'}</CardTitle></CardHeader>
           <CardContent>

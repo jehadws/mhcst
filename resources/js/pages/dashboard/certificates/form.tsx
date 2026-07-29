@@ -32,7 +32,7 @@ export default function CertificateFormPage({ enrollments }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="إصدار شهادة" />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4 max-w-2xl mx-auto">
+      <div className="flex h-full flex-1 flex-col gap-4 p-4">
         <Card>
           <CardHeader><CardTitle>إصدار شهادة جديدة</CardTitle></CardHeader>
           <CardContent>

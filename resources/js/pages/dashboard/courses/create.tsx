@@ -72,7 +72,7 @@ export function CourseForm({ course, categories = [], instructors = [] }: Props)
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEditing ? 'تعديل دورة' : 'إضافة دورة جديدة'} />
-            <div className="mx-auto flex h-full flex-1 max-w-4xl flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <Card>
                     <CardHeader>
                         <CardTitle>{isEditing ? 'تعديل الدورة' : 'دورة جديدة'}</CardTitle>

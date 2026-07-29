@@ -52,7 +52,7 @@ export default function InstructorFormPage({ instructor }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={isEditing ? 'تعديل مدرب' : 'إضافة مدرب'} />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4 max-w-3xl mx-auto">
+      <div className="flex h-full flex-1 flex-col gap-4 p-4">
         <Card>
           <CardHeader><CardTitle>{isEditing ? 'تعديل المدرب' : 'مدرب جديد'}</CardTitle></CardHeader>
           <CardContent>

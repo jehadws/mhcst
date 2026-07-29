@@ -49,7 +49,7 @@ export function EnrollmentForm({ enrollment, courses = [], students = [] }: Prop
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEditing ? 'تعديل تسجيل' : 'تسجيل جديد'} />
-            <div className="mx-auto flex h-full flex-1 max-w-3xl flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <Card>
                     <CardHeader>
                         <CardTitle>{isEditing ? 'تعديل طلب التسجيل' : 'تسجيل جديد'}</CardTitle>

@@ -37,7 +37,7 @@ export function UserForm({ user }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEditing ? 'تعديل مستخدم' : 'إضافة مستخدم'} />
-            <div className="mx-auto flex h-full flex-1 max-w-xl flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <Card>
                     <CardHeader>
                         <CardTitle>{isEditing ? 'تعديل بيانات المستخدم' : 'مستخدم جديد'}</CardTitle>

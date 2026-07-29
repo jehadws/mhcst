@@ -45,7 +45,7 @@ export default function BlogPostFormPage({ post }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={isEditing ? 'تعديل مقال' : 'إضافة مقال'} />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4 max-w-4xl mx-auto">
+      <div className="flex h-full flex-1 flex-col gap-4 p-4">
         <Card>
           <CardHeader><CardTitle>{isEditing ? 'تعديل المقال' : 'مقال جديد'}</CardTitle></CardHeader>
           <CardContent>

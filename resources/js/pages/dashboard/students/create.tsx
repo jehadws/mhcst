@@ -39,7 +39,7 @@ export function StudentForm({ student }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEditing ? 'تعديل متدرب' : 'إضافة متدرب'} />
-            <div className="mx-auto flex h-full flex-1 max-w-2xl flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <Card>
                     <CardHeader>
                         <CardTitle>{isEditing ? 'تعديل بيانات المتدرب' : 'متدرب جديد'}</CardTitle>

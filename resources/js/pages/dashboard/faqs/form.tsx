@@ -40,7 +40,7 @@ export default function FaqFormPage({ faq }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={isEditing ? 'تعديل سؤال' : 'إضافة سؤال'} />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4 max-w-3xl mx-auto">
+      <div className="flex h-full flex-1 flex-col gap-4 p-4">
         <Card>
           <CardHeader><CardTitle>{isEditing ? 'تعديل السؤال' : 'سؤال جديد'}</CardTitle></CardHeader>
           <CardContent>

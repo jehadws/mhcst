@@ -42,7 +42,7 @@ export default function BannerFormPage({ banner }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={isEditing ? 'تعديل بنر' : 'إضافة بنر'} />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4 max-w-2xl mx-auto">
+      <div className="flex h-full flex-1 flex-col gap-4 p-4">
         <Card>
           <CardHeader><CardTitle>{isEditing ? 'تعديل البنر' : 'بنر جديد'}</CardTitle></CardHeader>
           <CardContent>
