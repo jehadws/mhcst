@@ -29,7 +29,13 @@ interface SiteProviderProps {
 const SiteContext = createContext<SiteContextValue | null>(null)
 
 export function SiteProvider({ children, initialLocale, initialDirection }: SiteProviderProps) {
-    const [locale, setLocaleState] = useState<Locale>(initialLocale)
+    const [locale, setLocaleState] = useState<Locale>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem(LOCALE_KEY)
+            if (saved === 'en' || saved === 'ar') return saved
+        }
+        return initialLocale
+    })
     const [theme, setThemeState] = useState<Theme>('light')
 
     // Theme: load from localStorage (client-only, no hydration issue)
@@ -50,14 +56,6 @@ export function SiteProvider({ children, initialLocale, initialDirection }: Site
         html.classList.toggle('rtl', locale === 'ar')
         localStorage.setItem(LOCALE_KEY, locale)
     }, [locale])
-
-    // Locale: restore from localStorage (overrides server default if stale)
-    useEffect(() => {
-        const saved = localStorage.getItem(LOCALE_KEY) as Locale | null
-        if (saved && saved !== locale) {
-            setLocaleState(saved)
-        }
-    }, [])
 
     // Theme: sync dark mode
     useEffect(() => {
