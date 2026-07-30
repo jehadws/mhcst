@@ -4,6 +4,9 @@ import { dictionary, type Dictionary, type Locale } from '@/data/i18n'
 
 type Theme = 'light' | 'dark'
 
+const THEME_KEY = 'appearance'
+const LOCALE_KEY = 'ms-locale'
+
 interface SiteContextValue {
     locale: Locale
     dir: 'ltr' | 'rtl'
@@ -31,9 +34,12 @@ export function SiteProvider({ children, initialLocale, initialDirection }: Site
 
     // Theme: load from localStorage (client-only, no hydration issue)
     useEffect(() => {
-        const savedTheme = (localStorage.getItem('ms-theme') as Theme | null) ?? null
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        setThemeState(savedTheme ?? (prefersDark ? 'dark' : 'light'))
+        const saved = localStorage.getItem(THEME_KEY)
+        if (saved === 'dark' || saved === 'light') {
+            setThemeState(saved)
+        } else if (saved === 'system' || !saved) {
+            setThemeState(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        }
     }, [])
 
     // Locale: sync <html> instantly
@@ -42,13 +48,21 @@ export function SiteProvider({ children, initialLocale, initialDirection }: Site
         html.lang = locale
         html.dir = locale === 'ar' ? 'rtl' : 'ltr'
         html.classList.toggle('rtl', locale === 'ar')
-        localStorage.setItem('ms-locale', locale)
+        localStorage.setItem(LOCALE_KEY, locale)
     }, [locale])
+
+    // Locale: restore from localStorage (overrides server default if stale)
+    useEffect(() => {
+        const saved = localStorage.getItem(LOCALE_KEY) as Locale | null
+        if (saved && saved !== locale) {
+            setLocaleState(saved)
+        }
+    }, [])
 
     // Theme: sync dark mode
     useEffect(() => {
         document.documentElement.classList.toggle('dark', theme === 'dark')
-        localStorage.setItem('ms-theme', theme)
+        localStorage.setItem(THEME_KEY, theme)
     }, [theme])
 
     // Set locale instantly + sync to Laravel session in background

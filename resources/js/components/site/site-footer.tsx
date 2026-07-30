@@ -14,8 +14,8 @@ export function SiteFooter() {
     ]
 
     const legalLinks = [
-        { href: '/privacy', label: locale === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy' },
-        { href: '/terms', label: locale === 'ar' ? 'الشروط والأحكام' : 'Terms of Use' },
+        { href: '/privacy-policy', label: locale === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy' },
+        { href: '/terms-of-use', label: locale === 'ar' ? 'الشروط والأحكام' : 'Terms of Use' },
     ]
 
     const socials = [

@@ -33,11 +33,8 @@ Route::get('/contact', [SiteController::class, 'contact'])->name('contact');
 Route::get('/reviews', [SiteController::class, 'reviews'])->name('reviews');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
-// Route::get('/privacy', [SiteController::class, 'privacy'])->name('privacy');
-// Route::get('/terms', [SiteController::class, 'terms'])->name('terms');
-
-Route::get('/terms', fn () => app(SiteContentController::class)->show('terms'))->name('terms');
-Route::get('/policies', fn () => app(SiteContentController::class)->show('policies'))->name('policies');
+Route::get('/terms-of-use', fn () => app(SiteContentController::class)->show('terms-of-use'))->name('terms-of-use');
+Route::get('/privacy-policy', fn () => app(SiteContentController::class)->show('privacy-policy'))->name('privacy-policy');
 
 // Public form submissions
 Route::post('/contact', [LeadController::class, 'publicStore'])->name('contact.store');
@@ -171,10 +168,10 @@ Route::middleware(['auth'])->group(function () {
     // ═══════════════════════════════════════════════════════
     // CMS PAGES
     // ═══════════════════════════════════════════════════════
-    Route::get('dashboard/pages/terms', fn () => app(SiteContentController::class)->edit('terms'))->name('dashboard.pages.terms.edit');
-    Route::put('dashboard/pages/terms', fn (Request $request) => app(SiteContentController::class)->update($request, 'terms'))->name('dashboard.pages.terms.update');
-    Route::get('dashboard/pages/policies', fn () => app(SiteContentController::class)->edit('policies'))->name('dashboard.pages.policies.edit');
-    Route::put('dashboard/pages/policies', fn (Request $request) => app(SiteContentController::class)->update($request, 'policies'))->name('dashboard.pages.policies.update');
+    Route::get('dashboard/pages/privacy-policy', fn () => app(SiteContentController::class)->edit('privacy-policy'))->name('dashboard.pages.privacy-policy.edit');
+    Route::put('dashboard/pages/privacy-policy', fn (Request $request) => app(SiteContentController::class)->update($request, 'privacy-policy'))->name('dashboard.pages.privacy-policy.update');
+    Route::get('dashboard/pages/terms-of-use', fn () => app(SiteContentController::class)->edit('terms-of-use'))->name('dashboard.pages.terms-of-use.edit');
+    Route::put('dashboard/pages/terms-of-use', fn (Request $request) => app(SiteContentController::class)->update($request, 'terms-of-use'))->name('dashboard.pages.terms-of-use.update');
 
     // ═══════════════════════════════════════════════════════
     // FAQS

@@ -2,6 +2,7 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { Link } from '@inertiajs/react';
+import { useSite } from '@/context/site-context';
 import {
     Award,
     BookOpen,
@@ -21,8 +22,10 @@ import {
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
+    const { isRTL } = useSite();
+
     return (
-        <Sidebar collapsible="icon" variant="inset" side="left">
+        <Sidebar collapsible="icon" variant="inset" side={isRTL ? 'right' : 'left'}>
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -74,10 +77,10 @@ export function AppSidebar() {
 
 
                 <NavMain
-                    label="Lagel"
+                    label="Legal"
                     items={[
-                        { title: 'Privacy Polices', url: '/dashboard/pages/terms', icon: BookOpen },
-                        { title: 'Terms of use', url: '/dashboard/pages/policies', icon: BookOpen },
+                        { title: 'Privacy Policy', url: '/dashboard/pages/privacy-policy', icon: BookOpen },
+                        { title: 'Terms of Use', url: '/dashboard/pages/terms-of-use', icon: BookOpen },
                     ]}
                 />
 
