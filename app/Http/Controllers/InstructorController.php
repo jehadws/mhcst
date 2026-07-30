@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreInstructorRequest;
 use App\Models\Instructor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class InstructorController extends Controller
@@ -15,7 +14,7 @@ class InstructorController extends Controller
         $query = Instructor::withCount('courses');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('name', 'like', '%'.$request->search.'%');
         }
 
         return Inertia::render('dashboard/instructors/list', [
@@ -38,12 +37,13 @@ class InstructorController extends Controller
         }
 
         Instructor::create($data);
+
         return to_route('dashboard.instructors.list');
     }
 
     public function show(Instructor $instructor)
     {
-        return Inertia::render('dashboard/instructors/details', [
+        return Inertia::render('dashboard/instructors/show', [
             'instructor' => $instructor->load('courses'),
         ]);
     }
@@ -60,30 +60,30 @@ class InstructorController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('photo')) {
-            if ($instructor->photo) Storage::disk('public')->delete($instructor->photo);
             $data['photo'] = $request->file('photo')->store('instructors', 'public');
+        } else {
+            $instructor->updateImage($data['photo'] ?? null, 'photo');
+            $data['photo'] = $instructor->photo;
         }
 
         $instructor->update($data);
+
         return to_route('dashboard.instructors.list');
     }
 
     public function destroy(Instructor $instructor)
     {
-        if ($instructor->photo) Storage::disk('public')->delete($instructor->photo);
         $instructor->delete();
+
         return to_route('dashboard.instructors.list');
     }
 
     public function bulkActions(Request $request)
     {
         if ($request->input('action') === 'delete_selected') {
-            $instructors = Instructor::whereIn('id', $request->input('entries', []))->get();
-            foreach ($instructors as $inst) {
-                if ($inst->photo) Storage::disk('public')->delete($inst->photo);
-                $inst->delete();
-            }
+            Instructor::whereIn('id', $request->input('entries', []))->delete();
         }
+
         return to_route('dashboard.instructors.list');
     }
 }

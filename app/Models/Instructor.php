@@ -2,14 +2,18 @@
 
 namespace App\Models;
 
+use App\Traits\HasImage;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Instructor extends Model
 {
+    use HasImage;
+
+    protected string $imageField = 'photo';
+
     protected $fillable = [
         'name', 'bio_ar', 'bio_en', 'photo', 'email', 'phone',
-        'specialization', 'years_experience', 'social_links', 'is_active'
+        'specialization', 'years_experience', 'social_links', 'is_active',
     ];
 
     protected $casts = [

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBannerRequest;
 use App\Models\Banner;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class BannerController extends Controller
@@ -31,12 +30,13 @@ class BannerController extends Controller
         }
 
         Banner::create($data);
+
         return to_route('dashboard.banners.list');
     }
 
     public function show(Banner $banner)
     {
-        return Inertia::render('dashboard/banners/details', [
+        return Inertia::render('dashboard/banners/show', [
             'banner' => $banner,
         ]);
     }
@@ -53,30 +53,30 @@ class BannerController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('image')) {
-            if ($banner->image) Storage::disk('public')->delete($banner->image);
             $data['image'] = $request->file('image')->store('banners', 'public');
+        } else {
+            $banner->updateImage($data['image'] ?? null, 'image');
+            $data['image'] = $banner->image;
         }
 
         $banner->update($data);
+
         return to_route('dashboard.banners.list');
     }
 
     public function destroy(Banner $banner)
     {
-        if ($banner->image) Storage::disk('public')->delete($banner->image);
         $banner->delete();
+
         return to_route('dashboard.banners.list');
     }
 
     public function bulkActions(Request $request)
     {
         if ($request->input('action') === 'delete_selected') {
-            $items = Banner::whereIn('id', $request->input('entries', []))->get();
-            foreach ($items as $item) {
-                if ($item->image) Storage::disk('public')->delete($item->image);
-                $item->delete();
-            }
+            Banner::whereIn('id', $request->input('entries', []))->delete();
         }
+
         return to_route('dashboard.banners.list');
     }
 }

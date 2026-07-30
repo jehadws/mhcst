@@ -14,7 +14,7 @@ class CategoryController extends Controller
         $query = Category::with('parent')->withCount('courses');
 
         if ($request->filled('search')) {
-            $query->where('name_ar', 'like', '%' . $request->search . '%');
+            $query->where('name_ar', 'like', '%'.$request->search.'%');
         }
 
         return Inertia::render('dashboard/categories/list', [
@@ -25,7 +25,7 @@ class CategoryController extends Controller
 
     public function create()
     {
-        return Inertia::render('dashboard/categories/form', [
+        return Inertia::render('dashboard/categories/create', [
             'parents' => Category::query()->whereNull('parent_id')->get(['id', 'name_ar']),
         ]);
     }
@@ -33,19 +33,20 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request)
     {
         Category::create($request->validated());
+
         return to_route('dashboard.categories.list');
     }
 
     public function show(Category $category)
     {
-        return Inertia::render('dashboard/categories/details', [
+        return Inertia::render('dashboard/categories/show', [
             'category' => $category->load(['children', 'courses']),
         ]);
     }
 
     public function edit(Category $category)
     {
-        return Inertia::render('dashboard/categories/form', [
+        return Inertia::render('dashboard/categories/edit', [
             'category' => $category,
             'parents' => Category::query()
                 ->whereNull('parent_id')
@@ -61,6 +62,7 @@ class CategoryController extends Controller
         $data['slug'] = $request->input('slug', $category->slug);
 
         $category->update($data);
+
         return to_route('dashboard.categories.list');
     }
 
@@ -70,6 +72,7 @@ class CategoryController extends Controller
             return back()->withErrors(['message' => 'لا يمكن الحذف، يوجد عناصر مرتبطة']);
         }
         $category->delete();
+
         return to_route('dashboard.categories.list');
     }
 
@@ -78,6 +81,7 @@ class CategoryController extends Controller
         if ($request->input('action') === 'delete_selected') {
             Category::whereIn('id', $request->input('entries', []))->delete();
         }
+
         return to_route('dashboard.categories.list');
     }
 }

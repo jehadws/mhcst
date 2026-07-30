@@ -23,12 +23,13 @@ class NotificationTemplateController extends Controller
     public function store(StoreNotificationTemplateRequest $request)
     {
         NotificationTemplate::create($request->validated());
+
         return to_route('dashboard.notification-templates.list');
     }
 
     public function show(NotificationTemplate $notificationTemplate)
     {
-        return Inertia::render('dashboard/notification-templates/details', [
+        return Inertia::render('dashboard/notification-templates/show', [
             'template' => $notificationTemplate,
         ]);
     }
@@ -43,12 +44,14 @@ class NotificationTemplateController extends Controller
     public function update(StoreNotificationTemplateRequest $request, NotificationTemplate $notificationTemplate)
     {
         $notificationTemplate->update($request->validated());
+
         return to_route('dashboard.notification-templates.list');
     }
 
     public function destroy(NotificationTemplate $notificationTemplate)
     {
         $notificationTemplate->delete();
+
         return to_route('dashboard.notification-templates.list');
     }
 }

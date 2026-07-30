@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\HasImage;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Course extends Model
 {
-    use LogsActivity;
+    use HasImage, LogsActivity;
+
+    protected string $imageField = 'cover_image';
 
     protected $fillable = [
         'category_id', 'title_ar', 'title_en', 'slug', 'description_ar', 'description_en',

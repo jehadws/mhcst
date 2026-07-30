@@ -5,7 +5,6 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BlogPostController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CertificateController;
-use App\Http\Controllers\CmsPageController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EnrollmentController;
@@ -20,7 +19,9 @@ use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TestimonialController;
+use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [SiteController::class, 'home'])->name('home');
@@ -35,8 +36,8 @@ Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 // Route::get('/privacy', [SiteController::class, 'privacy'])->name('privacy');
 // Route::get('/terms', [SiteController::class, 'terms'])->name('terms');
 
-Route::get('/terms', fn() => app(SiteContentController::class)->show('terms'))->name('terms');
-Route::get('/policies', fn() => app(SiteContentController::class)->show('policies'))->name('policies');
+Route::get('/terms', fn () => app(SiteContentController::class)->show('terms'))->name('terms');
+Route::get('/policies', fn () => app(SiteContentController::class)->show('policies'))->name('policies');
 
 // Public form submissions
 Route::post('/contact', [LeadController::class, 'publicStore'])->name('contact.store');
@@ -45,6 +46,12 @@ Route::post('/review', [ReviewController::class, 'publicStore'])->name('review.p
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // ═══════════════════════════════════════════════════════
+    // UPLOADS (ImageUploader)
+    // ═══════════════════════════════════════════════════════
+    Route::post('uploads/image', [UploadController::class, 'store'])->name('uploads.image');
+    Route::delete('uploads/image', [UploadController::class, 'destroy'])->name('uploads.destroy');
 
     // ═══════════════════════════════════════════════════════
     // USERS
@@ -164,13 +171,10 @@ Route::middleware(['auth'])->group(function () {
     // ═══════════════════════════════════════════════════════
     // CMS PAGES
     // ═══════════════════════════════════════════════════════
-    Route::get('dashboard/cms-pages/list', [CmsPageController::class, 'index'])->name('dashboard.cms-pages.list');
-    Route::get('dashboard/cms-pages/create', [CmsPageController::class, 'create'])->name('dashboard.cms-pages.create');
-    Route::get('dashboard/cms-pages/{cmsPage}/edit', [CmsPageController::class, 'edit'])->name('dashboard.cms-pages.edit');
-    Route::get('dashboard/cms-pages/{cmsPage}', [CmsPageController::class, 'show'])->name('dashboard.cms-pages.show');
-    Route::post('dashboard/cms-pages', [CmsPageController::class, 'store'])->name('dashboard.cms-pages.store');
-    Route::put('dashboard/cms-pages/{cmsPage}', [CmsPageController::class, 'update'])->name('dashboard.cms-pages.update');
-    Route::delete('dashboard/cms-pages/{cmsPage}', [CmsPageController::class, 'destroy'])->name('dashboard.cms-pages.destroy');
+    Route::get('dashboard/pages/terms', fn () => app(SiteContentController::class)->edit('terms'))->name('dashboard.pages.terms.edit');
+    Route::put('dashboard/pages/terms', fn (Request $request) => app(SiteContentController::class)->update($request, 'terms'))->name('dashboard.pages.terms.update');
+    Route::get('dashboard/pages/policies', fn () => app(SiteContentController::class)->edit('policies'))->name('dashboard.pages.policies.edit');
+    Route::put('dashboard/pages/policies', fn (Request $request) => app(SiteContentController::class)->update($request, 'policies'))->name('dashboard.pages.policies.update');
 
     // ═══════════════════════════════════════════════════════
     // FAQS
@@ -222,13 +226,9 @@ Route::middleware(['auth'])->group(function () {
     // ═══════════════════════════════════════════════════════
     // SITE SETTINGS
     // ═══════════════════════════════════════════════════════
-    Route::get('dashboard/site-settings/list', [SiteSettingController::class, 'index'])->name('dashboard.site-settings.list');
-    Route::get('dashboard/site-settings/create', [SiteSettingController::class, 'create'])->name('dashboard.site-settings.create');
-    Route::get('dashboard/site-settings/{siteSetting}/edit', [SiteSettingController::class, 'edit'])->name('dashboard.site-settings.edit');
-    Route::get('dashboard/site-settings/{siteSetting}', [SiteSettingController::class, 'show'])->name('dashboard.site-settings.show');
-    Route::post('dashboard/site-settings', [SiteSettingController::class, 'store'])->name('dashboard.site-settings.store');
-    Route::put('dashboard/site-settings/{siteSetting}', [SiteSettingController::class, 'update'])->name('dashboard.site-settings.update');
-    Route::delete('dashboard/site-settings/{siteSetting}', [SiteSettingController::class, 'destroy'])->name('dashboard.site-settings.destroy');
+    Route::get('dashboard/site-settings', [SiteSettingController::class, 'edit'])->name('dashboard.site-settings.edit');
+    Route::put('dashboard/site-settings', [SiteSettingController::class, 'update'])->name('dashboard.site-settings.update');
+
 });
 
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');

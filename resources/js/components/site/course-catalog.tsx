@@ -1,76 +1,72 @@
-import { useMemo, useState } from 'react'
-import { Search, SlidersHorizontal, X } from 'lucide-react'
-import { categories, levelLabels, type CourseCategory, type Level } from '@/data/courses'
-import { useSite } from '@/context/site-context'
-import { cn } from '@/lib/utils'
-import { CourseCard } from './course-card'
+import { useSite } from '@/context/site-context';
+import { categories, levelLabels, type CourseCategory, type Level } from '@/data/courses';
+import { cn } from '@/lib/utils';
+import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { CourseCard } from './course-card';
 
-type Sort = 'popular' | 'rating' | 'price-low' | 'price-high'
+type Sort = 'popular' | 'rating' | 'price-low' | 'price-high';
 
 export function CourseCatalog({ courses }: { courses: any[] }) {
-    const { t, tr, dir } = useSite()
-    const [query, setQuery] = useState('')
-    const [category, setCategory] = useState<CourseCategory | 'all'>('all')
-    const [level, setLevel] = useState<Level | 'all'>('all')
-    const [sort, setSort] = useState<Sort>('popular')
+    const { t, tr, dir } = useSite();
+    const [query, setQuery] = useState('');
+    const [category, setCategory] = useState<CourseCategory | 'all'>('all');
+    const [level, setLevel] = useState<Level | 'all'>('all');
+    const [sort, setSort] = useState<Sort>('popular');
 
-    const levels: Level[] = ['beginner', 'intermediate', 'advanced']
+    const levels: Level[] = ['beginner', 'intermediate', 'advanced'];
 
     const filtered = useMemo(() => {
-        const q = query.trim().toLowerCase()
+        const q = query.trim().toLowerCase();
         let list = courses.filter((c) => {
-            const matchesCategory = category === 'all' || c.category === category
-            const matchesLevel = level === 'all' || c.level === level
-            const haystack = [c.title_en, c.title_ar, c.bio_en, c.bio_ar, c.instructors[0].name, c.instructors[0].name]
-                .join(' ')
-                .toLowerCase()
-            const matchesQuery = q === '' || haystack.includes(q)
-            return matchesCategory && matchesLevel && matchesQuery
-        })
+            const matchesCategory = category === 'all' || c.category === category;
+            const matchesLevel = level === 'all' || c.level === level;
+            const haystack = [c.title_en, c.title_ar, c.bio_en, c.bio_ar, c.instructors[0].name, c.instructors[0].name].join(' ').toLowerCase();
+            const matchesQuery = q === '' || haystack.includes(q);
+            return matchesCategory && matchesLevel && matchesQuery;
+        });
 
         list = [...list].sort((a, b) => {
             switch (sort) {
                 case 'rating':
-                    return b.rating - a.rating
+                    return b.rating - a.rating;
                 case 'price-low':
-                    return a.price_usd - b.price_usd
+                    return a.price_usd - b.price_usd;
                 case 'price-high':
-                    return b.price_usd - a.price_usd
+                    return b.price_usd - a.price_usd;
                 default:
-                    return b.reviews - a.reviews
+                    return b.reviews - a.reviews;
             }
-        })
-        return list
-    }, [query, category, level, sort])
+        });
+        return list;
+    }, [query, category, level, sort]);
 
-    const hasFilters = query !== '' || category !== 'all' || level !== 'all'
+    const hasFilters = query !== '' || category !== 'all' || level !== 'all';
 
     const clear = () => {
-        setQuery('')
-        setCategory('all')
-        setLevel('all')
-        setSort('popular')
-    }
+        setQuery('');
+        setCategory('all');
+        setLevel('all');
+        setSort('popular');
+    };
 
     const selectClasses =
-        'h-10 rounded-lg border border-input bg-card px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40'
+        'h-10 rounded-lg border border-input bg-card px-3 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40';
 
     return (
         <section id="courses" className="scroll-mt-20">
-            <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20">
+            <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20">
                 <div className="max-w-2xl">
-                    <h2 className="text-balance font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-                        {t.catalog.title}
-                    </h2>
-                    <p className="mt-3 text-pretty leading-relaxed text-muted-foreground">{t.catalog.subtitle}</p>
+                    <h2 className="text-foreground font-serif text-3xl font-bold tracking-tight sm:text-4xl">{t.catalog.title}</h2>
+                    <p className="text-muted-foreground mt-3 leading-relaxed text-pretty">{t.catalog.subtitle}</p>
                 </div>
 
                 {/* Controls */}
-                <div className="mt-8 rounded-2xl border border-border bg-card p-4 sm:p-5">
+                <div className="border-border bg-card mt-8 rounded-2xl border p-4 sm:p-5">
                     <div className="relative">
                         <Search
                             className={cn(
-                                'pointer-events-none absolute top-1/2 size-4 -translate-y-1/2 text-muted-foreground',
+                                'text-muted-foreground pointer-events-none absolute top-1/2 size-4 -translate-y-1/2',
                                 dir === 'rtl' ? 'right-3' : 'left-3',
                             )}
                         />
@@ -80,15 +76,15 @@ export function CourseCatalog({ courses }: { courses: any[] }) {
                             onChange={(e) => setQuery(e.target.value)}
                             placeholder={t.catalog.searchPlaceholder}
                             className={cn(
-                                'h-11 w-full rounded-lg border border-input bg-background text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40',
-                                dir === 'rtl' ? 'pr-9 pl-3' : 'pl-9 pr-3',
+                                'border-input bg-background focus-visible:border-ring focus-visible:ring-ring/40 h-11 w-full rounded-lg border text-sm transition-colors outline-none focus-visible:ring-2',
+                                dir === 'rtl' ? 'pr-9 pl-3' : 'pr-3 pl-9',
                             )}
                             aria-label={t.catalog.searchPlaceholder}
                         />
                     </div>
 
                     <div className="mt-4 flex flex-wrap items-center gap-3">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <div className="text-muted-foreground flex items-center gap-2 text-sm">
                             <SlidersHorizontal className="size-4" />
                         </div>
                         <select
@@ -135,15 +131,15 @@ export function CourseCatalog({ courses }: { courses: any[] }) {
 
                 {/* Results meta */}
                 <div className="mt-6 flex items-center justify-between">
-                    <p className="text-sm text-muted-foreground">
-                        <span className="font-semibold text-foreground">{filtered.length}</span>{' '}
+                    <p className="text-muted-foreground text-sm">
+                        <span className="text-foreground font-semibold">{filtered.length}</span>{' '}
                         {filtered.length === 1 ? t.catalog.resultsOne : t.catalog.resultsMany}
                     </p>
                     {hasFilters && (
                         <button
                             type="button"
                             onClick={clear}
-                            className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                            className="text-muted-foreground hover:bg-secondary hover:text-foreground inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors"
                         >
                             <X className="size-4" />
                             {t.catalog.clear}
@@ -159,12 +155,12 @@ export function CourseCatalog({ courses }: { courses: any[] }) {
                         ))}
                     </div>
                 ) : (
-                    <div className="mt-6 rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+                    <div className="border-border bg-card mt-6 rounded-2xl border border-dashed p-12 text-center">
                         <p className="text-muted-foreground">{t.catalog.empty}</p>
                         <button
                             type="button"
                             onClick={clear}
-                            className="mt-4 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary"
+                            className="border-border bg-background hover:bg-secondary mt-4 rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
                         >
                             {t.catalog.clear}
                         </button>
@@ -172,5 +168,5 @@ export function CourseCatalog({ courses }: { courses: any[] }) {
                 )}
             </div>
         </section>
-    )
+    );
 }

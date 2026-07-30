@@ -1,12 +1,27 @@
-import { Category, Course, Instructor } from "@/types";
-import { CourseForm } from "./create";
+import AppLayout from "@/layouts/app-layout";
+import { BreadcrumbItem, Category, Course, Instructor } from "@/types";
+import { Head } from "@inertiajs/react";
+import CourseForm from "@/components/forms/course-form";
 
 interface Props {
-    course: Course;
-    categories: Category[];
-    instructors: Instructor[];
+  course: Course;
+  categories: Category[];
+  instructors: Instructor[];
 }
 
-export default function EditCoursePage({ course, categories, instructors }: Props) {
-    return <CourseForm course={course} categories={categories} instructors={instructors} />;
+const breadcrumbs: BreadcrumbItem[] = [
+  { title: 'لوحة التحكم', href: '/dashboard' },
+  { title: 'الدورات', href: '/dashboard/courses/list' },
+  { title: 'تعديل', href: '#' },
+];
+
+export default function EditCourse({ course, categories, instructors }: Props) {
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="تعديل دورة" />
+      <div className="flex h-full flex-1 flex-col gap-4 p-4">
+        <CourseForm course={course} categories={categories} instructors={instructors} />
+      </div>
+    </AppLayout>
+  );
 }

@@ -20,9 +20,9 @@ class EnrollmentController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('full_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%')
-                  ->orWhere('phone', 'like', '%' . $request->search . '%');
+                $q->where('full_name', 'like', '%'.$request->search.'%')
+                    ->orWhere('email', 'like', '%'.$request->search.'%')
+                    ->orWhere('phone', 'like', '%'.$request->search.'%');
             });
         }
         if ($request->filled('status')) {
@@ -53,12 +53,13 @@ class EnrollmentController extends Controller
     public function store(StoreEnrollmentRequest $request)
     {
         Enrollment::create($request->validated());
+
         return to_route('dashboard.enrollments.list');
     }
 
     public function show(Enrollment $enrollment)
     {
-        return Inertia::render('dashboard/enrollments/details', [
+        return Inertia::render('dashboard/enrollments/show', [
             'enrollment' => $enrollment->load(['course', 'student', 'statusHistory.changedBy', 'certificate']),
         ]);
     }
@@ -109,6 +110,7 @@ class EnrollmentController extends Controller
     public function destroy(Enrollment $enrollment)
     {
         $enrollment->delete();
+
         return to_route('dashboard.enrollments.list');
     }
 
@@ -117,6 +119,7 @@ class EnrollmentController extends Controller
         if ($request->input('action') === 'delete_selected') {
             Enrollment::whereIn('id', $request->input('entries', []))->delete();
         }
+
         return to_route('dashboard.enrollments.list');
     }
 }

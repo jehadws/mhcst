@@ -6,7 +6,6 @@ use App\Http\Requests\StoreBlogPostRequest;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class BlogPostController extends Controller
@@ -19,7 +18,7 @@ class BlogPostController extends Controller
             $query->where('status', $request->status);
         }
         if ($request->filled('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%');
+            $query->where('title', 'like', '%'.$request->search.'%');
         }
 
         return Inertia::render('dashboard/blog-posts/list', [
@@ -43,12 +42,13 @@ class BlogPostController extends Controller
         }
 
         BlogPost::create($data);
+
         return to_route('dashboard.blog-posts.list');
     }
 
     public function show(BlogPost $blogPost)
     {
-        return Inertia::render('dashboard/blog-posts/details', [
+        return Inertia::render('dashboard/blog-posts/show', [
             'post' => $blogPost->load('author'),
         ]);
     }
@@ -65,30 +65,30 @@ class BlogPostController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('cover_image')) {
-            if ($blogPost->cover_image) Storage::disk('public')->delete($blogPost->cover_image);
             $data['cover_image'] = $request->file('cover_image')->store('blog', 'public');
+        } else {
+            $blogPost->updateImage($data['cover_image'] ?? null, 'cover_image');
+            $data['cover_image'] = $blogPost->cover_image;
         }
 
         $blogPost->update($data);
+
         return to_route('dashboard.blog-posts.list');
     }
 
     public function destroy(BlogPost $blogPost)
     {
-        if ($blogPost->cover_image) Storage::disk('public')->delete($blogPost->cover_image);
         $blogPost->delete();
+
         return to_route('dashboard.blog-posts.list');
     }
 
     public function bulkActions(Request $request)
     {
         if ($request->input('action') === 'delete_selected') {
-            $posts = BlogPost::whereIn('id', $request->input('entries', []))->get();
-            foreach ($posts as $post) {
-                if ($post->cover_image) Storage::disk('public')->delete($post->cover_image);
-                $post->delete();
-            }
+            BlogPost::whereIn('id', $request->input('entries', []))->delete();
         }
+
         return to_route('dashboard.blog-posts.list');
     }
 }

@@ -66,10 +66,18 @@ export function AppSidebar() {
                     label="Content"
                     items={[
                         { title: 'Blog Posts', url: '/dashboard/blog-posts/list', icon: FileText },
-                        { title: 'Pages', url: '/dashboard/cms-pages/list', icon: BookOpen },
                         { title: 'Banners', url: '/dashboard/banners/list', icon: Image },
                         { title: 'Testimonials', url: '/dashboard/testimonials/list', icon: Star },
                         { title: 'FAQs', url: '/dashboard/faqs/list', icon: HelpCircle },
+                    ]}
+                />
+
+
+                <NavMain
+                    label="Lagel"
+                    items={[
+                        { title: 'Privacy Polices', url: '/dashboard/pages/terms', icon: BookOpen },
+                        { title: 'Terms of use', url: '/dashboard/pages/policies', icon: BookOpen },
                     ]}
                 />
 
@@ -77,7 +85,7 @@ export function AppSidebar() {
                     label="Settings"
                     items={[
                         { title: 'Users', url: '/dashboard/users/list', icon: Users },
-                        { title: 'Site Settings', url: '/dashboard/settings/site-content', icon: Settings },
+                        { title: 'Site Settings', url: '/dashboard/site-settings', icon: Settings },
                     ]}
                 />
             </SidebarContent>

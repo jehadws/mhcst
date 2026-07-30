@@ -12,7 +12,14 @@ class StoreCategoryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->parent_id === '0' || $this->parent_id === 0) {
+            $this->merge(['parent_id' => null]);
+        }
     }
 
     /**

@@ -2,31 +2,44 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 
 class StoreInstructorRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('social_links') && is_string($this->social_links)) {
+            $decoded = json_decode($this->social_links, true);
+            $this->merge([
+                'social_links' => is_array($decoded) ? $decoded : [],
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [
             'name' => 'required|string|max:255',
             'bio_ar' => 'nullable|string',
             'bio_en' => 'nullable|string',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => ['nullable', function ($attribute, $value, $fail) {
+                if ($value instanceof UploadedFile) {
+                    if (! str_starts_with($value->getMimeType(), 'image/')) {
+                        $fail('يجب أن تكون الصورة من نوع image.');
+                    }
+                    if ($value->getSize() > 2048 * 1024) {
+                        $fail('حجم الصورة يتجاوز 2MB.');
+                    }
+                } elseif (! is_string($value)) {
+                    $fail('قيمة الصورة غير صالحة.');
+                }
+            }],
             'email' => 'nullable|email',
             'phone' => 'nullable|string|max:20',
             'specialization' => 'nullable|string|max:255',

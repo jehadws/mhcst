@@ -17,7 +17,7 @@ class CertificateController extends Controller
         $query = Certificate::with(['course', 'student']);
 
         if ($request->filled('search')) {
-            $query->where('certificate_number', 'like', '%' . $request->search . '%');
+            $query->where('certificate_number', 'like', '%'.$request->search.'%');
         }
 
         return Inertia::render('dashboard/certificates/list', [
@@ -26,14 +26,14 @@ class CertificateController extends Controller
         ]);
     }
 
-public function create()
-{
-    return Inertia::render('dashboard/certificates/form', [
-        'enrollments' => Enrollment::where('status', 'completed')
-            ->doesntHave('certificate')
-            ->with(['student', 'course'])
-            ->get(['id', 'full_name', 'course_id']),
-    ]);
+    public function create()
+    {
+        return Inertia::render('dashboard/certificates/create', [
+            'enrollments' => Enrollment::where('status', 'completed')
+                ->doesntHave('certificate')
+                ->with(['student', 'course'])
+                ->get(['id', 'full_name', 'course_id']),
+        ]);
     }
 
     public function store(StoreCertificateRequest $request)
@@ -50,20 +50,24 @@ public function create()
         }
 
         Certificate::create($data);
+
         return to_route('dashboard.certificates.list');
     }
 
     public function show(Certificate $certificate)
     {
-        return Inertia::render('dashboard/certificates/details', [
+        return Inertia::render('dashboard/certificates/show', [
             'certificate' => $certificate->load(['course', 'student', 'issuer']),
         ]);
     }
 
     public function destroy(Certificate $certificate)
     {
-        if ($certificate->file_path) Storage::disk('public')->delete($certificate->file_path);
+        if ($certificate->file_path) {
+            Storage::disk('public')->delete($certificate->file_path);
+        }
         $certificate->delete();
+
         return to_route('dashboard.certificates.list');
     }
 
@@ -72,10 +76,13 @@ public function create()
         if ($request->input('action') === 'delete_selected') {
             $certs = Certificate::whereIn('id', $request->input('entries', []))->get();
             foreach ($certs as $c) {
-                if ($c->file_path) Storage::disk('public')->delete($c->file_path);
+                if ($c->file_path) {
+                    Storage::disk('public')->delete($c->file_path);
+                }
                 $c->delete();
             }
         }
+
         return to_route('dashboard.certificates.list');
     }
 }

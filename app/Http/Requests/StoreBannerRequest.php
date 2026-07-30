@@ -2,28 +2,31 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 
 class StoreBannerRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'image' => 'required|image|max:2048',
+            'image' => ['nullable', function ($attribute, $value, $fail) {
+                if ($value instanceof UploadedFile) {
+                    if (! str_starts_with($value->getMimeType(), 'image/')) {
+                        $fail('يجب أن تكون الصورة من نوع image.');
+                    }
+                    if ($value->getSize() > 2048 * 1024) {
+                        $fail('حجم الصورة يتجاوز 2MB.');
+                    }
+                } elseif (! is_string($value)) {
+                    $fail('قيمة الصورة غير صالحة.');
+                }
+            }],
             'title' => 'nullable|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'cta_text' => 'nullable|string|max:100',

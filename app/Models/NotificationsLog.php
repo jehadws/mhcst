@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\NotificationsLogFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class NotificationsLog extends Model
 {
-    /** @use HasFactory<\Database\Factories\NotificationsLogFactory> */
+    /** @use HasFactory<NotificationsLogFactory> */
     use HasFactory;
 
     protected $table = 'notifications_logs';

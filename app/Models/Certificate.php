@@ -2,17 +2,18 @@
 
 namespace App\Models;
 
+use Database\Factories\CertificateFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Certificate extends Model
 {
-    /** @use HasFactory<\Database\Factories\CertificateFactory> */
+    /** @use HasFactory<CertificateFactory> */
     use HasFactory;
 
     protected $fillable = [
         'enrollment_id', 'student_id', 'course_id', 'certificate_number',
-        'file_path', 'issued_at', 'issued_by'
+        'file_path', 'issued_at', 'issued_by',
     ];
 
     protected $casts = [

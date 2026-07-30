@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreLeadRequest;
 use App\Models\Lead;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -28,7 +27,7 @@ class LeadController extends Controller
 
     public function show(Lead $lead)
     {
-        return Inertia::render('dashboard/leads/details', [
+        return Inertia::render('dashboard/leads/show', [
             'lead' => $lead,
         ]);
     }
@@ -40,12 +39,14 @@ class LeadController extends Controller
         ]);
 
         $lead->update($data);
+
         return to_route('dashboard.leads.list');
     }
 
     public function destroy(Lead $lead)
     {
         $lead->delete();
+
         return to_route('dashboard.leads.list');
     }
 

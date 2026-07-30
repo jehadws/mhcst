@@ -24,12 +24,13 @@ class FaqController extends Controller
     public function store(StoreFaqRequest $request)
     {
         Faq::create($request->validated());
+
         return to_route('dashboard.faqs.list');
     }
 
     public function show(Faq $faq)
     {
-        return Inertia::render('dashboard/faqs/details', [
+        return Inertia::render('dashboard/faqs/show', [
             'faq' => $faq,
         ]);
     }
@@ -44,12 +45,14 @@ class FaqController extends Controller
     public function update(StoreFaqRequest $request, Faq $faq)
     {
         $faq->update($request->validated());
+
         return to_route('dashboard.faqs.list');
     }
 
     public function destroy(Faq $faq)
     {
         $faq->delete();
+
         return to_route('dashboard.faqs.list');
     }
 
@@ -58,6 +61,7 @@ class FaqController extends Controller
         if ($request->input('action') === 'delete_selected') {
             Faq::whereIn('id', $request->input('entries', []))->delete();
         }
+
         return to_route('dashboard.faqs.list');
     }
 }

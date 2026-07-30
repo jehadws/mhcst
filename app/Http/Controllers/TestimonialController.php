@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTestimonialRequest;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class TestimonialController extends Controller
@@ -38,12 +37,13 @@ class TestimonialController extends Controller
         }
 
         Testimonial::create($data);
+
         return to_route('dashboard.testimonials.list');
     }
 
     public function show(Testimonial $testimonial)
     {
-        return Inertia::render('dashboard/testimonials/details', [
+        return Inertia::render('dashboard/testimonials/show', [
             'testimonial' => $testimonial,
         ]);
     }
@@ -60,30 +60,30 @@ class TestimonialController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('photo')) {
-            if ($testimonial->photo) Storage::disk('public')->delete($testimonial->photo);
             $data['photo'] = $request->file('photo')->store('testimonials', 'public');
+        } else {
+            $testimonial->updateImage($data['photo'] ?? null, 'photo');
+            $data['photo'] = $testimonial->photo;
         }
 
         $testimonial->update($data);
+
         return to_route('dashboard.testimonials.list');
     }
 
     public function destroy(Testimonial $testimonial)
     {
-        if ($testimonial->photo) Storage::disk('public')->delete($testimonial->photo);
         $testimonial->delete();
+
         return to_route('dashboard.testimonials.list');
     }
 
     public function bulkActions(Request $request)
     {
         if ($request->input('action') === 'delete_selected') {
-            $items = Testimonial::whereIn('id', $request->input('entries', []))->get();
-            foreach ($items as $item) {
-                if ($item->photo) Storage::disk('public')->delete($item->photo);
-                $item->delete();
-            }
+            Testimonial::whereIn('id', $request->input('entries', []))->delete();
         }
+
         return to_route('dashboard.testimonials.list');
     }
 }

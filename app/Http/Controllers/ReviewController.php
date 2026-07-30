@@ -38,12 +38,13 @@ class ReviewController extends Controller
     public function store(StoreReviewRequest $request)
     {
         Review::create($request->validated());
+
         return to_route('dashboard.reviews.list');
     }
 
     public function show(Review $review)
     {
-        return Inertia::render('dashboard/reviews/details', [
+        return Inertia::render('dashboard/reviews/show', [
             'review' => $review->load('course'),
         ]);
     }
@@ -59,12 +60,14 @@ class ReviewController extends Controller
     public function update(StoreReviewRequest $request, Review $review)
     {
         $review->update($request->validated());
+
         return to_route('dashboard.reviews.list');
     }
 
     public function destroy(Review $review)
     {
         $review->delete();
+
         return to_route('dashboard.reviews.list');
     }
 
@@ -76,6 +79,7 @@ class ReviewController extends Controller
         if ($request->input('action') === 'publish_selected') {
             Review::whereIn('id', $request->input('entries', []))->update(['is_published' => true]);
         }
+
         return to_route('dashboard.reviews.list');
     }
 }

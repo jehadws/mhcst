@@ -12,7 +12,7 @@ class UpdateStudentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,7 @@ class UpdateStudentRequest extends FormRequest
     {
         return [
             'full_name' => 'sometimes|string|max:255',
-            'email' => 'nullable|email|unique:students,email,' . $this->student?->id,
+            'email' => 'nullable|email|unique:students,email,'.$this->student?->id,
             'phone' => 'sometimes|string|max:20',
             'city' => 'nullable|string|max:100',
         ];

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Banner;
+use Illuminate\Database\Seeder;
 
 class BannerSeeder extends Seeder
 {

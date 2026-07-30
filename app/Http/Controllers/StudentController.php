@@ -16,9 +16,9 @@ class StudentController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('full_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%')
-                  ->orWhere('phone', 'like', '%' . $request->search . '%');
+                $q->where('full_name', 'like', '%'.$request->search.'%')
+                    ->orWhere('email', 'like', '%'.$request->search.'%')
+                    ->orWhere('phone', 'like', '%'.$request->search.'%');
             });
         }
 
@@ -36,17 +36,18 @@ class StudentController extends Controller
     public function store(StoreStudentRequest $request)
     {
         $data = $request->validated();
-        if (!empty($data['password'])) {
+        if (! empty($data['password'])) {
             $data['password'] = bcrypt($data['password']);
         }
 
         Student::create($data);
+
         return to_route('dashboard.students.list');
     }
 
     public function show(Student $student)
     {
-        return Inertia::render('dashboard/students/details', [
+        return Inertia::render('dashboard/students/show', [
             'student' => $student->load('enrollments.course'),
         ]);
     }
@@ -61,17 +62,19 @@ class StudentController extends Controller
     public function update(UpdateStudentRequest $request, Student $student)
     {
         $data = $request->validated();
-        if (!empty($data['password'])) {
+        if (! empty($data['password'])) {
             $data['password'] = bcrypt($data['password']);
         }
 
         $student->update($data);
+
         return to_route('dashboard.students.list');
     }
 
     public function destroy(Student $student)
     {
         $student->delete();
+
         return to_route('dashboard.students.list');
     }
 

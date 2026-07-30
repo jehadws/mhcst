@@ -34,7 +34,7 @@ export default function LeadShowPage({ lead }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={lead.name} />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4 max-w-3xl mx-auto">
+      <div className="flex h-full flex-1 flex-col gap-4 p-4">
         <Button variant="outline" onClick={() => router.get(route('dashboard.leads.list'))} className="w-fit">
           <ArrowRight className="w-4 h-4 ml-2" /> رجوع
         </Button>

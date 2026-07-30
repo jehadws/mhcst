@@ -9,7 +9,7 @@ class LocaleController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'locale' => ['required', 'string', 'in:' . implode(',', config('app.supported_locales', ['en']))],
+            'locale' => ['required', 'string', 'in:'.implode(',', config('app.supported_locales', ['en']))],
         ]);
 
         session(['locale' => $validated['locale']]);

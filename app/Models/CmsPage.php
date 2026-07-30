@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\CmsPageFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CmsPage extends Model
 {
-    /** @use HasFactory<\Database\Factories\CmsPageFactory> */
+    /** @use HasFactory<CmsPageFactory> */
     use HasFactory;
 
     public $timestamps = false;

@@ -8,7 +8,6 @@ use App\Models\Course;
 use App\Models\Instructor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class CourseController extends Controller
@@ -18,7 +17,7 @@ class CourseController extends Controller
         $query = Course::with(['category', 'instructors'])->withCount('enrollments');
 
         if ($request->filled('search')) {
-            $query->where('title_ar', 'like', '%' . $request->search . '%');
+            $query->where('title_ar', 'like', '%'.$request->search.'%');
         }
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -65,7 +64,7 @@ class CourseController extends Controller
 
     public function show(Course $course)
     {
-        return Inertia::render('dashboard/courses/details', [
+        return Inertia::render('dashboard/courses/show', [
             'course' => $course->load(['category', 'instructors', 'media', 'reviews.student']),
         ]);
     }
@@ -84,8 +83,10 @@ class CourseController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('cover_image')) {
-            if ($course->cover_image) Storage::disk('public')->delete($course->cover_image);
             $data['cover_image'] = $request->file('cover_image')->store('courses', 'public');
+        } else {
+            $course->updateImage($data['cover_image'] ?? null, 'cover_image');
+            $data['cover_image'] = $course->cover_image;
         }
 
         $course->update($data);
@@ -103,20 +104,17 @@ class CourseController extends Controller
 
     public function destroy(Course $course)
     {
-        if ($course->cover_image) Storage::disk('public')->delete($course->cover_image);
         $course->delete();
+
         return to_route('dashboard.courses.list');
     }
 
     public function bulkActions(Request $request)
     {
         if ($request->input('action') === 'delete_selected') {
-            $courses = Course::whereIn('id', $request->input('entries', []))->get();
-            foreach ($courses as $c) {
-                if ($c->cover_image) Storage::disk('public')->delete($c->cover_image);
-                $c->delete();
-            }
+            Course::whereIn('id', $request->input('entries', []))->delete();
         }
+
         return to_route('dashboard.courses.list');
     }
 }

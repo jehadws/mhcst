@@ -12,7 +12,7 @@ class StoreEnrollmentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -30,7 +30,7 @@ class StoreEnrollmentRequest extends FormRequest
             'phone' => 'required|string|max:20',
             'company_name' => 'nullable|string|max:255',
             'status' => 'required|in:pending,confirmed,completed,cancelled',
-            'payment_method' => 'required|in:cash,bank_transfer,other',
+            'payment_method' => 'nullable|in:cash,bank_transfer,other',
             'payment_status' => 'required|in:unpaid,partial,paid',
             'amount_due' => 'required|numeric|min:0',
             'amount_paid' => 'required|numeric|min:0',

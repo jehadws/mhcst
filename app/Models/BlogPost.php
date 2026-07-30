@@ -2,17 +2,21 @@
 
 namespace App\Models;
 
+use App\Traits\HasImage;
+use Database\Factories\BlogPostFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class BlogPost extends Model
 {
-    /** @use HasFactory<\Database\Factories\BlogPostFactory> */
-    use HasFactory;
+    /** @use HasFactory<BlogPostFactory> */
+    use HasFactory, HasImage;
+
+    protected string $imageField = 'cover_image';
 
     protected $fillable = [
         'author_id', 'title', 'slug', 'excerpt', 'content', 'cover_image',
-        'status', 'published_at', 'seo_title', 'seo_description'
+        'status', 'published_at', 'seo_title', 'seo_description',
     ];
 
     protected $casts = [
