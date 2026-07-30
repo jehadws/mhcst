@@ -106,7 +106,7 @@ export default function TestimonialsListPage() {
                     data={testimonials.data}
                     title="آراء العملاء"
                     description="التوصيات والآراء المعروضة في الموقع."
-                    searchKey="search"
+                    searchFields={['name', 'quote']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.testimonials.create'))}
                     onRefresh={() => router.reload()}

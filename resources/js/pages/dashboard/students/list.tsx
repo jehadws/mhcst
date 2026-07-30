@@ -131,7 +131,7 @@ export default function StudentsListPage() {
                     data={students.data}
                     title="المتدربين"
                     description="إدارة بيانات المتدربين المسجلين في المنصة."
-                    searchKey="search"
+                    searchFields={['full_name', 'email', 'phone']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.students.create'))}
                     onRefresh={() => router.reload()}

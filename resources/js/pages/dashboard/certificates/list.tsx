@@ -90,7 +90,7 @@ export default function CertificatesListPage() {
                     data={certificates.data}
                     title="الشهادات المعتمدة"
                     description="الشهادات المُصدّرة للمتدربين."
-                    searchKey="search"
+                    searchFields={['certificate_number', 'student.full_name', 'course.title_ar', 'course.title_en']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.certificates.create'))}
                     onRefresh={() => router.reload()}

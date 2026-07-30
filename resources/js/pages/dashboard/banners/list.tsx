@@ -94,7 +94,7 @@ export default function BannersListPage() {
                     data={banners}
                     title="البنرات الإعلانية"
                     description="الصور المعروضة في الصفحة الرئيسية."
-                    searchKey="search"
+                    searchFields={['title', 'subtitle']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.banners.create'))}
                     onRefresh={() => router.reload()}

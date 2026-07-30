@@ -100,7 +100,7 @@ export default function InstructorsListPage() {
                     data={instructors.data}
                     title="المدربون"
                     description="إدارة المدربين والمحاضرين."
-                    searchKey="search"
+                    searchFields={['name', 'specialization']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.instructors.create'))}
                     onRefresh={() => router.reload()}

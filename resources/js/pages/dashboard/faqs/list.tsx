@@ -95,7 +95,7 @@ export default function FaqsListPage() {
                     data={faqs}
                     title="الأسئلة الشائعة"
                     description="الأسئلة المعروضة في صفحة المساعدة."
-                    searchKey="search"
+                    searchFields={['question', 'answer']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.faqs.create'))}
                     onRefresh={() => router.reload()}

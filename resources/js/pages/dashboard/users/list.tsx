@@ -119,7 +119,7 @@ export default function UsersListPage({ users = [] }: Props) {
                     data={users}
                     title="المستخدمون"
                     description="إدارة حسابات المستخدمين والمشرفين."
-                    searchKey="name"
+                    searchFields={['name', 'email']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.users.create'))}
                     onRefresh={() => router.reload()}

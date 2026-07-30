@@ -130,7 +130,7 @@ export default function CoursesListPage() {
                     data={courses.data}
                     title="الدورات التدريبية"
                     description="إدارة الدورات والمحتوى التدريبي."
-                    searchKey="search"
+                    searchFields={['title_ar', 'title_en']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.courses.create'))}
                     onRefresh={() => router.reload()}

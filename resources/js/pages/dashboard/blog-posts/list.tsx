@@ -108,7 +108,7 @@ export default function BlogPostsListPage() {
                     data={posts.data}
                     title="المدونة"
                     description="المقالات والأخبار المنشورة."
-                    searchKey="search"
+                    searchFields={['title']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.blog-posts.create'))}
                     onRefresh={() => router.reload()}

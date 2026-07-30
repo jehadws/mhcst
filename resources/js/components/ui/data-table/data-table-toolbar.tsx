@@ -21,7 +21,8 @@ interface DataTableToolbarProps<TData> {
     }[]
     customFilter?: (value: any, filterValues: string[]) => boolean
   }[]
-  searchKey?: string
+  globalFilter?: string
+  onGlobalFilterChange?: (value: string) => void
   bulkActions?: {
     label: string
     action: (selectedRows: TData[]) => void
@@ -33,7 +34,8 @@ interface DataTableToolbarProps<TData> {
 export function DataTableToolbar<TData>({
   table,
   filterableColumns = [],
-  searchKey,
+  globalFilter,
+  onGlobalFilterChange,
   bulkActions = [],
   onAddNew,
   onRefresh,
@@ -55,11 +57,11 @@ export function DataTableToolbar<TData>({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-1 items-center space-x-2">
-        {searchKey && (
+        {onGlobalFilterChange && (
           <Input
             placeholder={`بحث...`}
-            value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-            onChange={(event) => table.getColumn(searchKey)?.setFilterValue(event.target.value)}
+            value={globalFilter ?? ""}
+            onChange={(event) => onGlobalFilterChange(event.target.value)}
             className="h-9 w-[150px] lg:w-[250px]"
           />
         )}

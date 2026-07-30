@@ -109,7 +109,7 @@ export default function LeadsListPage() {
                     data={leads.data}
                     title="الرسائل والاستفسارات"
                     description="رسائل التواصل وطلبات عروض الأسعار."
-                    searchKey="search"
+                    searchFields={['name', 'email', 'phone']}
                     bulkActions={bulkActions}
                     onRefresh={() => router.reload()}
                 />

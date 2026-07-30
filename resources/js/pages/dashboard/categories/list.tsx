@@ -88,7 +88,7 @@ export default function CategoriesListPage() {
                     data={categories.data}
                     title="التصنيفات"
                     description="تصنيفات الدورات التدريبية."
-                    searchKey="search"
+                    searchFields={['name_ar', 'name_en']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.categories.create'))}
                     onRefresh={() => router.reload()}

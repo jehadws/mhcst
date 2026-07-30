@@ -130,7 +130,7 @@ export default function EnrollmentsListPage() {
                     data={enrollments.data}
                     title="التسجيلات"
                     description="إدارة طلبات التسجيل في الدورات."
-                    searchKey="search"
+                    searchFields={['full_name', 'email', 'phone']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.enrollments.create'))}
                     onRefresh={() => router.reload()}

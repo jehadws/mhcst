@@ -18,12 +18,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
 
+function getNestedValue(obj: any, path: string): unknown {
+  return path.split('.').reduce((acc, key) => acc?.[key], obj)
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   title?: string
   description?: string
-  searchKey?: string
+  searchFields?: string[]
   filterableColumns?: {
     id: string
     title: string
@@ -47,7 +51,7 @@ export function DataTable<TData, TValue>({
   data,
   title,
   description,
-  searchKey,
+  searchFields,
   filterableColumns = [],
   bulkActions = [],
   initialPageSize = 10,
@@ -58,6 +62,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+  const [globalFilter, setGlobalFilter] = React.useState('')
 
   const table = useReactTable({
     data,
@@ -70,6 +75,15 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: (row, _columnId, filterValue: string) => {
+      if (!filterValue || !searchFields?.length) return true
+      const q = String(filterValue).toLowerCase()
+      return searchFields.some((field) => {
+        const val = getNestedValue(row.original, field)
+        return val != null && String(val).toLowerCase().includes(q)
+      })
+    },
     initialState: {
       pagination: {
         pageSize: initialPageSize,
@@ -80,6 +94,7 @@ export function DataTable<TData, TValue>({
       columnFilters,
       columnVisibility,
       rowSelection,
+      globalFilter,
     },
   })
 
@@ -94,7 +109,8 @@ export function DataTable<TData, TValue>({
       <DataTableToolbar
         table={table}
         filterableColumns={filterableColumns}
-        searchKey={searchKey}
+        globalFilter={globalFilter}
+        onGlobalFilterChange={setGlobalFilter}
         bulkActions={bulkActions}
         onAddNew={onAddNew}
         onRefresh={onRefresh}
