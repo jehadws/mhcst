@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { router } from '@inertiajs/react'
 import { Award, BookOpen, GraduationCap, Search } from 'lucide-react'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
@@ -18,31 +17,45 @@ interface Enrollment {
         title_en?: string
         slug: string
     }
+    student?: {
+        full_name: string
+        email?: string
+    }
     certificate?: {
         id: number
         certificate_number: string
     }
 }
 
-interface Props {
-    query?: string
-    enrollments?: Enrollment[]
-    searched?: boolean
-}
-
-export default function StudentPortal({ query = '', enrollments = [], searched = false }: Props) {
+export default function StudentPortal() {
     const { t, locale } = useSite()
-    const [inputVal, setInputVal] = useState(query)
+    const [inputVal, setInputVal] = useState('')
+    const [enrollments, setEnrollments] = useState<Enrollment[]>([])
+    const [searched, setSearched] = useState(false)
     const [loading, setLoading] = useState(false)
 
-    const handleSearch = (e: React.FormEvent) => {
+    const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!inputVal.trim()) return
+
         setLoading(true)
-        router.get(route('student.portal'), { query: inputVal.trim() }, {
-            preserveState: false,
-            onFinish: () => setLoading(false),
-        })
+        try {
+            const url = route ? route('student.portal.search', { query: inputVal.trim() }) : `/student/portal/search?query=${encodeURIComponent(inputVal.trim())}`
+            const res = await fetch(url, {
+                headers: {
+                    'Accept': 'application/json',
+                },
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setEnrollments(data.enrollments || [])
+                setSearched(true)
+            }
+        } catch (err) {
+            console.error('Failed to search enrollments:', err)
+        } finally {
+            setLoading(false)
+        }
     }
 
     const statusBadge = (status: string) => {
@@ -133,6 +146,9 @@ export default function StudentPortal({ query = '', enrollments = [], searched =
                                     <div className="grid gap-4 sm:grid-cols-1">
                                         {enrollments.map((enr) => {
                                             const courseName = courseTitle(enr.course, locale)
+                                            const learnerName = enr.student?.full_name || enr.full_name
+                                            const learnerEmail = enr.student?.email || enr.email
+
                                             return (
                                                 <div key={enr.id} className="overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md">
                                                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -143,7 +159,7 @@ export default function StudentPortal({ query = '', enrollments = [], searched =
                                                             </div>
                                                             <h3 className="font-serif text-lg font-bold text-foreground">{courseName}</h3>
                                                             <p className="text-xs text-muted-foreground">
-                                                                {locale === 'ar' ? 'المتدرب:' : 'Learner:'} {enr.full_name} ({enr.email})
+                                                                {locale === 'ar' ? 'المتدرب:' : 'Learner:'} {learnerName} ({learnerEmail})
                                                             </p>
                                                         </div>
 

@@ -474,7 +474,8 @@ export const dictionary = {
                 saving: 'Saving...',
                 saveSettings: 'Save Settings',
                 fieldLabels: {
-                    site_name: 'Site Name',
+                    site_name: 'Site Name (English)',
+                    site_name_ar: 'Site Name (Arabic)',
                     site_tagline: 'Tagline',
                     site_logo: 'Site Logo',
                     meta_description: 'Meta Description',
@@ -983,7 +984,8 @@ export const dictionary = {
                 saving: 'جارٍ الحفظ...',
                 saveSettings: 'حفظ الإعدادات',
                 fieldLabels: {
-                    site_name: 'اسم المنصة',
+                    site_name: 'اسم المنصة (بالإنجليزية)',
+                    site_name_ar: 'اسم المنصة (بالعربية)',
                     site_tagline: 'الشعار النصي',
                     site_logo: 'شعار الموقع',
                     meta_description: 'وصف الميتا',

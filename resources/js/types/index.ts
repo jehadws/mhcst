@@ -262,6 +262,7 @@ export interface SiteSetting {
 
 export interface SiteSettings {
     site_name?: string;
+    site_name_ar?: string;
     site_tagline?: string;
     site_logo?: string;
     contact_email?: string;

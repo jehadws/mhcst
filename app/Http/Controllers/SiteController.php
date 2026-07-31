@@ -83,9 +83,11 @@ class SiteController extends Controller
     public function contact(): Response
     {
         $courses = Course::where('status', 'published')->get(['id', 'title_ar', 'title_en', 'slug']);
+        $faqs = Faq::where('is_published', true)->get();
 
         return Inertia::render('site/contact', [
             'courses' => $courses,
+            'faqs' => $faqs,
         ]);
     }
 

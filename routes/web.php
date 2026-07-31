@@ -40,6 +40,7 @@ Route::redirect('/blog/{slug}', '/blog-posts/{slug}');
 Route::get('/verify-certificate', [CertificateController::class, 'verify'])->name('verify-certificate');
 Route::get('/verify-certificate/{number}/download', [CertificateController::class, 'publicDownload'])->name('certificates.public-download');
 Route::get('/student/portal', [StudentPortalController::class, 'index'])->name('student.portal');
+Route::get('/student/portal/search', [StudentPortalController::class, 'search'])->name('student.portal.search');
 Route::get('/terms-of-use', fn () => app(SiteContentController::class)->show('terms-of-use'))->name('terms-of-use');
 Route::get('/privacy-policy', fn () => app(SiteContentController::class)->show('privacy-policy'))->name('privacy-policy');
 

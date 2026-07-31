@@ -10,7 +10,7 @@ test('student portal page can be rendered', function () {
     $response->assertSuccessful();
 });
 
-test('student can lookup enrollments by email or phone', function () {
+test('student can lookup enrollments by email or phone via API', function () {
     $student = Student::factory()->create([
         'email' => 'student.portal.test@mhcst.edu.ly',
         'phone' => '+218919998877',
@@ -24,11 +24,9 @@ test('student can lookup enrollments by email or phone', function () {
         'status' => 'confirmed',
     ]);
 
-    $response = $this->get(route('student.portal', ['query' => 'student.portal.test@mhcst.edu.ly']));
+    $response = $this->getJson(route('student.portal.search', ['query' => 'student.portal.test@mhcst.edu.ly']));
 
-    $response->assertSuccessful();
-    $response->assertInertia(fn ($page) => $page
-        ->component('site/student/portal')
-        ->has('enrollments', 1)
-    );
+    $response->assertSuccessful()
+        ->assertJsonCount(1, 'enrollments')
+        ->assertJsonPath('enrollments.0.email', 'student.portal.test@mhcst.edu.ly');
 });

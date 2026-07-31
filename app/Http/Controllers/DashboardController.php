@@ -65,17 +65,20 @@ class DashboardController extends Controller
             ->get()
             ->map(fn ($row) => ['status' => $row->status, 'count' => $row->count]);
 
+        $locale = app()->getLocale();
+        $titleKey = $locale === 'ar' ? 'title_ar' : 'title_en';
+
         $topCourses = Enrollment::query()
-            ->select('course_id', DB::raw('COUNT(*) as count'))
+            ->select('course_id', DB::raw('COUNT(*) as total'))
             ->whereNotNull('course_id')
             ->with('course:id,title_ar,title_en')
             ->groupBy('course_id')
-            ->orderByDesc('count')
+            ->orderByDesc('total')
             ->take(5)
             ->get()
             ->map(fn ($row) => [
-                'title' => $row->course?->title_ar ?? $row->course?->title_en ?? '—',
-                'count' => $row->count,
+                'title' => $row->course ? ($row->course->{$titleKey} ?? $row->course->title_ar ?? $row->course->title_en ?? '—') : '—',
+                'count' => $row->total,
             ]);
 
         $leadsByMonth = $this->seriesByMonth(

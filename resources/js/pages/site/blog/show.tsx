@@ -20,7 +20,6 @@ interface BlogPost {
     cover_image?: string
     published_at?: string
     reading_time?: number
-    author?: { name: string }
 }
 
 interface Props {
@@ -93,14 +92,6 @@ export default function BlogShow({ post, related = [] }: Props) {
                                     <span className="flex items-center gap-1">
                                         <Clock className="size-3.5" />
                                         {post.reading_time} {locale === 'ar' ? 'دقائق للقراءة' : 'min read'}
-                                    </span>
-                                )}
-                                {post.author && (
-                                    <span className="flex items-center gap-1">
-                                        <span className="flex size-5 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
-                                            {post.author.name.charAt(0)}
-                                        </span>
-                                        {post.author.name}
                                     </span>
                                 )}
                             </div>
