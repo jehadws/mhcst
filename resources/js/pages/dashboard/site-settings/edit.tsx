@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import ImageUploader from '@/components/image-uploader';
 import type { BreadcrumbItem } from '@/types';
+import { useSite } from '@/context/site-context';
 
 interface SettingField {
     key: string;
@@ -23,46 +24,21 @@ interface SettingGroup {
     fields: SettingField[];
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'لوحة التحكم', href: '/dashboard' },
-    { title: 'إعدادات الموقع', href: '#' },
-];
-
-const fieldLabels: Record<string, string> = {
-    site_name: 'اسم المنصة',
-    site_tagline: 'الشعار النصي',
-    site_logo: 'شعار الموقع',
-    meta_description: 'وصف الميتا',
-    contact_email: 'البريد الإلكتروني',
-    contact_phone: 'رقم الهاتف',
-    whatsapp_number: 'رقم واتساب',
-    address: 'العنوان',
-    social_links: 'روابط التواصل الاجتماعي',
-    footer_text: 'نص التذييل',
-};
-
-const socialPlaceholders: Record<string, string> = {
-    facebook: 'https://facebook.com/...',
-    instagram: 'https://instagram.com/...',
-    linkedin: 'https://linkedin.com/...',
-    twitter: 'https://twitter.com/...',
-    youtube: 'https://youtube.com/...',
-    tiktok: 'https://tiktok.com/@...',
-    telegram: 'https://t.me/...',
-    whatsapp: 'https://wa.me/...',
-};
-
 function parseJson(value: string): Record<string, string> {
     try {
         const parsed = JSON.parse(value);
         if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
             return parsed;
         }
-    } catch {}
+    } catch {
+        return {};
+    }
     return {};
 }
 
 export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[] }) {
+    const { t } = useSite();
+    const d = t.dashboard;
     const [settings, setSettings] = useState<Record<string, string>>(() => {
         const initial: Record<string, string> = {};
         groups.forEach(g => g.fields.forEach(f => { initial[f.key] = f.value; }));
@@ -76,19 +52,26 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: d.sidebar.items.dashboard, href: '/dashboard' },
+        { title: d.siteSettings.title, href: '#' },
+    ];
+
     const handleValueChange = (key: string, value: string) => {
         setSettings(prev => ({ ...prev, [key]: value }));
         setErrors(prev => {
-            const { [`settings.${key}`]: _, ...rest } = prev;
-            return rest;
+            const next = { ...prev };
+            delete next[`settings.${key}`];
+            return next;
         });
     };
 
     const handleImageChange = (key: string, path: string | null) => {
         setSettings(prev => ({ ...prev, [key]: path || '' }));
         setErrors(prev => {
-            const { [`settings.${key}`]: _, ...rest } = prev;
-            return rest;
+            const next = { ...prev };
+            delete next[`settings.${key}`];
+            return next;
         });
     };
 
@@ -112,8 +95,9 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
 
     const removeSocialLink = (key: string) => {
         setSocialLinks(prev => {
-            const { [key]: _, ...rest } = prev;
-            return rest;
+            const next = { ...prev };
+            delete next[key];
+            return next;
         });
     };
 
@@ -124,7 +108,6 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
 
         const fd = new FormData();
         fd.append('_method', 'PUT');
-
         fd.append('settings[social_links]', JSON.stringify(socialLinks));
 
         Object.entries(settings).forEach(([key, value]) => {
@@ -135,12 +118,12 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
         router.post(route('dashboard.site-settings.update'), fd, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success('تم حفظ الإعدادات بنجاح');
+                toast.success(d.toast.savedSuccess);
                 setProcessing(false);
             },
             onError: (errs) => {
                 setErrors(errs);
-                toast.error('يرجى التحقق من الأخطاء أدناه');
+                toast.error(d.siteContent.validationError);
                 setProcessing(false);
             },
         });
@@ -151,13 +134,21 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
             if (settings[field.key]?.startsWith('http')) {
                 return settings[field.key];
             }
-
             return settings[field.key]
                 ? `/storage/${settings[field.key]}`
                 : '';
         }
-
         return settings[field.key] || '';
+    };
+
+    const fieldLabel = (key: string): string => {
+        const labels = d.siteSettings.fieldLabels as Record<string, string>;
+        return labels[key.toLowerCase()] || key;
+    };
+
+    const socialPlaceholder = (platform: string): string => {
+        const placeholders = d.siteSettings.social as Record<string, string>;
+        return placeholders[platform.toLowerCase()] || d.form.placeholders.socialUrl;
     };
 
     const renderField = (field: SettingField) => {
@@ -171,7 +162,7 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
                             value={settings[field.key]}
                             onChange={(path) => handleImageChange(field.key, path)}
                             folder="settings"
-                            label={fieldLabels[field.key] || field.key}
+                            label={fieldLabel(field.key)}
                         />
                         {error && <p className="text-sm text-destructive mt-1">{error}</p>}
                     </div>
@@ -180,7 +171,7 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
             case 'json':
                 return field.key === 'social_links' ? (
                     <div>
-                        <Label>{fieldLabels[field.key] || field.key}</Label>
+                        <Label>{fieldLabel(field.key)}</Label>
                         <div className="mt-2 space-y-3">
                             {Object.entries(socialLinks).map(([platform, url]) => (
                                 <div key={platform} className="flex items-start gap-2">
@@ -188,12 +179,12 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
                                         <Input
                                             value={platform}
                                             onChange={e => handleSocialKeyChange(platform, e.target.value)}
-                                            placeholder="المنصة"
+                                            placeholder={d.form.placeholders.socialPlatform}
                                         />
                                         <Input
                                             value={url}
                                             onChange={e => handleSocialValueChange(platform, e.target.value)}
-                                            placeholder={socialPlaceholders[platform] || 'رابط المنصة'}
+                                            placeholder={socialPlaceholder(platform)}
                                             dir="ltr"
                                         />
                                     </div>
@@ -209,14 +200,14 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
                                 </div>
                             ))}
                             <Button type="button" variant="outline" size="sm" onClick={addSocialLink}>
-                                <Plus className="h-4 w-4 ml-1" /> إضافة منصة
+                                <Plus className="h-4 w-4 ms-1" /> {d.siteSettings.social.add}
                             </Button>
                         </div>
                         {error && <p className="text-sm text-destructive mt-1">{error}</p>}
                     </div>
                 ) : (
                     <div>
-                        <Label>{fieldLabels[field.key] || field.key}</Label>
+                        <Label>{fieldLabel(field.key)}</Label>
                         <Textarea
                             value={getFieldValue(field)}
                             onChange={e => handleValueChange(field.key, e.target.value)}
@@ -231,7 +222,7 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
             default:
                 return (
                     <div>
-                        <Label>{fieldLabels[field.key] || field.key}</Label>
+                        <Label>{fieldLabel(field.key)}</Label>
                         <Input
                             value={getFieldValue(field)}
                             onChange={e => handleValueChange(field.key, e.target.value)}
@@ -243,19 +234,25 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
         }
     };
 
+    const translateTab = (label: string): string => {
+        const tabs = d.siteSettings.tabs as Record<string, string>;
+        const key = Object.keys(tabs).find(k => label.toLowerCase().includes(k));
+        return key ? tabs[key] : label;
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="إعدادات الموقع" />
+            <Head title={d.siteSettings.title} />
 
             <form onSubmit={handleSubmit}>
                 <div className="border-b">
                     <div className="flex items-center justify-between py-4 px-4">
                         <div>
-                            <h1 className="text-xl font-semibold">إعدادات الموقع</h1>
-                            <p className="text-sm text-muted-foreground">إدارة الإعدادات العامة للمنصة</p>
+                            <h1 className="text-xl font-semibold">{d.siteSettings.title}</h1>
+                            <p className="text-sm text-muted-foreground">{d.siteSettings.description}</p>
                         </div>
                         <Button disabled={processing} type="submit">
-                            {processing ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
+                            {processing ? d.siteSettings.saving : d.form.buttons.save}
                         </Button>
                     </div>
                 </div>
@@ -265,7 +262,7 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
                         <TabsList className="mb-6">
                             {groups.map(group => (
                                 <TabsTrigger key={group.label} value={group.label}>
-                                    {group.label}
+                                    {translateTab(group.label)}
                                 </TabsTrigger>
                             ))}
                         </TabsList>

@@ -1,3 +1,4 @@
+import { useSite } from "@/context/site-context";
 import { router, useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,9 @@ interface Props {
 }
 
 export default function CertificateForm({ enrollments }: Props) {
+  const { t } = useSite();
+  const d = t.dashboard;
+
   const { data, setData, post, processing, errors } = useForm({
     enrollment_id: '',
     certificate_number: '',
@@ -23,13 +27,13 @@ export default function CertificateForm({ enrollments }: Props) {
 
   return (
     <Card>
-      <CardHeader><CardTitle>إصدار شهادة جديدة</CardTitle></CardHeader>
+      <CardHeader><CardTitle>{d.form.buttons.creating}</CardTitle></CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="enrollment_id">التسجيل *</Label>
+            <Label htmlFor="enrollment_id">{d.form.labels.enrollment} *</Label>
             <Select value={data.enrollment_id} onValueChange={(v) => setData('enrollment_id', v)}>
-              <SelectTrigger><SelectValue placeholder="اختر المتدرب والدورة" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={d.form.placeholders.selectEnrollment} /></SelectTrigger>
               <SelectContent>
                 {enrollments.map(e => (
                   <SelectItem key={e.id} value={String(e.id)}>{e.full_name} — {e.course.title_ar}</SelectItem>
@@ -40,20 +44,20 @@ export default function CertificateForm({ enrollments }: Props) {
           </div>
 
           <div>
-            <Label htmlFor="certificate_number">رقم الشهادة *</Label>
+            <Label htmlFor="certificate_number">{d.form.labels.certificateNumber} *</Label>
             <Input id="certificate_number" value={data.certificate_number} onChange={e => setData('certificate_number', e.target.value)} dir="ltr" placeholder="MSET-XXXXXX" />
             {errors.certificate_number && <p className="text-sm text-red-500 mt-1">{errors.certificate_number}</p>}
           </div>
 
           <div>
-            <Label htmlFor="file">ملف الشهادة (PDF) *</Label>
+            <Label htmlFor="file">{d.form.labels.file} *</Label>
             <Input id="file" type="file" accept=".pdf,image/*" onChange={e => setData('file', e.target.files?.[0] || null)} />
             {errors.file && <p className="text-sm text-red-500 mt-1">{errors.file}</p>}
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => router.get(route('dashboard.certificates.list'))}>إلغاء</Button>
-            <Button type="submit" disabled={processing}>{processing ? 'جاري...' : 'إصدار الشهادة'}</Button>
+            <Button type="button" variant="outline" onClick={() => router.get(route('dashboard.certificates.list'))}>{d.form.buttons.cancel}</Button>
+            <Button type="submit" disabled={processing}>{processing ? d.form.buttons.saving : d.form.buttons.save}</Button>
           </div>
         </form>
       </CardContent>

@@ -1,5 +1,6 @@
 import AppLayout from "@/layouts/app-layout";
 import { BreadcrumbItem, Testimonial } from "@/types";
+import { useSite } from "@/context/site-context";
 import { Head, router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,9 +12,11 @@ interface Props {
 }
 
 export default function TestimonialDetailsPage({ testimonial }: Props) {
+    const { t } = useSite();
+    const d = t.dashboard;
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'لوحة التحكم', href: '/dashboard' },
-        { title: 'آراء العملاء', href: '/dashboard/testimonials/list' },
+        { title: d.sidebar.items.dashboard, href: '/dashboard' },
+        { title: d.sidebar.items.testimonials, href: '/dashboard/testimonials/list' },
         { title: testimonial.name, href: '#' },
     ];
 
@@ -23,10 +26,10 @@ export default function TestimonialDetailsPage({ testimonial }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                     <Button variant="outline" onClick={() => router.get(route('dashboard.testimonials.list'))}>
-                        <ArrowRight className="ml-2 h-4 w-4" /> رجوع للقائمة
+                        <ArrowRight className="ms-2 h-4 w-4" /> {d.show.backToList}
                     </Button>
                     <Button onClick={() => router.get(route('dashboard.testimonials.edit', testimonial.id))}>
-                        <Edit className="ml-2 h-4 w-4" /> تعديل الرأي
+                        <Edit className="ms-2 h-4 w-4" /> {d.show.edit} {d.entities.testimonial.singular}
                     </Button>
                 </div>
 
@@ -41,7 +44,7 @@ export default function TestimonialDetailsPage({ testimonial }: Props) {
                             )}
                         </div>
                         <Badge variant={testimonial.is_published ? 'default' : 'secondary'}>
-                            {testimonial.is_published ? 'منشور' : 'مسودة'}
+                            {d.status[testimonial.is_published ? 'published' : 'draft']}
                         </Badge>
                     </CardHeader>
                     <CardContent>

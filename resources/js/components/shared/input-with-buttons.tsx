@@ -41,7 +41,7 @@ export default function InputWithButtons({
         </Button>
       )}
       {showAddButton && (
-        <Button type="button" variant="outline" className="ml-1" onClick={onAdd}>
+        <Button type="button" variant="outline" className="ms-1" onClick={onAdd}>
           {rightButtonLabel ? rightButtonLabel : <Plus className="h-4 w-4" />}
         </Button>
       )}

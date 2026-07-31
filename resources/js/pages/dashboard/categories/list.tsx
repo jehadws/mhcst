@@ -1,4 +1,5 @@
 import AppLayout from "@/layouts/app-layout";
+import { useSite } from "@/context/site-context";
 import { BreadcrumbItem, Category, PaginatedData } from "@/types";
 import { Head, router, usePage } from "@inertiajs/react";
 import { useState } from "react";
@@ -11,20 +12,21 @@ import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'لوحة التحكم', href: '/dashboard' },
-    { title: 'التصنيفات', href: '/dashboard/categories/list' },
-];
-
 export default function CategoriesListPage() {
     const { categories } = usePage<{ categories: PaginatedData<Category> }>().props;
+    const { t } = useSite();
+    const d = t.dashboard;
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: d.sidebar.items.dashboard, href: '/dashboard' },
+        { title: d.sidebar.items.categories, href: '/dashboard/categories/list' },
+    ];
     const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, loading: false, item: null as Category | null });
 
     const handleDeleteConfirm = () => {
         if (!deleteDialog.item) return;
         router.delete(route('dashboard.categories.destroy', deleteDialog.item.id), {
-            onSuccess: () => { toast.success('تم الحذف'); setDeleteDialog({ isOpen: false, loading: false, item: null }); },
-            onError: () => toast.error('فشل الحذف'),
+            onSuccess: () => { toast.success(d.toast.deletedSuccess); setDeleteDialog({ isOpen: false, loading: false, item: null }); },
+            onError: () => toast.error(d.toast.deleteFailed),
         });
     };
 
@@ -32,15 +34,17 @@ export default function CategoriesListPage() {
         {
             id: 'select',
             header: ({ table }) => (
-                <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} />
+                <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} className="ms-2" />
             ),
-            cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />,
+            cell: ({ row }) => (
+                <Checkbox className="ms-2" checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />
+            ),
             enableSorting: false,
             enableHiding: false,
         },
         {
             accessorKey: 'name_ar',
-            header: 'الاسم',
+            header: d.columns.name,
             cell: ({ row }) => (
                 <div className="flex items-center gap-2">
                     <span className="text-lg">{row.original.icon}</span>
@@ -48,8 +52,8 @@ export default function CategoriesListPage() {
                 </div>
             ),
         },
-        { accessorKey: 'slug', header: 'المعرف' },
-        { accessorKey: 'sort_order', header: 'الترتيب' },
+        { accessorKey: 'slug', header: d.columns.slug },
+        { accessorKey: 'sort_order', header: d.columns.sortOrder },
         {
             id: 'actions',
             cell: ({ row }) => {
@@ -58,9 +62,9 @@ export default function CategoriesListPage() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => router.get(route('dashboard.categories.show', item.id))}><Eye className="w-4 h-4 ml-2" /> عرض</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => router.get(route('dashboard.categories.edit', item.id))}><Edit className="w-4 h-4 ml-2" /> تعديل</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setDeleteDialog({ isOpen: true, loading: false, item })} className="text-destructive"><Trash2 className="w-4 h-4 ml-2 text-destructive" /> حذف</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.get(route('dashboard.categories.show', item.id))}><Eye className="w-4 h-4 ms-2" /> {d.actions.view}</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.get(route('dashboard.categories.edit', item.id))}><Edit className="w-4 h-4 ms-2" /> {d.actions.edit}</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setDeleteDialog({ isOpen: true, loading: false, item })} className="text-destructive"><Trash2 className="w-4 h-4 ms-2 text-destructive" /> {d.actions.delete}</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );
@@ -70,10 +74,10 @@ export default function CategoriesListPage() {
 
     const bulkActions = [
         {
-            label: 'حذف المحدد',
+            label: `${d.actions.delete} ${d.entities.category.plural}`,
             action: (selectedRows: Category[]) => {
                 router.post(route('dashboard.categories.bulk-actions'), { action: 'delete_selected', entries: selectedRows.map(r => r.id) }, {
-                    onSuccess: () => toast.success('تم الحذف'), onError: () => toast.error('فشلت العملية')
+                    onSuccess: () => toast.success(d.toast.deletedSuccess), onError: () => toast.error(d.toast.operationFailed)
                 });
             },
         },
@@ -81,13 +85,13 @@ export default function CategoriesListPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="التصنيفات" />
+            <Head title={d.entities.category.plural} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <DataTable
                     columns={columns}
                     data={categories.data}
-                    title="التصنيفات"
-                    description="تصنيفات الدورات التدريبية."
+                    title={d.entities.category.plural}
+                    description={d.entities.category.description}
                     searchFields={['name_ar', 'name_en']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.categories.create'))}
@@ -97,10 +101,10 @@ export default function CategoriesListPage() {
                     isOpen={deleteDialog.isOpen}
                     onClose={() => setDeleteDialog({ isOpen: false, loading: false, item: null })}
                     onConfirm={handleDeleteConfirm}
-                    title="حذف تصنيف"
-                    description={`هل أنت متأكد من حذف "${deleteDialog.item?.name_ar}"؟`}
-                    confirmText="حذف"
-                    cancelText="إلغاء"
+                    title={`${d.confirm.deleteTitle} ${d.entities.category.singular}`}
+                    description={`${d.confirm.deleteDescription} "${deleteDialog.item?.name_ar}"؟`}
+                    confirmText={d.actions.delete}
+                    cancelText={d.actions.cancel}
                     variant="destructive"
                     loading={deleteDialog.loading}
                 />

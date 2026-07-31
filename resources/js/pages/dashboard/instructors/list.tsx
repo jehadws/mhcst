@@ -1,4 +1,5 @@
 import AppLayout from "@/layouts/app-layout";
+import { useSite } from "@/context/site-context";
 import { BreadcrumbItem, Instructor, PaginatedData } from "@/types";
 import { Head, router, usePage } from "@inertiajs/react";
 import { useState } from "react";
@@ -12,34 +13,39 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'لوحة التحكم', href: '/dashboard' },
-    { title: 'المدربون', href: '/dashboard/instructors/list' },
-];
-
 export default function InstructorsListPage() {
     const { instructors } = usePage<{ instructors: PaginatedData<Instructor> }>().props;
+    const { t } = useSite();
+    const d = t.dashboard;
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: d.sidebar.items.dashboard, href: '/dashboard' },
+        { title: d.sidebar.items.instructors, href: '/dashboard/instructors/list' },
+    ];
     const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, loading: false, item: null as Instructor | null });
 
     const handleDeleteConfirm = () => {
         if (!deleteDialog.item) return;
         router.delete(route('dashboard.instructors.destroy', deleteDialog.item.id), {
-            onSuccess: () => { toast.success('تم الحذف'); setDeleteDialog({ isOpen: false, loading: false, item: null }); },
-            onError: () => toast.error('فشل الحذف'),
+            onSuccess: () => { toast.success(d.toast.deletedSuccess); setDeleteDialog({ isOpen: false, loading: false, item: null }); },
+            onError: () => toast.error(d.toast.deleteFailed),
         });
     };
 
     const columns: ColumnDef<Instructor>[] = [
         {
             id: 'select',
-            header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} />,
-            cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />,
+            header: ({ table }) => (
+                <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} className="ms-2" />
+            ),
+            cell: ({ row }) => (
+                <Checkbox className="ms-2" checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />
+            ),
             enableSorting: false,
             enableHiding: false,
         },
         {
             accessorKey: 'name',
-            header: 'الاسم',
+            header: d.columns.name,
             cell: ({ row }) => (
                 <div className="flex items-center gap-3">
                     {row.original.photo ? (
@@ -51,14 +57,14 @@ export default function InstructorsListPage() {
                 </div>
             ),
         },
-        { accessorKey: 'specialization', header: 'التخصص' },
-        { accessorKey: 'years_experience', header: 'سنوات الخبرة' },
+        { accessorKey: 'specialization', header: d.columns.specialization },
+        { accessorKey: 'years_experience', header: d.columns.yearsExperience },
         {
             accessorKey: 'is_active',
-            header: 'الحالة',
+            header: d.columns.isActive,
             cell: ({ row }) => (
                 <Badge className={row.getValue('is_active') ? 'bg-green-500' : 'bg-gray-500'}>
-                    {row.getValue('is_active') ? 'نشط' : 'معطل'}
+                    {row.getValue('is_active') ? d.status.active : d.status.inactive}
                 </Badge>
             ),
         },
@@ -70,9 +76,9 @@ export default function InstructorsListPage() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => router.get(route('dashboard.instructors.show', item.id))}><Eye className="w-4 h-4 ml-2" /> عرض</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => router.get(route('dashboard.instructors.edit', item.id))}><Edit className="w-4 h-4 ml-2" /> تعديل</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setDeleteDialog({ isOpen: true, loading: false, item })} className="text-destructive"><Trash2 className="w-4 h-4 ml-2 text-destructive" /> حذف</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.get(route('dashboard.instructors.show', item.id))}><Eye className="w-4 h-4 ms-2" /> {d.actions.view}</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.get(route('dashboard.instructors.edit', item.id))}><Edit className="w-4 h-4 ms-2" /> {d.actions.edit}</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setDeleteDialog({ isOpen: true, loading: false, item })} className="text-destructive"><Trash2 className="w-4 h-4 ms-2 text-destructive" /> {d.actions.delete}</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );
@@ -82,10 +88,10 @@ export default function InstructorsListPage() {
 
     const bulkActions = [
         {
-            label: 'حذف المحدد',
+            label: `${d.actions.delete} ${d.entities.instructor.plural}`,
             action: (selectedRows: Instructor[]) => {
                 router.post(route('dashboard.instructors.bulk-actions'), { action: 'delete_selected', entries: selectedRows.map(r => r.id) }, {
-                    onSuccess: () => toast.success('تم الحذف'), onError: () => toast.error('فشلت العملية')
+                    onSuccess: () => toast.success(d.toast.deletedSuccess), onError: () => toast.error(d.toast.operationFailed)
                 });
             },
         },
@@ -93,13 +99,13 @@ export default function InstructorsListPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="المدربون" />
+            <Head title={d.entities.instructor.plural} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <DataTable
                     columns={columns}
                     data={instructors.data}
-                    title="المدربون"
-                    description="إدارة المدربين والمحاضرين."
+                    title={d.entities.instructor.plural}
+                    description={d.entities.instructor.description}
                     searchFields={['name', 'specialization']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.instructors.create'))}
@@ -109,10 +115,10 @@ export default function InstructorsListPage() {
                     isOpen={deleteDialog.isOpen}
                     onClose={() => setDeleteDialog({ isOpen: false, loading: false, item: null })}
                     onConfirm={handleDeleteConfirm}
-                    title="حذف مدرب"
-                    description={`هل أنت متأكد من حذف "${deleteDialog.item?.name}"؟`}
-                    confirmText="حذف"
-                    cancelText="إلغاء"
+                    title={`${d.confirm.deleteTitle} ${d.entities.instructor.singular}`}
+                    description={`${d.confirm.deleteDescription} "${deleteDialog.item?.name}"؟`}
+                    confirmText={d.actions.delete}
+                    cancelText={d.actions.cancel}
                     variant="destructive"
                     loading={deleteDialog.loading}
                 />

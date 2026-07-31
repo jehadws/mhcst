@@ -1,7 +1,7 @@
 import AppLayout from "@/layouts/app-layout";
+import { useSite } from "@/context/site-context";
 import { BreadcrumbItem, Enrollment, PaginatedData } from "@/types";
 import { Head, router, usePage } from "@inertiajs/react";
-import { useState } from "react";
 import { ColumnDef } from '@tanstack/react-table';
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable } from "@/components/ui/data-table/data-table";
@@ -11,73 +11,58 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'لوحة التحكم', href: '/dashboard' },
-    { title: 'التسجيلات', href: '/dashboard/enrollments/list' },
-];
-
-const statusLabels: Record<string, string> = {
-    pending: 'معلق',
-    confirmed: 'مؤكد',
-    completed: 'مكتمل',
-    cancelled: 'ملغي',
-};
-
-const paymentLabels: Record<string, string> = {
-    unpaid: 'غير مدفوع',
-    partial: 'جزئي',
-    paid: 'مدفوع',
-};
-
-const paymentColors: Record<string, string> = {
-    unpaid: 'bg-red-500',
-    partial: 'bg-yellow-500',
-    paid: 'bg-green-500',
-};
-
 export default function EnrollmentsListPage() {
     const { enrollments } = usePage<{ enrollments: PaginatedData<Enrollment> }>().props;
+    const { t } = useSite();
+    const d = t.dashboard;
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: d.sidebar.items.dashboard, href: '/dashboard' },
+        { title: d.sidebar.items.enrollments, href: '/dashboard/enrollments/list' },
+    ];
 
     const columns: ColumnDef<Enrollment>[] = [
         {
             id: 'select',
             header: ({ table }) => (
-                <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} />
+                <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} className="ms-2" />
             ),
-            cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />,
+            cell: ({ row }) => (
+                <Checkbox className="ms-2" checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />
+            ),
             enableSorting: false,
             enableHiding: false,
         },
         {
             accessorKey: 'full_name',
-            header: 'اسم المتدرب',
+            header: d.columns.fullName,
         },
         {
             accessorKey: 'course.title_ar',
-            header: 'الدورة',
+            header: d.columns.course,
             cell: ({ row }) => row.original.course?.title_ar || '-',
         },
         {
             accessorKey: 'status',
-            header: 'الحالة',
-            cell: ({ row }) => <Badge variant="outline">{statusLabels[row.getValue('status') as string]}</Badge>,
+            header: d.columns.status,
+            cell: ({ row }) => <Badge variant="outline">{d.status[row.getValue('status') as keyof typeof d.status]}</Badge>,
         },
         {
             accessorKey: 'payment_status',
-            header: 'الدفع',
+            header: d.columns.payment,
             cell: ({ row }) => {
                 const ps = row.getValue('payment_status') as string;
-                return <Badge className={paymentColors[ps]}>{paymentLabels[ps]}</Badge>;
+                const colorMap: Record<string, string> = { unpaid: 'bg-red-500', partial: 'bg-yellow-500', paid: 'bg-green-500' };
+                return <Badge className={colorMap[ps]}>{d.payment[ps as keyof typeof d.payment]}</Badge>;
             },
         },
         {
             accessorKey: 'amount_paid',
-            header: 'المبلغ',
+            header: d.columns.amount,
             cell: ({ row }) => `${row.original.amount_paid} / ${row.original.amount_due} د.ل`,
         },
         {
             accessorKey: 'source',
-            header: 'المصدر',
+            header: d.columns.source,
         },
         {
             id: 'actions',
@@ -87,10 +72,10 @@ export default function EnrollmentsListPage() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => router.get(route('dashboard.enrollments.show', item.id))}><Eye className="w-4 h-4 ml-2" /> عرض</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.get(route('dashboard.enrollments.show', item.id))}><Eye className="w-4 h-4 ms-2" /> {d.actions.view}</DropdownMenuItem>
                             {item.status === 'pending' && (
                                 <DropdownMenuItem onClick={() => router.post(route('dashboard.enrollments.status', item.id), { status: 'confirmed' })}>
-                                    <CheckCircle className="w-4 h-4 ml-2 text-green-600" /> تأكيد
+                                    <CheckCircle className="w-4 h-4 ms-2 text-green-600" /> {d.actions.confirm}
                                 </DropdownMenuItem>
                             )}
                         </DropdownMenuContent>
@@ -102,34 +87,34 @@ export default function EnrollmentsListPage() {
 
     const bulkActions = [
         {
-            label: 'تأكيد المحدد',
+            label: d.actions.confirm,
             action: (selectedRows: Enrollment[]) => {
                 selectedRows.forEach(row => {
                     router.post(route('dashboard.enrollments.status', row.id), { status: 'confirmed' });
                 });
-                toast.success('تم تأكيد التسجيلات');
+                toast.success(d.toast.confirmedSuccess);
             },
         },
         {
-            label: 'حذف المحدد',
+            label: `${d.actions.delete} ${d.entities.enrollment.plural}`,
             action: (selectedRows: Enrollment[]) => {
                 router.post(route('dashboard.enrollments.bulk-actions'), {
                     action: 'delete_selected',
                     entries: selectedRows.map(r => r.id),
-                }, { onSuccess: () => toast.success('تم الحذف') });
+                }, { onSuccess: () => toast.success(d.toast.deletedSuccess), onError: () => toast.error(d.toast.operationFailed) });
             },
         },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="التسجيلات" />
+            <Head title={d.entities.enrollment.plural} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <DataTable
                     columns={columns}
                     data={enrollments.data}
-                    title="التسجيلات"
-                    description="إدارة طلبات التسجيل في الدورات."
+                    title={d.entities.enrollment.plural}
+                    description={d.entities.enrollment.description}
                     searchFields={['full_name', 'email', 'phone']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.enrollments.create'))}

@@ -143,16 +143,28 @@ export interface Lead {
 export interface Testimonial {
     id: number;
     name: string;
+    full_name?: string;
+    job_title?: string;
+    organization?: string;
     role_title?: string;
     company?: string;
+    rating?: number;
     quote: string;
+    testimonial_ar?: string;
+    testimonial_en?: string;
     is_published: boolean;
+    is_active?: boolean;
+    photo?: string;
+    sort_order?: number;
 }
 
 export interface Banner {
     id: number;
     image: string;
     title?: string;
+    subtitle?: string;
+    cta_text?: string;
+    cta_link?: string;
     is_active: boolean;
     sort_order: number;
 }
@@ -160,8 +172,14 @@ export interface Banner {
 export interface Faq {
     id: number;
     question: string;
+    question_ar?: string;
+    question_en?: string;
     answer: string;
+    answer_ar?: string;
+    answer_en?: string;
+    sort_order: number;
     is_published: boolean;
+    is_active?: boolean;
 }
 
 export interface BlogPost {

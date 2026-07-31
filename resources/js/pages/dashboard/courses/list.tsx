@@ -1,4 +1,5 @@
 import AppLayout from "@/layouts/app-layout";
+import { useSite } from "@/context/site-context";
 import { BreadcrumbItem, Course, PaginatedData } from "@/types";
 import { Head, router, usePage } from "@inertiajs/react";
 import { useState } from "react";
@@ -12,31 +13,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'لوحة التحكم', href: '/dashboard' },
-    { title: 'الدورات', href: '/dashboard/courses/list' },
-];
-
-const levelLabels: Record<string, string> = {
-    beginner: 'مبتدئ',
-    intermediate: 'متوسط',
-    advanced: 'متقدم',
-};
-
-const statusColors: Record<string, string> = {
-    draft: 'bg-gray-500',
-    published: 'bg-green-500',
-    archived: 'bg-red-500',
-};
-
-const statusLabels: Record<string, string> = {
-    draft: 'مسودة',
-    published: 'منشور',
-    archived: 'مؤرشف',
-};
-
 export default function CoursesListPage() {
     const { courses } = usePage<{ courses: PaginatedData<Course> }>().props;
+    const { t } = useSite();
+    const d = t.dashboard;
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: d.sidebar.items.dashboard, href: '/dashboard' },
+        { title: d.sidebar.items.courses, href: '/dashboard/courses/list' },
+    ];
     const [deleteDialog, setDeleteDialog] = useState({
         isOpen: false, loading: false, item: null as Course | null,
     });
@@ -45,10 +29,10 @@ export default function CoursesListPage() {
         if (!deleteDialog.item) return;
         router.delete(route('dashboard.courses.destroy', deleteDialog.item.id), {
             onSuccess: () => {
-                toast.success('تم الحذف');
+                toast.success(d.toast.deletedSuccess);
                 setDeleteDialog({ isOpen: false, loading: false, item: null });
             },
-            onError: () => toast.error('فشل الحذف'),
+            onError: () => toast.error(d.toast.deleteFailed),
         });
     };
 
@@ -56,39 +40,40 @@ export default function CoursesListPage() {
         {
             id: 'select',
             header: ({ table }) => (
-                <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} />
+                <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} className="ms-2" />
             ),
             cell: ({ row }) => (
-                <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />
+                <Checkbox className="ms-2" checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />
             ),
             enableSorting: false,
             enableHiding: false,
         },
         {
             accessorKey: 'title_ar',
-            header: 'عنوان الدورة',
+            header: d.columns.title,
         },
         {
             accessorKey: 'category.name_ar',
-            header: 'التصنيف',
+            header: d.columns.category,
             cell: ({ row }) => row.original.category?.name_ar || '-',
         },
         {
             accessorKey: 'level',
-            header: 'المستوى',
-            cell: ({ row }) => levelLabels[row.getValue('level') as string] || row.getValue('level'),
+            header: d.columns.level,
+            cell: ({ row }) => d.level[row.getValue('level') as keyof typeof d.level] || row.getValue('level'),
         },
         {
             accessorKey: 'price',
-            header: 'السعر',
+            header: d.columns.price,
             cell: ({ row }) => `${row.getValue('price')} د.ل`,
         },
         {
             accessorKey: 'status',
-            header: 'الحالة',
+            header: d.columns.status,
             cell: ({ row }) => {
                 const status = row.getValue('status') as string;
-                return <Badge className={statusColors[status]}>{statusLabels[status]}</Badge>;
+                const colorMap: Record<string, string> = { draft: 'bg-gray-500', published: 'bg-green-500', archived: 'bg-red-500' };
+                return <Badge className={colorMap[status]}>{d.status[status as keyof typeof d.status]}</Badge>;
             },
         },
         {
@@ -99,9 +84,9 @@ export default function CoursesListPage() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => router.get(route('dashboard.courses.show', item.id))}><Eye className="w-4 h-4 ml-2" /> عرض</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => router.get(route('dashboard.courses.edit', item.id))}><Edit className="w-4 h-4 ml-2" /> تعديل</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setDeleteDialog({ isOpen: true, loading: false, item })} className="text-destructive"><Trash2 className="w-4 h-4 ml-2 text-destructive" /> حذف</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.get(route('dashboard.courses.show', item.id))}><Eye className="w-4 h-4 ms-2" /> {d.actions.view}</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.get(route('dashboard.courses.edit', item.id))}><Edit className="w-4 h-4 ms-2" /> {d.actions.edit}</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setDeleteDialog({ isOpen: true, loading: false, item })} className="text-destructive"><Trash2 className="w-4 h-4 ms-2 text-destructive" /> {d.actions.delete}</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );
@@ -111,25 +96,25 @@ export default function CoursesListPage() {
 
     const bulkActions = [
         {
-            label: 'حذف المحدد',
+            label: `${d.actions.delete} ${d.entities.course.plural}`,
             action: (selectedRows: Course[]) => {
                 router.post(route('dashboard.courses.bulk-actions'), {
                     action: 'delete_selected',
                     entries: selectedRows.map(r => r.id),
-                }, { onSuccess: () => toast.success('تم الحذف'), onError: () => toast.error('فشلت العملية') });
+                }, { onSuccess: () => toast.success(d.toast.deletedSuccess), onError: () => toast.error(d.toast.operationFailed) });
             },
         },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="الدورات" />
+            <Head title={d.entities.course.plural} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <DataTable
                     columns={columns}
                     data={courses.data}
-                    title="الدورات التدريبية"
-                    description="إدارة الدورات والمحتوى التدريبي."
+                    title={d.entities.course.plural}
+                    description={d.entities.course.description}
                     searchFields={['title_ar', 'title_en']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.courses.create'))}
@@ -139,10 +124,10 @@ export default function CoursesListPage() {
                     isOpen={deleteDialog.isOpen}
                     onClose={() => setDeleteDialog({ isOpen: false, loading: false, item: null })}
                     onConfirm={handleDeleteConfirm}
-                    title="حذف دورة"
-                    description={`هل أنت متأكد من حذف "${deleteDialog.item?.title_ar}"؟`}
-                    confirmText="حذف"
-                    cancelText="إلغاء"
+                    title={`${d.confirm.deleteTitle} ${d.entities.course.singular}`}
+                    description={`${d.confirm.deleteDescription} "${deleteDialog.item?.title_ar}"؟`}
+                    confirmText={d.actions.delete}
+                    cancelText={d.actions.cancel}
                     variant="destructive"
                     loading={deleteDialog.loading}
                 />

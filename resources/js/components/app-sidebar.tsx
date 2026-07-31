@@ -22,7 +22,8 @@ import {
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
-    const { isRTL } = useSite();
+    const { isRTL, t } = useSite();
+    const sidebar = t.dashboard.sidebar;
 
     return (
         <Sidebar collapsible="icon" variant="inset" side={isRTL ? 'right' : 'left'}>
@@ -40,55 +41,55 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain
-                    label="Overview"
+                    label={sidebar.overview}
                     items={[
-                        { title: 'Dashboard', url: '/dashboard', icon: LayoutGrid },
+                        { title: sidebar.items.dashboard, url: '/dashboard', icon: LayoutGrid },
                     ]}
                 />
 
                 <NavMain
-                    label="Training"
+                    label={sidebar.training}
                     items={[
-                        { title: 'Courses', url: '/dashboard/courses/list', icon: Presentation },
-                        { title: 'Categories', url: '/dashboard/categories/list', icon: Tag },
-                        { title: 'Instructors', url: '/dashboard/instructors/list', icon: UserCheck },
-                        { title: 'Enrollments', url: '/dashboard/enrollments/list', icon: GraduationCap },
-                        { title: 'Students', url: '/dashboard/students/list', icon: Users },
-                        { title: 'Certificates', url: '/dashboard/certificates/list', icon: Award },
+                        { title: sidebar.items.courses, url: '/dashboard/courses/list', icon: Presentation },
+                        { title: sidebar.items.categories, url: '/dashboard/categories/list', icon: Tag },
+                        { title: sidebar.items.instructors, url: '/dashboard/instructors/list', icon: UserCheck },
+                        { title: sidebar.items.enrollments, url: '/dashboard/enrollments/list', icon: GraduationCap },
+                        { title: sidebar.items.students, url: '/dashboard/students/list', icon: Users },
+                        { title: sidebar.items.certificates, url: '/dashboard/certificates/list', icon: Award },
                     ]}
                 />
 
                 <NavMain
-                    label="CRM"
+                    label={sidebar.crm}
                     items={[
-                        { title: 'Leads', url: '/dashboard/leads/list', icon: Briefcase },
+                        { title: sidebar.items.leads, url: '/dashboard/leads/list', icon: Briefcase },
                     ]}
                 />
 
                 <NavMain
-                    label="Content"
+                    label={sidebar.content}
                     items={[
-                        { title: 'Blog Posts', url: '/dashboard/blog-posts/list', icon: FileText },
-                        { title: 'Banners', url: '/dashboard/banners/list', icon: Image },
-                        { title: 'Testimonials', url: '/dashboard/testimonials/list', icon: Star },
-                        { title: 'FAQs', url: '/dashboard/faqs/list', icon: HelpCircle },
+                        { title: sidebar.items.blogPosts, url: '/dashboard/blog-posts/list', icon: FileText },
+                        { title: sidebar.items.banners, url: '/dashboard/banners/list', icon: Image },
+                        { title: sidebar.items.testimonials, url: '/dashboard/testimonials/list', icon: Star },
+                        { title: sidebar.items.faqs, url: '/dashboard/faqs/list', icon: HelpCircle },
                     ]}
                 />
 
 
                 <NavMain
-                    label="Legal"
+                    label={sidebar.legal}
                     items={[
-                        { title: 'Privacy Policy', url: '/dashboard/pages/privacy-policy', icon: BookOpen },
-                        { title: 'Terms of Use', url: '/dashboard/pages/terms-of-use', icon: BookOpen },
+                        { title: sidebar.items.privacyPolicy, url: '/dashboard/pages/privacy-policy', icon: BookOpen },
+                        { title: sidebar.items.termsOfUse, url: '/dashboard/pages/terms-of-use', icon: BookOpen },
                     ]}
                 />
 
                 <NavMain
-                    label="Settings"
+                    label={sidebar.settings}
                     items={[
-                        { title: 'Users', url: '/dashboard/users/list', icon: Users },
-                        { title: 'Site Settings', url: '/dashboard/site-settings', icon: Settings },
+                        { title: sidebar.items.users, url: '/dashboard/users/list', icon: Users },
+                        { title: sidebar.items.siteSettings, url: '/dashboard/site-settings', icon: Settings },
                     ]}
                 />
             </SidebarContent>

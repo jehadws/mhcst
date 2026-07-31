@@ -1,5 +1,6 @@
 import AppLayout from "@/layouts/app-layout";
 import { BreadcrumbItem, Faq } from "@/types";
+import { useSite } from "@/context/site-context";
 import { Head, router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,9 +12,11 @@ interface Props {
 }
 
 export default function FaqDetailsPage({ faq }: Props) {
+    const { t } = useSite();
+    const d = t.dashboard;
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'لوحة التحكم', href: '/dashboard' },
-        { title: 'الأسئلة الشائعة', href: '/dashboard/faqs/list' },
+        { title: d.sidebar.items.dashboard, href: '/dashboard' },
+        { title: d.sidebar.items.faqs, href: '/dashboard/faqs/list' },
         { title: faq.question, href: '#' },
     ];
 
@@ -23,10 +26,10 @@ export default function FaqDetailsPage({ faq }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                     <Button variant="outline" onClick={() => router.get(route('dashboard.faqs.list'))}>
-                        <ArrowRight className="ml-2 h-4 w-4" /> رجوع للقائمة
+                        <ArrowRight className="ms-2 h-4 w-4" /> {d.show.backToList}
                     </Button>
                     <Button onClick={() => router.get(route('dashboard.faqs.edit', faq.id))}>
-                        <Edit className="ml-2 h-4 w-4" /> تعديل السؤال
+                        <Edit className="ms-2 h-4 w-4" /> {d.show.edit} {d.entities.faq.singular}
                     </Button>
                 </div>
 
@@ -34,7 +37,7 @@ export default function FaqDetailsPage({ faq }: Props) {
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle className="text-lg">{faq.question}</CardTitle>
                         <Badge variant={faq.is_published ? 'default' : 'secondary'}>
-                            {faq.is_published ? 'منشور' : 'مسودة'}
+                            {d.status[faq.is_published ? 'published' : 'draft']}
                         </Badge>
                     </CardHeader>
                     <CardContent>

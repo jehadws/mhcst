@@ -1,4 +1,5 @@
-import { Course, Enrollment, Student } from "@/types";
+import { Enrollment } from "@/types";
+import { useSite } from "@/context/site-context";
 import { router, useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,8 @@ interface Props {
 }
 
 export default function EnrollmentForm({ enrollment, courses = [], students = [] }: Props) {
+  const { t } = useSite();
+  const d = t.dashboard;
   const isEditing = !!enrollment;
 
   const { data, setData, post, put, processing, errors } = useForm({
@@ -42,15 +45,15 @@ export default function EnrollmentForm({ enrollment, courses = [], students = []
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{isEditing ? 'تعديل طلب التسجيل' : 'تسجيل جديد'}</CardTitle>
+        <CardTitle>{isEditing ? d.form.buttons.editing : d.form.buttons.creating}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="course_id">الدورة التدريبية *</Label>
+              <Label htmlFor="course_id">{d.form.labels.courseOfInterest} *</Label>
               <Select value={data.course_id} onValueChange={(v) => setData('course_id', v)}>
-                <SelectTrigger><SelectValue placeholder="اختر الدورة" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={d.form.placeholders.selectCourse} /></SelectTrigger>
                 <SelectContent>
                   {courses.map((c) => (
                     <SelectItem key={c.id} value={String(c.id)}>{c.title_ar}</SelectItem>
@@ -60,9 +63,9 @@ export default function EnrollmentForm({ enrollment, courses = [], students = []
               {errors.course_id && <p className="mt-1 text-sm text-red-500">{errors.course_id}</p>}
             </div>
             <div>
-              <Label htmlFor="student_id">المتدرب (اختياري)</Label>
+              <Label htmlFor="student_id">{d.form.labels.student}</Label>
               <Select value={data.student_id} onValueChange={(v) => setData('student_id', v)}>
-                <SelectTrigger><SelectValue placeholder="اختر متدرب مسجل" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={d.form.placeholders.selectStudent} /></SelectTrigger>
                 <SelectContent>
                   {students.map((s) => (
                     <SelectItem key={s.id} value={String(s.id)}>{s.full_name}</SelectItem>
@@ -73,19 +76,19 @@ export default function EnrollmentForm({ enrollment, courses = [], students = []
           </div>
 
           <div>
-            <Label htmlFor="full_name">الاسم الكامل *</Label>
+            <Label htmlFor="full_name">{d.form.labels.fullName} *</Label>
             <Input id="full_name" value={data.full_name} onChange={(e) => setData('full_name', e.target.value)} />
             {errors.full_name && <p className="mt-1 text-sm text-red-500">{errors.full_name}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="email">البريد الإلكتروني *</Label>
+              <Label htmlFor="email">{d.form.labels.email} *</Label>
               <Input id="email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} />
               {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
             </div>
             <div>
-              <Label htmlFor="phone">رقم الهاتف *</Label>
+              <Label htmlFor="phone">{d.form.labels.phone} *</Label>
               <Input id="phone" value={data.phone} onChange={(e) => setData('phone', e.target.value)} />
               {errors.phone && <p className="mt-1 text-sm text-red-500">{errors.phone}</p>}
             </div>
@@ -93,25 +96,25 @@ export default function EnrollmentForm({ enrollment, courses = [], students = []
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="status">حالة التسجيل</Label>
-              <Select value={data.status} onValueChange={(v) => setData('status', v as any)}>
+              <Label htmlFor="status">{d.columns.status}</Label>
+              <Select value={data.status} onValueChange={(v) => setData('status', v as Enrollment['status'])}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="pending">قيد الانتظار</SelectItem>
-                  <SelectItem value="confirmed">مؤكد</SelectItem>
-                  <SelectItem value="completed">مكتمل</SelectItem>
-                  <SelectItem value="cancelled">ملغى</SelectItem>
+                  <SelectItem value="pending">{d.status.pending}</SelectItem>
+                  <SelectItem value="confirmed">{d.status.confirmed}</SelectItem>
+                  <SelectItem value="completed">{d.status.completed}</SelectItem>
+                  <SelectItem value="cancelled">{d.status.cancelled}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="payment_status">حالة الدفع</Label>
-              <Select value={data.payment_status} onValueChange={(v) => setData('payment_status', v as any)}>
+              <Label htmlFor="payment_status">{d.columns.payment}</Label>
+              <Select value={data.payment_status} onValueChange={(v) => setData('payment_status', v as Enrollment['payment_status'])}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="unpaid">غير مدفوع</SelectItem>
-                  <SelectItem value="partial">مدفوع جزئياً</SelectItem>
-                  <SelectItem value="paid">مدفوع بالكامل</SelectItem>
+                  <SelectItem value="unpaid">{d.payment.unpaid}</SelectItem>
+                  <SelectItem value="partial">{d.payment.partial}</SelectItem>
+                  <SelectItem value="paid">{d.payment.paid}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -119,23 +122,23 @@ export default function EnrollmentForm({ enrollment, courses = [], students = []
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="amount_due">المبلغ المستحق (د.ل)</Label>
+              <Label htmlFor="amount_due">{d.show.amountDue}</Label>
               <Input id="amount_due" type="number" step="0.01" value={data.amount_due} onChange={(e) => setData('amount_due', Number(e.target.value))} />
             </div>
             <div>
-              <Label htmlFor="amount_paid">المبلغ المدفوع (د.ل)</Label>
+              <Label htmlFor="amount_paid">{d.show.amountPaid}</Label>
               <Input id="amount_paid" type="number" step="0.01" value={data.amount_paid} onChange={(e) => setData('amount_paid', Number(e.target.value))} />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="notes">ملاحظات</Label>
+            <Label htmlFor="notes">{d.form.labels.notes}</Label>
             <Textarea id="notes" value={data.notes} onChange={(e) => setData('notes', e.target.value)} rows={3} />
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => router.get(route('dashboard.enrollments.list'))}>إلغاء</Button>
-            <Button type="submit" disabled={processing}>{processing ? 'جاري...' : isEditing ? 'تحديث' : 'حفظ'}</Button>
+            <Button type="button" variant="outline" onClick={() => router.get(route('dashboard.enrollments.list'))}>{d.form.buttons.cancel}</Button>
+            <Button type="submit" disabled={processing}>{processing ? d.form.buttons.saving : isEditing ? d.form.buttons.update : d.form.buttons.save}</Button>
           </div>
         </form>
       </CardContent>

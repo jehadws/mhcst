@@ -1,4 +1,5 @@
 import AppLayout from "@/layouts/app-layout";
+import { useSite } from "@/context/site-context";
 import { BreadcrumbItem, User } from "@/types";
 import { Head, router } from "@inertiajs/react";
 import { useState } from "react";
@@ -15,12 +16,13 @@ interface Props {
     users: User[];
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'لوحة التحكم', href: '/dashboard' },
-    { title: 'المستخدمون', href: '/dashboard/users/list' },
-];
-
 export default function UsersListPage({ users = [] }: Props) {
+    const { t } = useSite();
+    const d = t.dashboard;
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: d.sidebar.items.dashboard, href: '/dashboard' },
+        { title: d.sidebar.items.users, href: '/dashboard/users/list' },
+    ];
     const [deleteDialog, setDeleteDialog] = useState({
         isOpen: false, loading: false, item: null as User | null,
     });
@@ -31,11 +33,11 @@ export default function UsersListPage({ users = [] }: Props) {
 
         router.delete(route('dashboard.users.destroy', deleteDialog.item.id), {
             onSuccess: () => {
-                toast.success('تم الحذف بنجاح');
+                toast.success(d.toast.deletedSuccess);
                 setDeleteDialog({ isOpen: false, loading: false, item: null });
             },
             onError: () => {
-                toast.error('فشل الحذف');
+                toast.error(d.toast.deleteFailed);
                 setDeleteDialog(prev => ({ ...prev, loading: false }));
             }
         });
@@ -48,21 +50,24 @@ export default function UsersListPage({ users = [] }: Props) {
                 <Checkbox
                     checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
                     onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                    className="ms-2"
                 />
             ),
             cell: ({ row }) => (
-                <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />
+                <Checkbox
+                    className="ms-2"
+                    checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />
             ),
             enableSorting: false,
             enableHiding: false,
         },
         {
             accessorKey: 'name',
-            header: 'الاسم',
+            header: d.columns.name,
         },
         {
             accessorKey: 'email',
-            header: 'البريد الإلكتروني',
+            header: d.columns.email,
         },
         {
             id: 'actions',
@@ -77,16 +82,16 @@ export default function UsersListPage({ users = [] }: Props) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => router.get(route('dashboard.users.show', item.id))}>
-                                <Eye className="w-4 h-4 ml-2" /> عرض
+                                <Eye className="w-4 h-4 ms-2" /> {d.actions.view}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => router.get(route('dashboard.users.edit', item.id))}>
-                                <Edit className="w-4 h-4 ml-2" /> تعديل
+                                <Edit className="w-4 h-4 ms-2" /> {d.actions.edit}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => setDeleteDialog({ isOpen: true, loading: false, item })}
                                 className="text-destructive"
                             >
-                                <Trash2 className="w-4 h-4 ml-2 text-destructive" /> حذف
+                                <Trash2 className="w-4 h-4 ms-2 text-destructive" /> {d.actions.delete}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -97,14 +102,14 @@ export default function UsersListPage({ users = [] }: Props) {
 
     const bulkActions = [
         {
-            label: 'حذف المحدد',
+            label: `${d.actions.delete} ${d.entities.user.plural}`,
             action: (selectedRows: User[]) => {
                 router.post(route('dashboard.users.bulk-actions'), {
                     action: 'delete_selected',
                     entries: selectedRows.map(r => r.id),
                 }, {
-                    onSuccess: () => toast.success('تم الحذف بنجاح'),
-                    onError: () => toast.error('فشلت العملية'),
+                    onSuccess: () => toast.success(d.toast.deletedSuccess),
+                    onError: () => toast.error(d.toast.operationFailed),
                 });
             },
         },
@@ -112,13 +117,13 @@ export default function UsersListPage({ users = [] }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="المستخدمون" />
+            <Head title={d.entities.user.plural} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <DataTable
                     columns={columns}
                     data={users}
-                    title="المستخدمون"
-                    description="إدارة حسابات المستخدمين والمشرفين."
+                    title={d.entities.user.plural}
+                    description={d.entities.user.description}
                     searchFields={['name', 'email']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.users.create'))}
@@ -129,10 +134,10 @@ export default function UsersListPage({ users = [] }: Props) {
                     isOpen={deleteDialog.isOpen}
                     onClose={() => setDeleteDialog({ isOpen: false, loading: false, item: null })}
                     onConfirm={handleDeleteConfirm}
-                    title="حذف مستخدم"
-                    description={`هل أنت متأكد من حذف "${deleteDialog.item?.name}"؟`}
-                    confirmText="حذف"
-                    cancelText="إلغاء"
+                    title={`${d.confirm.deleteTitle} ${d.entities.user.singular}`}
+                    description={`${d.confirm.deleteDescription} "${deleteDialog.item?.name}"؟`}
+                    confirmText={d.actions.delete}
+                    cancelText={d.actions.cancel}
                     variant="destructive"
                     loading={deleteDialog.loading}
                 />

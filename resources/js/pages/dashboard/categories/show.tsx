@@ -1,5 +1,6 @@
 import AppLayout from "@/layouts/app-layout";
 import { BreadcrumbItem, Category } from "@/types";
+import { useSite } from "@/context/site-context";
 import { Head, router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,9 +14,11 @@ interface Props {
 }
 
 export default function CategoryDetailsPage({ category }: Props) {
+    const { t } = useSite();
+    const d = t.dashboard;
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'لوحة التحكم', href: '/dashboard' },
-        { title: 'التصنيفات', href: '/dashboard/categories/list' },
+        { title: d.sidebar.items.dashboard, href: '/dashboard' },
+        { title: d.sidebar.items.categories, href: '/dashboard/categories/list' },
         { title: category.name_ar, href: '#' },
     ];
 
@@ -25,10 +28,10 @@ export default function CategoryDetailsPage({ category }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                     <Button variant="outline" onClick={() => router.get(route('dashboard.categories.list'))}>
-                        <ArrowRight className="ml-2 h-4 w-4" /> رجوع للقائمة
+                        <ArrowRight className="ms-2 h-4 w-4" /> {d.show.backToList}
                     </Button>
                     <Button onClick={() => router.get(route('dashboard.categories.edit', category.id))}>
-                        <Edit className="ml-2 h-4 w-4" /> تعديل التصنيف
+                        <Edit className="ms-2 h-4 w-4" /> {d.show.edit} {d.entities.category.singular}
                     </Button>
                 </div>
 
@@ -49,18 +52,18 @@ export default function CategoryDetailsPage({ category }: Props) {
                     <CardContent className="space-y-6">
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div className="rounded-lg border p-3">
-                                <p className="text-xs text-muted-foreground">المعرف (Slug)</p>
+                                <p className="text-xs text-muted-foreground">{d.show.slug}</p>
                                 <p className="font-mono">{category.slug}</p>
                             </div>
                             <div className="rounded-lg border p-3">
-                                <p className="text-xs text-muted-foreground">الترتيب</p>
+                                <p className="text-xs text-muted-foreground">{d.show.sortOrder}</p>
                                 <p className="font-semibold">{category.sort_order}</p>
                             </div>
                         </div>
 
                         {category.children && category.children.length > 0 && (
                             <div className="rounded-lg border p-4">
-                                <h4 className="mb-2 font-semibold">التصنيفات الفرعية:</h4>
+                                <h4 className="mb-2 font-semibold">{d.show.subcategories}:</h4>
                                 <div className="flex flex-wrap gap-2">
                                     {category.children.map((c) => (
                                         <span key={c.id} className="rounded-md bg-secondary px-3 py-1 text-sm">
@@ -73,7 +76,7 @@ export default function CategoryDetailsPage({ category }: Props) {
 
                         {category.courses && category.courses.length > 0 && (
                             <div className="rounded-lg border p-4">
-                                <h4 className="mb-2 font-semibold">الدورات في هذا التصنيف:</h4>
+                                <h4 className="mb-2 font-semibold">{d.show.coursesInCategory}:</h4>
                                 <div className="space-y-1">
                                     {category.courses.map((course) => (
                                         <div key={course.id} className="text-sm py-1 border-b last:border-0">

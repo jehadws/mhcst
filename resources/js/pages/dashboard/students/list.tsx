@@ -1,4 +1,5 @@
 import AppLayout from "@/layouts/app-layout";
+import { useSite } from "@/context/site-context";
 import { BreadcrumbItem, PaginatedData, Student } from "@/types";
 import { Head, router, usePage } from "@inertiajs/react";
 import { useState } from "react";
@@ -11,13 +12,14 @@ import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'لوحة التحكم', href: '/dashboard' },
-    { title: 'المتدربين', href: '/dashboard/students/list' },
-];
-
 export default function StudentsListPage() {
     const { students } = usePage<{ students: PaginatedData<Student> }>().props;
+    const { t } = useSite();
+    const d = t.dashboard;
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: d.sidebar.items.dashboard, href: '/dashboard' },
+        { title: d.sidebar.items.students, href: '/dashboard/students/list' },
+    ];
     const [deleteDialog, setDeleteDialog] = useState({
         isOpen: false, loading: false, item: null as Student | null,
     });
@@ -28,11 +30,11 @@ export default function StudentsListPage() {
 
         router.delete(route('dashboard.students.destroy', deleteDialog.item.id), {
             onSuccess: () => {
-                toast.success('تم الحذف بنجاح');
+                toast.success(d.toast.deletedSuccess);
                 setDeleteDialog({ isOpen: false, loading: false, item: null });
             },
             onError: () => {
-                toast.error('فشل الحذف');
+                toast.error(d.toast.deleteFailed);
                 setDeleteDialog(prev => ({ ...prev, loading: false }));
             }
         });
@@ -42,39 +44,35 @@ export default function StudentsListPage() {
         {
             id: 'select',
             header: ({ table }) => (
-                <Checkbox
-                    checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-                    onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                    aria-label="Select all"
-                />
+                <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} className="ms-2" />
             ),
             cell: ({ row }) => (
-                <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />
+                <Checkbox className="ms-2" checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />
             ),
             enableSorting: false,
             enableHiding: false,
         },
         {
             accessorKey: 'full_name',
-            header: 'الاسم الكامل',
+            header: d.columns.fullName,
         },
         {
             accessorKey: 'email',
-            header: 'البريد الإلكتروني',
+            header: d.columns.email,
             cell: ({ row }) => row.getValue('email') || '-',
         },
         {
             accessorKey: 'phone',
-            header: 'الهاتف',
+            header: d.columns.phone,
         },
         {
             accessorKey: 'city',
-            header: 'المدينة',
+            header: d.columns.city,
             cell: ({ row }) => row.getValue('city') || '-',
         },
         {
             accessorKey: 'enrollments_count',
-            header: 'التسجيلات',
+            header: d.columns.enrollments,
         },
         {
             id: 'actions',
@@ -89,16 +87,16 @@ export default function StudentsListPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => router.get(route('dashboard.students.show', item.id))}>
-                                <Eye className="w-4 h-4 ml-2" /> عرض
+                                <Eye className="w-4 h-4 ms-2" /> {d.actions.view}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => router.get(route('dashboard.students.edit', item.id))}>
-                                <Edit className="w-4 h-4 ml-2" /> تعديل
+                                <Edit className="w-4 h-4 ms-2" /> {d.actions.edit}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => setDeleteDialog({ isOpen: true, loading: false, item })}
                                 className="text-destructive"
                             >
-                                <Trash2 className="w-4 h-4 ml-2 text-destructive" /> حذف
+                                <Trash2 className="w-4 h-4 ms-2 text-destructive" /> {d.actions.delete}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -109,14 +107,14 @@ export default function StudentsListPage() {
 
     const bulkActions = [
         {
-            label: 'حذف المحدد',
+            label: `${d.actions.delete} ${d.entities.student.plural}`,
             action: (selectedRows: Student[]) => {
                 router.post(route('dashboard.students.bulk-actions'), {
                     action: 'delete_selected',
                     entries: selectedRows.map(r => r.id),
                 }, {
-                    onSuccess: () => toast.success('تم الحذف بنجاح'),
-                    onError: () => toast.error('فشلت العملية'),
+                    onSuccess: () => toast.success(d.toast.deletedSuccess),
+                    onError: () => toast.error(d.toast.operationFailed),
                 });
             },
         },
@@ -124,13 +122,13 @@ export default function StudentsListPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="المتدربين" />
+            <Head title={d.entities.student.plural} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <DataTable
                     columns={columns}
                     data={students.data}
-                    title="المتدربين"
-                    description="إدارة بيانات المتدربين المسجلين في المنصة."
+                    title={d.entities.student.plural}
+                    description={d.entities.student.description}
                     searchFields={['full_name', 'email', 'phone']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.students.create'))}
@@ -141,10 +139,10 @@ export default function StudentsListPage() {
                     isOpen={deleteDialog.isOpen}
                     onClose={() => setDeleteDialog({ isOpen: false, loading: false, item: null })}
                     onConfirm={handleDeleteConfirm}
-                    title="حذف متدرب"
-                    description={`هل أنت متأكد من حذف "${deleteDialog.item?.full_name}"؟`}
-                    confirmText="حذف"
-                    cancelText="إلغاء"
+                    title={`${d.confirm.deleteTitle} ${d.entities.student.singular}`}
+                    description={`${d.confirm.deleteDescription} "${deleteDialog.item?.full_name}"؟`}
+                    confirmText={d.actions.delete}
+                    cancelText={d.actions.cancel}
                     variant="destructive"
                     loading={deleteDialog.loading}
                 />

@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { useSite } from "@/context/site-context"
 import { InertiaFormProps } from "@inertiajs/react"
 import { ArrowRight } from "lucide-react"
 
@@ -19,14 +20,18 @@ export default function FormHeader({
   description,
   onCancel,
   onSave,
-  saveLabel = "حفظ",
+  saveLabel,
   showReturn = true,
   form,
 }: FormHeaderProps) {
+  const { t } = useSite()
+  const d = t.dashboard
+  const label = saveLabel ?? d.form.buttons.save
+
   return (
     <div className="border-b">
       <div className="flex items-center justify-between py-4">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           {showReturn && (
             <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
               <ArrowRight className="h-4 w-4" />
@@ -38,7 +43,7 @@ export default function FormHeader({
           </div>
         </div>
         <Button onClick={onSave} disabled={form.processing || form.hasErrors} type="submit" variant={"default"}>
-          {saveLabel}
+          {label}
         </Button>
       </div>
     </div>

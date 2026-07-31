@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import Editor from '@/components/editor';
-
+import { useSite } from '@/context/site-context';
 
 type SiteContent = {
   id: number;
@@ -21,10 +21,12 @@ type FormValues = {
 }
 
 export default function EditSiteContentPage() {
+  const { t } = useSite();
+  const d = t.dashboard;
   const { content } = usePage<{ content: SiteContent }>().props;
 
   const breadcrumbs = [
-    { title: 'لوحة التحكم', href: '/dashboard' },
+    { title: d.sidebar.items.dashboard, href: '/dashboard' },
     { title: content.title, href: `/dashboard/pages/${content.slug}` }
   ];
 
@@ -47,23 +49,23 @@ export default function EditSiteContentPage() {
     form.put(`/dashboard/pages/${content.slug}`, {
       preserveScroll: true,
       onError: (errors) => {
-        toast.error('الرجاء إصلاح أخطاء التحقق');
+        toast.error(d.siteContent.validationError);
         console.error('Validation errors:', errors);
       },
       onSuccess: () => {
-        toast.success('تم تحديث المحتوى بنجاح');
+        toast.success(d.toast.updatedSuccess);
       },
     });
   };
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={`تعديل ${content.title}`} />
+      <Head title={`${d.siteContent.edit.replace('{title}', content.title)}`} />
 
       <div className="bg-background flex h-full min-h-screen flex-1 flex-col gap-4 p-4">
         <FormHeader
-          title={`تعديل ${content.title}`}
-          description="ادخل جميع البيانات المطلوبة"
+          title={`${d.siteContent.edit.replace('{title}', content.title)}`}
+          description={d.siteContent.description}
           onCancel={() => window.history.back()}
           onSave={handleSubmit}
           form={form}
@@ -71,7 +73,7 @@ export default function EditSiteContentPage() {
 
         <div className="grid grid-cols-1 gap-6">
           <FormField
-            label="العنوان"
+            label={d.form.labels.title}
             error={form.errors.title}
             className="mb-6"
           >
@@ -86,7 +88,7 @@ export default function EditSiteContentPage() {
           </FormField>
 
           <FormField
-            label="المحتوى"
+            label={d.form.labels.content}
             htmlFor="content"
             error={form.errors.content}
           >

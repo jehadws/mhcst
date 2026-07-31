@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useSite } from "@/context/site-context";
 import { Plus, Trash2 } from "lucide-react";
 
 interface KeyValueInputProps {
@@ -12,9 +13,14 @@ interface KeyValueInputProps {
 export default function KeyValueInput({
   value,
   onChange,
-  keyPlaceholder = "key",
-  valuePlaceholder = "Value",
+  keyPlaceholder,
+  valuePlaceholder,
 }: KeyValueInputProps) {
+  const { t } = useSite();
+  const d = t.dashboard;
+  const keyPlh = keyPlaceholder ?? d.form.placeholders.socialPlatform;
+  const valPlh = valuePlaceholder ?? d.form.placeholders.socialUrl;
+
   const handleAdd = () => {
     onChange([...value, { key: "", value: "" }]);
   };
@@ -45,13 +51,13 @@ export default function KeyValueInput({
             type="text"
             value={item.key}
             onChange={(e) => handleKeyChange(index, e.target.value)}
-            placeholder={keyPlaceholder}
+            placeholder={keyPlh}
           />
           <Input
             type="text"
             value={item.value}
             onChange={(e) => handleValueChange(index, e.target.value)}
-            placeholder={valuePlaceholder}
+            placeholder={valPlh}
           />
           <Button
             type="button"
@@ -69,8 +75,8 @@ export default function KeyValueInput({
         className="w-full"
         onClick={handleAdd}
       >
-        <Plus className="h-4 w-4 mr-2" />
-        إضافة المزيد
+        <Plus className="h-4 w-4 me-2" />
+        {d.siteSettings.social.add}
       </Button>
     </div>
   );

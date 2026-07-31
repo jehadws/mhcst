@@ -1,4 +1,5 @@
 import AppLayout from "@/layouts/app-layout";
+import { useSite } from "@/context/site-context";
 import { BreadcrumbItem, PaginatedData, Testimonial } from "@/types";
 import { Head, router, usePage } from "@inertiajs/react";
 import { useState } from "react";
@@ -12,34 +13,39 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
-const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'لوحة التحكم', href: '/dashboard' },
-    { title: 'آراء العملاء', href: '/dashboard/testimonials/list' },
-];
-
 export default function TestimonialsListPage() {
     const { testimonials } = usePage<{ testimonials: PaginatedData<Testimonial> }>().props;
+    const { t } = useSite();
+    const d = t.dashboard;
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: d.sidebar.items.dashboard, href: '/dashboard' },
+        { title: d.sidebar.items.testimonials, href: '/dashboard/testimonials/list' },
+    ];
     const [deleteDialog, setDeleteDialog] = useState({ isOpen: false, loading: false, item: null as Testimonial | null });
 
     const handleDeleteConfirm = () => {
         if (!deleteDialog.item) return;
         router.delete(route('dashboard.testimonials.destroy', deleteDialog.item.id), {
-            onSuccess: () => { toast.success('تم الحذف'); setDeleteDialog({ isOpen: false, loading: false, item: null }); },
-            onError: () => toast.error('فشل الحذف'),
+            onSuccess: () => { toast.success(d.toast.deletedSuccess); setDeleteDialog({ isOpen: false, loading: false, item: null }); },
+            onError: () => toast.error(d.toast.deleteFailed),
         });
     };
 
     const columns: ColumnDef<Testimonial>[] = [
         {
             id: 'select',
-            header: ({ table }) => <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} />,
-            cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />,
+            header: ({ table }) => (
+                <Checkbox checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')} onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)} className="ms-2" />
+            ),
+            cell: ({ row }) => (
+                <Checkbox className="ms-2" checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} />
+            ),
             enableSorting: false,
             enableHiding: false,
         },
         {
             accessorKey: 'name',
-            header: 'الاسم',
+            header: d.columns.name,
             cell: ({ row }) => (
                 <div className="flex items-center gap-3">
                     {row.original.photo ? (
@@ -56,15 +62,15 @@ export default function TestimonialsListPage() {
         },
         {
             accessorKey: 'quote',
-            header: 'الرأي',
+            header: d.columns.quote,
             cell: ({ row }) => <span className="line-clamp-1 max-w-xs">{row.getValue('quote')}</span>,
         },
         {
             accessorKey: 'is_published',
-            header: 'النشر',
+            header: d.columns.isPublished,
             cell: ({ row }) => (
                 <Badge className={row.getValue('is_published') ? 'bg-green-500' : 'bg-gray-500'}>
-                    {row.getValue('is_published') ? 'منشور' : 'مخفي'}
+                    {row.getValue('is_published') ? d.status.published : d.status.inactive}
                 </Badge>
             ),
         },
@@ -76,9 +82,9 @@ export default function TestimonialsListPage() {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => router.get(route('dashboard.testimonials.show', item.id))}><Eye className="w-4 h-4 ml-2" /> عرض</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => router.get(route('dashboard.testimonials.edit', item.id))}><Edit className="w-4 h-4 ml-2" /> تعديل</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setDeleteDialog({ isOpen: true, loading: false, item })} className="text-destructive"><Trash2 className="w-4 h-4 ml-2 text-destructive" /> حذف</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.get(route('dashboard.testimonials.show', item.id))}><Eye className="w-4 h-4 ms-2" /> {d.actions.view}</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => router.get(route('dashboard.testimonials.edit', item.id))}><Edit className="w-4 h-4 ms-2" /> {d.actions.edit}</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setDeleteDialog({ isOpen: true, loading: false, item })} className="text-destructive"><Trash2 className="w-4 h-4 ms-2 text-destructive" /> {d.actions.delete}</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );
@@ -88,10 +94,10 @@ export default function TestimonialsListPage() {
 
     const bulkActions = [
         {
-            label: 'حذف المحدد',
+            label: `${d.actions.delete} ${d.entities.testimonial.plural}`,
             action: (selectedRows: Testimonial[]) => {
                 router.post(route('dashboard.testimonials.bulk-actions'), { action: 'delete_selected', entries: selectedRows.map(r => r.id) }, {
-                    onSuccess: () => toast.success('تم الحذف'), onError: () => toast.error('فشلت العملية')
+                    onSuccess: () => toast.success(d.toast.deletedSuccess), onError: () => toast.error(d.toast.operationFailed)
                 });
             },
         },
@@ -99,13 +105,13 @@ export default function TestimonialsListPage() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="آراء العملاء" />
+            <Head title={d.entities.testimonial.plural} />
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <DataTable
                     columns={columns}
                     data={testimonials.data}
-                    title="آراء العملاء"
-                    description="التوصيات والآراء المعروضة في الموقع."
+                    title={d.entities.testimonial.plural}
+                    description={d.entities.testimonial.description}
                     searchFields={['name', 'quote']}
                     bulkActions={bulkActions}
                     onAddNew={() => router.get(route('dashboard.testimonials.create'))}
@@ -115,10 +121,10 @@ export default function TestimonialsListPage() {
                     isOpen={deleteDialog.isOpen}
                     onClose={() => setDeleteDialog({ isOpen: false, loading: false, item: null })}
                     onConfirm={handleDeleteConfirm}
-                    title="حذف رأي"
-                    description="هل أنت متأكد من حذف هذا الرأي؟"
-                    confirmText="حذف"
-                    cancelText="إلغاء"
+                    title={`${d.confirm.deleteTitle} ${d.entities.testimonial.singular}`}
+                    description={`${d.confirm.deleteDescription} "${deleteDialog.item?.name}"؟`}
+                    confirmText={d.actions.delete}
+                    cancelText={d.actions.cancel}
                     variant="destructive"
                     loading={deleteDialog.loading}
                 />

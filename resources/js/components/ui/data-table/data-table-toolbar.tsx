@@ -5,10 +5,10 @@ import { X, Plus, RefreshCw } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-// import { DataTableViewOptions } from "./data-table-view-options"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useState } from "react"
+import { useSite } from "@/context/site-context"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -42,6 +42,8 @@ export function DataTableToolbar<TData>({
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
   const [selectedAction, setSelectedAction] = useState<string | null>(null)
+  const { t } = useSite()
+  const dt = t.dashboard
 
   const handleApplyAction = () => {
     if (!selectedAction) return
@@ -56,10 +58,10 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex flex-1 items-center space-x-2">
+      <div className="flex flex-1 items-center gap-2">
         {onGlobalFilterChange && (
           <Input
-            placeholder={`بحث...`}
+            placeholder={dt.table.searchPlaceholder}
             value={globalFilter ?? ""}
             onChange={(event) => onGlobalFilterChange(event.target.value)}
             className="h-9 w-[150px] lg:w-[250px]"
@@ -85,8 +87,8 @@ export function DataTableToolbar<TData>({
           )}
         {isFiltered && (
           <Button variant="ghost" onClick={() => table.resetColumnFilters()} className="h-9 px-2 lg:px-3">
-            مسح فلتر
-            <X className="ml-2 h-4 w-4" />
+            {dt.table.clearFilter}
+            <X className="ms-2 h-4 w-4" />
           </Button>
         )}
       </div>
@@ -96,7 +98,7 @@ export function DataTableToolbar<TData>({
           <div className="flex items-center gap-2">
             <Select value={selectedAction || ""} onValueChange={setSelectedAction}>
               <SelectTrigger className="h-9 w-[150px]">
-                <SelectValue placeholder="Bulk Actions" />
+                <SelectValue placeholder={dt.table.bulkActions} />
               </SelectTrigger>
               <SelectContent>
                 {bulkActions.map((action) => (
@@ -107,15 +109,15 @@ export function DataTableToolbar<TData>({
               </SelectContent>
             </Select>
             <Button variant="outline" size="sm" onClick={handleApplyAction} disabled={!selectedAction} className="h-9">
-              تطبيق
+              {dt.table.apply}
             </Button>
           </div>
         )}
 
         {onAddNew && (
           <Button onClick={onAddNew} size="sm" className="h-9">
-            <Plus className="ml-2 h-4 w-4" />
-            أضافة جديد
+            <Plus className="me-2 h-4 w-4" />
+            {dt.table.addNew}
           </Button>
         )}
       </div>

@@ -1,5 +1,6 @@
 import AppLayout from "@/layouts/app-layout";
 import { BreadcrumbItem, Instructor } from "@/types";
+import { useSite } from "@/context/site-context";
 import { Head, router } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,9 +12,11 @@ interface Props {
 }
 
 export default function InstructorDetailsPage({ instructor }: Props) {
+    const { t } = useSite();
+    const d = t.dashboard;
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'لوحة التحكم', href: '/dashboard' },
-        { title: 'المدربون', href: '/dashboard/instructors/list' },
+        { title: d.sidebar.items.dashboard, href: '/dashboard' },
+        { title: d.sidebar.items.instructors, href: '/dashboard/instructors/list' },
         { title: instructor.name, href: '#' },
     ];
 
@@ -23,10 +26,10 @@ export default function InstructorDetailsPage({ instructor }: Props) {
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div className="flex items-center justify-between">
                     <Button variant="outline" onClick={() => router.get(route('dashboard.instructors.list'))}>
-                        <ArrowRight className="ml-2 h-4 w-4" /> رجوع للقائمة
+                        <ArrowRight className="ms-2 h-4 w-4" /> {d.show.backToList}
                     </Button>
                     <Button onClick={() => router.get(route('dashboard.instructors.edit', instructor.id))}>
-                        <Edit className="ml-2 h-4 w-4" /> تعديل المدرب
+                        <Edit className="ms-2 h-4 w-4" /> {d.show.edit} {d.entities.instructor.singular}
                     </Button>
                 </div>
 
@@ -46,11 +49,11 @@ export default function InstructorDetailsPage({ instructor }: Props) {
                             )}
                             <div>
                                 <CardTitle>{instructor.name}</CardTitle>
-                                <p className="text-sm text-muted-foreground">{instructor.specialization || 'مدرب'}</p>
+                                <p className="text-sm text-muted-foreground">{instructor.specialization || d.show.instructorDefault}</p>
                             </div>
                         </div>
                         <Badge variant={instructor.is_active ? 'default' : 'secondary'}>
-                            {instructor.is_active ? 'نشط' : 'غير نشط'}
+                            {instructor.is_active ? d.status.active : d.status.inactive}
                         </Badge>
                     </CardHeader>
                     <CardContent className="space-y-6">
@@ -58,33 +61,33 @@ export default function InstructorDetailsPage({ instructor }: Props) {
                             <div className="flex items-center gap-2 rounded-lg border p-3">
                                 <Mail className="size-4 text-muted-foreground" />
                                 <div>
-                                    <p className="text-xs text-muted-foreground">البريد الإلكتروني</p>
+                                    <p className="text-xs text-muted-foreground">{d.show.emailLabel}</p>
                                     <p className="font-medium">{instructor.email || '-'}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2 rounded-lg border p-3">
                                 <Phone className="size-4 text-muted-foreground" />
                                 <div>
-                                    <p className="text-xs text-muted-foreground">رقم الهاتف</p>
+                                    <p className="text-xs text-muted-foreground">{d.show.phoneLabel}</p>
                                     <p className="font-medium">{instructor.phone || '-'}</p>
                                 </div>
                             </div>
                             <div className="rounded-lg border p-3">
-                                <p className="text-xs text-muted-foreground">سنوات الخبرة</p>
-                                <p className="font-medium">{instructor.years_experience ?? 0} سنوات</p>
+                                <p className="text-xs text-muted-foreground">{d.form.labels.yearsExperience}</p>
+                                <p className="font-medium">{instructor.years_experience ?? 0} {d.show.yearsSuffix}</p>
                             </div>
                         </div>
 
                         {instructor.bio_ar && (
                             <div className="rounded-lg border p-4">
-                                <h4 className="mb-2 font-semibold">النبذة (عربي):</h4>
+                                <h4 className="mb-2 font-semibold">{d.form.labels.bioAr}:</h4>
                                 <p className="whitespace-pre-line text-sm text-muted-foreground">{instructor.bio_ar}</p>
                             </div>
                         )}
 
                         {instructor.bio_en && (
                             <div className="rounded-lg border p-4" dir="ltr">
-                                <h4 className="mb-2 font-semibold">Bio (English):</h4>
+                                <h4 className="mb-2 font-semibold">{d.form.labels.bioEn}:</h4>
                                 <p className="whitespace-pre-line text-sm text-muted-foreground">{instructor.bio_en}</p>
                             </div>
                         )}
