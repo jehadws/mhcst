@@ -21,6 +21,7 @@ export function SiteHeader() {
 
     const links = [
         { href: '/courses', label: t.nav.courses },
+        { href: '/student/portal', label: locale === 'ar' ? 'بوابة المتدربين' : 'Learner Portal' },
         { href: '/blog-posts', label: locale === 'ar' ? 'المدونة' : 'Blog' },
         { href: '/about', label: t.nav.about },
         { href: '/contact', label: t.nav.contact },

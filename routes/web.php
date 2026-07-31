@@ -19,6 +19,7 @@ use App\Http\Controllers\SiteContentController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentPortalController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
@@ -37,6 +38,8 @@ Route::get('/blog-posts/{slug}', [BlogController::class, 'show'])->name('blog.sh
 Route::redirect('/blog', '/blog-posts');
 Route::redirect('/blog/{slug}', '/blog-posts/{slug}');
 Route::get('/verify-certificate', [CertificateController::class, 'verify'])->name('verify-certificate');
+Route::get('/verify-certificate/{number}/download', [CertificateController::class, 'publicDownload'])->name('certificates.public-download');
+Route::get('/student/portal', [StudentPortalController::class, 'index'])->name('student.portal');
 Route::get('/terms-of-use', fn () => app(SiteContentController::class)->show('terms-of-use'))->name('terms-of-use');
 Route::get('/privacy-policy', fn () => app(SiteContentController::class)->show('privacy-policy'))->name('privacy-policy');
 
@@ -45,6 +48,7 @@ Route::post('/contact', [LeadController::class, 'publicStore'])->name('contact.s
 Route::post('/enroll', [EnrollmentController::class, 'publicStore'])->name('enroll.store');
 Route::post('/review', [ReviewController::class, 'publicStore'])->name('review.store');
 Route::post('/newsletter', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -113,6 +117,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('dashboard/courses/{course}', [CourseController::class, 'update'])->name('dashboard.courses.update');
     Route::delete('dashboard/courses/{course}', [CourseController::class, 'destroy'])->name('dashboard.courses.destroy');
     Route::post('dashboard/courses/bulk-actions', [CourseController::class, 'bulkActions'])->name('dashboard.courses.bulk-actions');
+    Route::delete('dashboard/course-attachments/{attachment}', [CourseController::class, 'destroyAttachment'])->name('dashboard.course-attachments.destroy');
 
     // ═══════════════════════════════════════════════════════
     // ENROLLMENTS
@@ -133,6 +138,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('dashboard/certificates/list', [CertificateController::class, 'index'])->name('dashboard.certificates.list');
     Route::get('dashboard/certificates/create', [CertificateController::class, 'create'])->name('dashboard.certificates.create');
     Route::get('dashboard/certificates/{certificate}', [CertificateController::class, 'show'])->name('dashboard.certificates.show');
+    Route::get('dashboard/certificates/{certificate}/download', [CertificateController::class, 'download'])->name('dashboard.certificates.download');
     Route::post('dashboard/certificates', [CertificateController::class, 'store'])->name('dashboard.certificates.store');
     Route::delete('dashboard/certificates/{certificate}', [CertificateController::class, 'destroy'])->name('dashboard.certificates.destroy');
     Route::post('dashboard/certificates/bulk-actions', [CertificateController::class, 'bulkActions'])->name('dashboard.certificates.bulk-actions');
@@ -237,6 +243,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('dashboard/newsletter/list', [NewsletterController::class, 'index'])->name('dashboard.newsletter.list');
     Route::delete('dashboard/newsletter/{subscriber}', [NewsletterController::class, 'destroy'])->name('dashboard.newsletter.destroy');
     Route::post('dashboard/newsletter/bulk-actions', [NewsletterController::class, 'bulkActions'])->name('dashboard.newsletter.bulk-actions');
+
+    // ═══════════════════════════════════════════════════════
+    // NEWSLETTER CAMPAIGNS
+    // ═══════════════════════════════════════════════════════
+    Route::get('dashboard/newsletter/campaigns/list', [NewsletterController::class, 'campaigns'])->name('dashboard.newsletter.campaigns.list');
+    Route::get('dashboard/newsletter/campaigns/create', [NewsletterController::class, 'campaignsCreate'])->name('dashboard.newsletter.campaigns.create');
+    Route::get('dashboard/newsletter/campaigns/{campaign}', [NewsletterController::class, 'campaignsShow'])->name('dashboard.newsletter.campaigns.show');
+    Route::get('dashboard/newsletter/campaigns/{campaign}/edit', [NewsletterController::class, 'campaignsEdit'])->name('dashboard.newsletter.campaigns.edit');
+    Route::post('dashboard/newsletter/campaigns', [NewsletterController::class, 'campaignsStore'])->name('dashboard.newsletter.campaigns.store');
+    Route::patch('dashboard/newsletter/campaigns/{campaign}', [NewsletterController::class, 'campaignsUpdate'])->name('dashboard.newsletter.campaigns.update');
+    Route::post('dashboard/newsletter/campaigns/{campaign}/send', [NewsletterController::class, 'campaignSend'])->name('dashboard.newsletter.campaigns.send');
+    Route::delete('dashboard/newsletter/campaigns/{campaign}', [NewsletterController::class, 'campaignsDestroy'])->name('dashboard.newsletter.campaigns.destroy');
 
 });
 

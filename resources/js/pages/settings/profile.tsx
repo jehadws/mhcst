@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { useSite } from '@/context/site-context';
+import { toast } from 'sonner';
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { t } = useSite();
@@ -29,7 +30,10 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        patch(route('profile.update'));
+        patch(route('profile.update'), {
+            onSuccess: () => toast.success(t.dashboard.toast.updatedSuccess),
+            onError: () => toast.error(t.dashboard.toast.operationFailed),
+        });
     };
 
     return (

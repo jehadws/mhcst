@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Enrollment extends Model
 {
-    use LogsActivity;
+    use HasFactory, LogsActivity;
 
     protected $fillable = [
         'course_id', 'student_id', 'full_name', 'email', 'phone', 'company_name',

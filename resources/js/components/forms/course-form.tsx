@@ -8,7 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import ImageUploader from "@/components/image-uploader";
+import { ChevronDown, FileText, Plus, Trash2, Upload } from "lucide-react";
+import { toast } from "sonner";
 
 interface Props {
   course?: Course;
@@ -16,14 +19,48 @@ interface Props {
   instructors: Instructor[];
 }
 
+type LessonItem = { title_ar: string; title_en: string; duration_minutes: number };
+type CurriculumItem = { section_title_ar: string; section_title_en: string; lessons: LessonItem[] };
+
+type CourseFormData = {
+  category_id: string;
+  title_ar: string;
+  title_en: string;
+  slug: string;
+  description_ar: string;
+  description_en: string;
+  level: 'beginner' | 'intermediate' | 'advanced';
+  duration_hours: number;
+  location_type: 'onsite' | 'online' | 'hybrid';
+  venue: string;
+  start_date: string;
+  end_date: string;
+  capacity: number;
+  price: number;
+  status: 'draft' | 'published' | 'archived';
+  cover_image: string | null;
+  instructors: Array<{ id: number; is_lead: boolean }>;
+  curriculums: CurriculumItem[];
+  attachment_files: File[];
+};
+
 export default function CourseForm({ course, categories = [], instructors = [] }: Props) {
   const { t } = useSite();
   const d = t.dashboard;
   const isEditing = !!course;
 
   const initialInstructorIds = course?.instructors?.map((i) => i.id) || [];
+  const initialCurriculums: CurriculumItem[] = (course?.curriculums || []).map((c) => ({
+    section_title_ar: c.section_title_ar || "",
+    section_title_en: c.section_title_en || "",
+    lessons: Array.isArray(c.lessons) ? c.lessons.map((l) => ({
+      title_ar: l.title_ar || "",
+      title_en: l.title_en || "",
+      duration_minutes: l.duration_minutes || 0,
+    })) : [],
+  }));
 
-  const { data, setData, post, put, processing, errors } = useForm({
+  const { data, setData, post, put, processing, errors } = useForm<CourseFormData>({
     category_id: course?.category_id ? String(course.category_id) : '',
     title_ar: course?.title_ar || '',
     title_en: course?.title_en || '',
@@ -40,15 +77,23 @@ export default function CourseForm({ course, categories = [], instructors = [] }
     price: course?.price || 0,
     status: course?.status || 'draft',
     cover_image: course?.cover_image || null,
-    instructors: initialInstructorIds.map((id) => ({ id, is_lead: true })) as Array<{ id: number; is_lead: boolean }>,
+    instructors: initialInstructorIds.map((id) => ({ id, is_lead: true })),
+    curriculums: initialCurriculums,
+    attachment_files: [],
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditing) {
-      put(route('dashboard.courses.update', course!.id));
+      put(route('dashboard.courses.update', course!.id), {
+        onSuccess: () => toast.success(d.toast.updatedSuccess),
+        onError: () => toast.error(d.toast.operationFailed),
+      });
     } else {
-      post(route('dashboard.courses.store'));
+      post(route('dashboard.courses.store'), {
+        onSuccess: () => toast.success(d.toast.savedSuccess),
+        onError: () => toast.error(d.toast.operationFailed),
+      });
     }
   };
 
@@ -58,6 +103,57 @@ export default function CourseForm({ course, categories = [], instructors = [] }
     } else {
       setData('instructors', data.instructors.filter((i) => i.id !== instructorId));
     }
+  };
+
+  const addSection = () => {
+    setData('curriculums', [...data.curriculums, { section_title_ar: '', section_title_en: '', lessons: [] }]);
+  };
+
+  const removeSection = (index: number) => {
+    setData('curriculums', data.curriculums.filter((_, i) => i !== index));
+  };
+
+  const updateSection = (index: number, field: keyof CurriculumItem, value: string) => {
+    setData('curriculums', data.curriculums.map((s, i) => (i === index ? { ...s, [field]: value } : s)));
+  };
+
+  const addLesson = (sectionIndex: number) => {
+    setData('curriculums', data.curriculums.map((s, i) =>
+      i === sectionIndex ? { ...s, lessons: [...s.lessons, { title_ar: '', title_en: '', duration_minutes: 0 }] } : s
+    ));
+  };
+
+  const removeLesson = (sectionIndex: number, lessonIndex: number) => {
+    setData('curriculums', data.curriculums.map((s, i) =>
+      i === sectionIndex ? { ...s, lessons: s.lessons.filter((_, li) => li !== lessonIndex) } : s
+    ));
+  };
+
+  const updateLesson = (sectionIndex: number, lessonIndex: number, field: string, value: string | number) => {
+    setData('curriculums', data.curriculums.map((s, i) =>
+      i === sectionIndex
+        ? { ...s, lessons: s.lessons.map((l, li) => (li === lessonIndex ? { ...l, [field]: value } : l)) }
+        : s
+    ));
+  };
+
+  const handleAttachmentFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setData('attachment_files', [...data.attachment_files, ...files]);
+    }
+    e.target.value = '';
+  };
+
+  const removeAttachmentFile = (index: number) => {
+    setData('attachment_files', data.attachment_files.filter((_, i) => i !== index));
+  };
+
+  const deleteExistingAttachment = (attachmentId: number) => {
+    router.delete(route('dashboard.course-attachments.destroy', attachmentId), {
+      onSuccess: () => toast.success(d.toast.deletedSuccess),
+      onError: () => toast.error(d.toast.operationFailed),
+    });
   };
 
   return (
@@ -193,6 +289,138 @@ export default function CourseForm({ course, categories = [], instructors = [] }
                 <p className="text-sm text-muted-foreground">{d.form.placeholders.noInstructors}</p>
               )}
             </div>
+          </div>
+
+          {/* Curriculum Builder */}
+          <div className="space-y-3 rounded-xl border border-border p-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">{d.form.labels.curriculum}</Label>
+              <Button type="button" variant="outline" size="sm" onClick={addSection}>
+                <Plus className="size-4" /> {d.form.labels.addSection}
+              </Button>
+            </div>
+
+            {data.curriculums.length === 0 && (
+              <p className="text-sm text-muted-foreground">{d.form.labels.noSections}</p>
+            )}
+
+            {data.curriculums.map((section, sectionIndex) => (
+              <Collapsible key={sectionIndex} defaultOpen className="rounded-lg border border-border/80">
+                <CollapsibleTrigger className="flex w-full items-center justify-between gap-3 bg-muted/30 px-4 py-3 text-sm font-semibold hover:bg-muted/50">
+                  <span className="flex items-center gap-2">
+                    <ChevronDown className="size-4 text-muted-foreground transition-transform" />
+                    {section.section_title_ar || `${d.form.labels.addSection} ${sectionIndex + 1}`}
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="text-xs font-normal text-muted-foreground">{section.lessons.length} {d.form.labels.lessons}</span>
+                    <Button type="button" variant="ghost" size="icon" className="size-7" onClick={() => removeSection(sectionIndex)}>
+                      <Trash2 className="size-4 text-destructive" />
+                    </Button>
+                  </span>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-3 px-4 py-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor={`section-ar-${sectionIndex}`}>{d.form.labels.sectionTitleAr}</Label>
+                      <Input id={`section-ar-${sectionIndex}`} value={section.section_title_ar} onChange={(e) => updateSection(sectionIndex, 'section_title_ar', e.target.value)} />
+                    </div>
+                    <div>
+                      <Label htmlFor={`section-en-${sectionIndex}`}>{d.form.labels.sectionTitleEn}</Label>
+                      <Input id={`section-en-${sectionIndex}`} dir="ltr" value={section.section_title_en} onChange={(e) => updateSection(sectionIndex, 'section_title_en', e.target.value)} />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 rounded-lg bg-background p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-muted-foreground">{d.form.labels.lessons}</span>
+                      <Button type="button" variant="outline" size="sm" onClick={() => addLesson(sectionIndex)}>
+                        <Plus className="size-3.5" /> {d.form.labels.addLesson}
+                      </Button>
+                    </div>
+
+                    {section.lessons.length === 0 && (
+                      <p className="text-xs text-muted-foreground">{d.form.labels.noLessons}</p>
+                    )}
+
+                    {section.lessons.map((lesson, lessonIndex) => (
+                      <div key={lessonIndex} className="flex items-center gap-2 rounded-md border border-border/70 bg-card p-2">
+                        <Input
+                          value={lesson.title_ar}
+                          placeholder={d.form.labels.lessonTitleAr}
+                          onChange={(e) => updateLesson(sectionIndex, lessonIndex, 'title_ar', e.target.value)}
+                          className="flex-1"
+                        />
+                        <Input
+                          dir="ltr"
+                          value={lesson.title_en}
+                          placeholder={d.form.labels.lessonTitleEn}
+                          onChange={(e) => updateLesson(sectionIndex, lessonIndex, 'title_en', e.target.value)}
+                          className="flex-1"
+                        />
+                        <Input
+                          type="number"
+                          value={lesson.duration_minutes}
+                          placeholder={d.form.labels.durationMinutes}
+                          onChange={(e) => updateLesson(sectionIndex, lessonIndex, 'duration_minutes', Number(e.target.value))}
+                          className="w-32"
+                        />
+                        <Button type="button" variant="ghost" size="icon" className="size-8 shrink-0" onClick={() => removeLesson(sectionIndex, lessonIndex)}>
+                          <Trash2 className="size-4 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            ))}
+          </div>
+
+          {/* Attachments */}
+          <div className="space-y-3 rounded-xl border border-border p-4">
+            <Label className="text-base font-semibold">{d.form.labels.attachments}</Label>
+
+            <label className="flex cursor-pointer items-center justify-center gap-3 rounded-lg border-2 border-dashed border-border bg-muted/20 px-4 py-6 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground">
+              <Upload className="size-5" />
+              <span>{d.form.labels.uploadAttachmentsHint}</span>
+              <input type="file" multiple className="hidden" onChange={handleAttachmentFiles} />
+            </label>
+
+            {data.attachment_files.length > 0 && (
+              <div className="space-y-2">
+                {data.attachment_files.map((file, index) => (
+                  <div key={index} className="flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-card px-3 py-2 text-sm">
+                    <span className="flex items-center gap-2 truncate">
+                      <FileText className="size-4 shrink-0 text-primary" />
+                      <span className="truncate">{file.name}</span>
+                    </span>
+                    <Button type="button" variant="ghost" size="icon" className="size-7 shrink-0" onClick={() => removeAttachmentFile(index)}>
+                      <Trash2 className="size-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {isEditing && course?.attachments && course.attachments.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-muted-foreground">{d.form.labels.existingAttachments}</p>
+                {course.attachments.map((att) => (
+                  <div key={att.id} className="flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-card px-3 py-2 text-sm">
+                    <a href={`/storage/${att.file_path}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 truncate hover:text-primary">
+                      <FileText className="size-4 shrink-0 text-primary" />
+                      <span className="truncate">{att.title_ar || att.title_en}</span>
+                    </a>
+                    <Button type="button" variant="ghost" size="icon" className="size-7 shrink-0" onClick={() => deleteExistingAttachment(att.id)}>
+                      <Trash2 className="size-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!isEditing && data.attachment_files.length === 0 && (
+              <p className="text-xs text-muted-foreground">{d.form.labels.noAttachments}</p>
+            )}
           </div>
 
           <div>

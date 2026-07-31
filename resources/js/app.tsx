@@ -6,6 +6,7 @@ import { createRoot } from 'react-dom/client';
 import { route as routeFn } from 'ziggy-js';
 import { initializeTheme } from './hooks/use-appearance';
 import { SiteProvider } from './context/site-context';
+import { Toaster } from './components/ui/sonner';
 
 declare global {
     const route: typeof routeFn;
@@ -26,6 +27,7 @@ createInertiaApp({
         root.render(
             <SiteProvider initialLocale={locale} initialDirection={direction}>
                 <App {...props} />
+                <Toaster />
             </SiteProvider>
         );
     },

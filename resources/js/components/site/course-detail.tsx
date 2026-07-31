@@ -146,28 +146,106 @@ export function CourseDetail({ course, courses = [] }: { course: any; courses?: 
                         </div>
                     )}
 
-                    {modules.length > 0 && (
+                    {(course.curriculums?.length > 0 || modules.length > 0) && (
                         <div>
                             <div className="flex items-baseline justify-between">
                                 <h2 className="font-serif text-2xl font-semibold tracking-tight">{t.course.curriculum}</h2>
                                 <span className="text-sm text-muted-foreground">
-                                    {modules.length} {t.course.modules} · {totalLessons} {t.catalog.lessons}
+                                    {(course.curriculums?.length || modules.length)} {t.course.modules}
                                 </span>
                             </div>
-                            <div className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border">
-                                {modules.map((m: any, i: number) => (
-                                    <div key={i} className="flex items-center justify-between gap-4 px-5 py-4">
-                                        <div className="flex items-center gap-3">
-                                            <span className="flex size-8 items-center justify-center rounded-lg bg-secondary font-serif text-sm font-semibold text-secondary-foreground">
-                                                {i + 1}
+                            {course.curriculums?.length > 0 ? (
+                                <div className="mt-4 space-y-4">
+                                    {course.curriculums.map((curr: any, i: number) => {
+                                        const secTitle = locale === 'ar' ? curr.section_title_ar : (curr.section_title_en || curr.section_title_ar)
+                                        const lessonsList = Array.isArray(curr.lessons) ? curr.lessons : []
+                                        return (
+                                            <div key={curr.id || i} className="overflow-hidden rounded-2xl border border-border bg-card">
+                                                <div className="flex items-center justify-between border-b border-border/60 bg-muted/30 px-5 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 font-serif text-xs font-bold text-primary">
+                                                            {i + 1}
+                                                        </span>
+                                                        <span className="font-semibold text-foreground">{secTitle}</span>
+                                                    </div>
+                                                    {lessonsList.length > 0 && (
+                                                        <span className="text-xs font-medium text-muted-foreground">
+                                                            {lessonsList.length} {t.catalog.lessons}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                {lessonsList.length > 0 && (
+                                                    <div className="divide-y divide-border/40 px-5">
+                                                        {lessonsList.map((les: any, j: number) => {
+                                                            const lesTitle = locale === 'ar' ? (les.title_ar || les.title) : (les.title_en || les.title_ar || les.title)
+                                                            return (
+                                                                <div key={j} className="flex items-center justify-between py-3 text-sm">
+                                                                    <span className="text-foreground/90">{lesTitle}</span>
+                                                                    {les.duration_minutes && (
+                                                                        <span className="text-xs text-muted-foreground">{les.duration_minutes} دقيقة</span>
+                                                                    )}
+                                                                </div>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="mt-4 divide-y divide-border overflow-hidden rounded-2xl border border-border">
+                                    {modules.map((m: any, i: number) => (
+                                        <div key={i} className="flex items-center justify-between gap-4 px-5 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <span className="flex size-8 items-center justify-center rounded-lg bg-secondary font-serif text-sm font-semibold text-secondary-foreground">
+                                                    {i + 1}
+                                                </span>
+                                                <span className="font-medium">{typeof m.title === 'string' ? m.title : tr(m.title)}</span>
+                                            </div>
+                                            <span className="shrink-0 text-sm text-muted-foreground">
+                                                {m.lessons} {t.catalog.lessons}
                                             </span>
-                                            <span className="font-medium">{typeof m.title === 'string' ? m.title : tr(m.title)}</span>
                                         </div>
-                                        <span className="shrink-0 text-sm text-muted-foreground">
-                                            {m.lessons} {t.catalog.lessons}
-                                        </span>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {course.attachments?.length > 0 && (
+                        <div>
+                            <h2 className="font-serif text-2xl font-semibold tracking-tight">
+                                {locale === 'ar' ? 'الملفات والمرفقات الدراسية' : 'Course Files & Attachments'}
+                            </h2>
+                            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                                {course.attachments.map((att: any) => {
+                                    const attTitle = locale === 'ar' ? att.title_ar : (att.title_en || att.title_ar)
+                                    return (
+                                        <a
+                                            key={att.id}
+                                            href={`/storage/${att.file_path}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card p-4 transition-colors hover:border-primary hover:bg-primary/5"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-xs uppercase">
+                                                    {att.file_type || 'PDF'}
+                                                </span>
+                                                <div>
+                                                    <p className="text-sm font-semibold text-foreground line-clamp-1">{attTitle}</p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {locale === 'ar' ? 'تحميل المستند' : 'Download file'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span className="rounded-lg bg-secondary px-3 py-1.5 text-xs font-bold text-secondary-foreground">
+                                                ↓
+                                            </span>
+                                        </a>
+                                    )
+                                })}
                             </div>
                         </div>
                     )}

@@ -14,6 +14,7 @@ import {
     LayoutGrid,
     MailPlus,
     Presentation,
+    Send,
     Settings,
     Star,
     Tag,
@@ -60,13 +61,14 @@ export function AppSidebar() {
                     ]}
                 />
 
-                <NavMain
-                    label={sidebar.crm}
-                    items={[
-                        { title: sidebar.items.leads, url: '/dashboard/leads/list', icon: Briefcase },
-                        { title: sidebar.items.newsletter, url: '/dashboard/newsletter/list', icon: MailPlus },
-                    ]}
-                />
+                    <NavMain
+                        label={sidebar.crm}
+                        items={[
+                            { title: sidebar.items.leads, url: '/dashboard/leads/list', icon: Briefcase },
+                            { title: sidebar.items.newsletter, url: '/dashboard/newsletter/list', icon: MailPlus },
+                            { title: sidebar.items.newsletterCampaigns, url: '/dashboard/newsletter/campaigns/list', icon: Send },
+                        ]}
+                    />
 
                 <NavMain
                     label={sidebar.content}

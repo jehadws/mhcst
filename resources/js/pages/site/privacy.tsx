@@ -1,15 +1,20 @@
-import { Head } from '@inertiajs/react'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
+import { SeoHead } from '@/components/seo-head'
 import { useSite } from '@/context/site-context'
 import { Shield } from 'lucide-react'
 
 export default function PrivacyPage() {
-    const { t, locale } = useSite()
+    const { locale } = useSite()
 
     return (
         <>
-            <Head title={`${locale === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'} | ${t.brandShort}`} />
+            <SeoHead
+                title={locale === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'}
+                description={locale === 'ar'
+                    ? 'سياسة الخصوصية وحماية البيانات في المعهد الحديث العالي للعلوم والتكنولوجيا'
+                    : 'Privacy policy and data protection at MHCST'}
+            />
             <div className="flex min-h-screen flex-col">
                 <SiteHeader />
                 <main className="flex-1">

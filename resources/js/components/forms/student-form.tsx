@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 interface Props {
   student?: Student;
@@ -26,9 +27,15 @@ export default function StudentForm({ student }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditing) {
-      put(route('dashboard.students.update', student!.id));
+      put(route('dashboard.students.update', student!.id), {
+        onSuccess: () => toast.success(d.toast.updatedSuccess),
+        onError: () => toast.error(d.toast.operationFailed),
+      });
     } else {
-      post(route('dashboard.students.store'));
+      post(route('dashboard.students.store'), {
+        onSuccess: () => toast.success(d.toast.savedSuccess),
+        onError: () => toast.error(d.toast.operationFailed),
+      });
     }
   };
 

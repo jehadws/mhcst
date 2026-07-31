@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface Props {
   enrollment?: Enrollment;
@@ -36,9 +37,15 @@ export default function EnrollmentForm({ enrollment, courses = [], students = []
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditing) {
-      put(route('dashboard.enrollments.update', enrollment!.id));
+      put(route('dashboard.enrollments.update', enrollment!.id), {
+        onSuccess: () => toast.success(d.toast.updatedSuccess),
+        onError: () => toast.error(d.toast.operationFailed),
+      });
     } else {
-      post(route('dashboard.enrollments.store'));
+      post(route('dashboard.enrollments.store'), {
+        onSuccess: () => toast.success(d.toast.savedSuccess),
+        onError: () => toast.error(d.toast.operationFailed),
+      });
     }
   };
 

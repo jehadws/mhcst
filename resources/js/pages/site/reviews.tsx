@@ -1,21 +1,26 @@
-import { Head } from '@inertiajs/react'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
+import { SeoHead } from '@/components/seo-head'
 import { Testimonials } from '@/components/site/testimonials'
 import { FloatingButtons } from '@/components/site/floating-buttons'
 import { useSite } from '@/context/site-context'
 import { Star } from 'lucide-react'
 
 interface Props {
-    testimonials?: any[]
+    testimonials?: Array<Record<string, unknown>>;
 }
 
 export default function PublicReviewsPage({ testimonials }: Props) {
-    const { t } = useSite()
+    const { t, locale } = useSite()
 
     return (
         <>
-            <Head title={`${t.nav.testimonials} | ${t.brandShort}`} />
+            <SeoHead
+                title={t.nav.testimonials}
+                description={locale === 'ar'
+                    ? 'آراء وتجارب المتدربين في المعهد الحديث العالي للعلوم والتكنولوجيا'
+                    : 'Student testimonials and experiences at the Modern Higher Institute for Science & Technology'}
+            />
             <div className="flex min-h-screen flex-col">
                 <SiteHeader />
                 <main className="flex-1">

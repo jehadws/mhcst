@@ -1,6 +1,6 @@
-import { Head } from '@inertiajs/react'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
+import { SeoHead } from '@/components/seo-head'
 import { Contact } from '@/components/site/contact'
 import { EnrollForm } from '@/components/site/enroll-form'
 import { FloatingButtons } from '@/components/site/floating-buttons'
@@ -8,15 +8,20 @@ import { useSite } from '@/context/site-context'
 import { Mail } from 'lucide-react'
 
 interface Props {
-    courses?: any[]
+    courses?: Array<{ id: number; title_ar: string; title_en?: string; slug: string }>;
 }
 
 export default function PublicContactPage({ courses = [] }: Props) {
-    const { t } = useSite()
+    const { t, locale } = useSite()
 
     return (
         <>
-            <Head title={`${t.nav.contact} | ${t.brandShort}`} />
+            <SeoHead
+                title={t.nav.contact}
+                description={locale === 'ar'
+                    ? 'تواصل مع المعهد الحديث العالي للعلوم والتكنولوجيا - احصل على استشارة مجانية حول دوراتنا التدريبية'
+                    : 'Contact the Modern Higher Institute for Science & Technology for a free consultation about our training courses'}
+            />
             <div className="flex min-h-screen flex-col">
                 <SiteHeader />
                 <main className="flex-1">

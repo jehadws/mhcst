@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import ImageUploader from "@/components/image-uploader";
+import { toast } from "sonner";
 
 interface Props {
   testimonial?: Testimonial;
@@ -31,9 +32,15 @@ export default function TestimonialForm({ testimonial }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditing) {
-      put(route('dashboard.testimonials.update', testimonial!.id));
+      put(route('dashboard.testimonials.update', testimonial!.id), {
+        onSuccess: () => toast.success(d.toast.updatedSuccess),
+        onError: () => toast.error(d.toast.operationFailed),
+      });
     } else {
-      post(route('dashboard.testimonials.store'));
+      post(route('dashboard.testimonials.store'), {
+        onSuccess: () => toast.success(d.toast.savedSuccess),
+        onError: () => toast.error(d.toast.operationFailed),
+      });
     }
   };
 

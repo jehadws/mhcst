@@ -1,6 +1,6 @@
-import { Head } from '@inertiajs/react'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
+import { SeoHead } from '@/components/seo-head'
 import { Stats } from '@/components/site/stats'
 import { Testimonials } from '@/components/site/testimonials'
 import { Contact } from '@/components/site/contact'
@@ -8,7 +8,6 @@ import { FloatingButtons } from '@/components/site/floating-buttons'
 import { useSite } from '@/context/site-context'
 import {
     Award,
-    CheckCircle2,
     Eye,
     GraduationCap,
     Lightbulb,
@@ -19,7 +18,7 @@ import {
 } from 'lucide-react'
 
 interface Props {
-    testimonials?: any[]
+    testimonials?: Array<Record<string, unknown>>
 }
 
 export default function PublicAboutPage({ testimonials }: Props) {
@@ -90,7 +89,10 @@ export default function PublicAboutPage({ testimonials }: Props) {
 
     return (
         <>
-            <Head title={`${t.nav.about} | ${t.brandShort}`} />
+            <SeoHead
+                title={locale === 'ar' ? 'من نحن' : 'About Us'}
+                description={mission.body}
+            />
             <div className="flex min-h-screen flex-col">
                 <SiteHeader />
                 <main className="flex-1">

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ImageUploader from "@/components/image-uploader";
+import { toast } from "sonner";
 
 interface Props {
   post?: BlogPost;
@@ -33,9 +34,15 @@ export default function BlogPostForm({ post }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditing) {
-      put(route('dashboard.blog-posts.update', post!.id));
+      put(route('dashboard.blog-posts.update', post!.id), {
+        onSuccess: () => toast.success(d.toast.updatedSuccess),
+        onError: () => toast.error(d.toast.operationFailed),
+      });
     } else {
-      submitPost(route('dashboard.blog-posts.store'));
+      submitPost(route('dashboard.blog-posts.store'), {
+        onSuccess: () => toast.success(d.toast.savedSuccess),
+        onError: () => toast.error(d.toast.operationFailed),
+      });
     }
   };
 

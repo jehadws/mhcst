@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCourseRequest;
 use App\Models\Category;
 use App\Models\Course;
+use App\Models\CourseAttachment;
 use App\Models\Instructor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class CourseController extends Controller
@@ -59,20 +61,46 @@ class CourseController extends Controller
             $course->instructors()->sync($syncData);
         }
 
+        if ($request->has('curriculums')) {
+            foreach ($request->input('curriculums', []) as $index => $curr) {
+                if (! empty($curr['section_title_ar'])) {
+                    $course->curriculums()->create([
+                        'section_title_ar' => $curr['section_title_ar'],
+                        'section_title_en' => $curr['section_title_en'] ?? null,
+                        'lessons' => $curr['lessons'] ?? [],
+                        'sort_order' => $index,
+                    ]);
+                }
+            }
+        }
+
+        if ($request->hasFile('attachment_files')) {
+            foreach ($request->file('attachment_files') as $file) {
+                $path = $file->store('course-attachments', 'public');
+                $course->attachments()->create([
+                    'title_ar' => $file->getClientOriginalName(),
+                    'title_en' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getClientOriginalExtension(),
+                    'file_size_bytes' => $file->getSize(),
+                ]);
+            }
+        }
+
         return to_route('dashboard.courses.list');
     }
 
     public function show(Course $course)
     {
         return Inertia::render('dashboard/courses/show', [
-            'course' => $course->load(['category', 'instructors', 'media', 'reviews.student']),
+            'course' => $course->load(['category', 'instructors', 'media', 'reviews.student', 'curriculums', 'attachments']),
         ]);
     }
 
     public function edit(Course $course)
     {
         return Inertia::render('dashboard/courses/edit', [
-            'course' => $course->load('instructors'),
+            'course' => $course->load(['instructors', 'curriculums', 'attachments']),
             'categories' => Category::all(['id', 'name_ar']),
             'instructors' => Instructor::where('is_active', true)->get(['id', 'name']),
         ]);
@@ -99,7 +127,44 @@ class CourseController extends Controller
             $course->instructors()->sync($syncData);
         }
 
+        if ($request->has('curriculums')) {
+            $course->curriculums()->delete();
+            foreach ($request->input('curriculums', []) as $index => $curr) {
+                if (! empty($curr['section_title_ar'])) {
+                    $course->curriculums()->create([
+                        'section_title_ar' => $curr['section_title_ar'],
+                        'section_title_en' => $curr['section_title_en'] ?? null,
+                        'lessons' => $curr['lessons'] ?? [],
+                        'sort_order' => $index,
+                    ]);
+                }
+            }
+        }
+
+        if ($request->hasFile('attachment_files')) {
+            foreach ($request->file('attachment_files') as $file) {
+                $path = $file->store('course-attachments', 'public');
+                $course->attachments()->create([
+                    'title_ar' => $file->getClientOriginalName(),
+                    'title_en' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                    'file_type' => $file->getClientOriginalExtension(),
+                    'file_size_bytes' => $file->getSize(),
+                ]);
+            }
+        }
+
         return to_route('dashboard.courses.list');
+    }
+
+    public function destroyAttachment(CourseAttachment $attachment)
+    {
+        if ($attachment->file_path) {
+            Storage::disk('public')->delete($attachment->file_path);
+        }
+        $attachment->delete();
+
+        return back();
     }
 
     public function destroy(Course $course)

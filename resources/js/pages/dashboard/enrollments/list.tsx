@@ -74,7 +74,7 @@ export default function EnrollmentsListPage() {
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => router.get(route('dashboard.enrollments.show', item.id))}><Eye className="w-4 h-4 ms-2" /> {d.actions.view}</DropdownMenuItem>
                             {item.status === 'pending' && (
-                                <DropdownMenuItem onClick={() => router.post(route('dashboard.enrollments.status', item.id), { status: 'confirmed' })}>
+                                <DropdownMenuItem onClick={() => router.post(route('dashboard.enrollments.status', item.id), { status: 'confirmed' }, { onSuccess: () => toast.success(d.toast.confirmedSuccess), onError: () => toast.error(d.toast.operationFailed) })}>
                                     <CheckCircle className="w-4 h-4 ms-2 text-green-600" /> {d.actions.confirm}
                                 </DropdownMenuItem>
                             )}
@@ -89,10 +89,12 @@ export default function EnrollmentsListPage() {
         {
             label: d.actions.confirm,
             action: (selectedRows: Enrollment[]) => {
-                selectedRows.forEach(row => {
-                    router.post(route('dashboard.enrollments.status', row.id), { status: 'confirmed' });
+                selectedRows.forEach((row) => {
+                    router.post(route('dashboard.enrollments.status', row.id), { status: 'confirmed' }, {
+                        onSuccess: () => toast.success(d.toast.confirmedSuccess),
+                        onError: () => toast.error(d.toast.operationFailed),
+                    });
                 });
-                toast.success(d.toast.confirmedSuccess);
             },
         },
         {

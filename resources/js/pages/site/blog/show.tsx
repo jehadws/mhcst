@@ -1,7 +1,8 @@
-import { Head, Link } from '@inertiajs/react'
-import { ArrowLeft, ArrowRight, BookOpen, Calendar, ChevronLeft, ChevronRight, Clock, Tag } from 'lucide-react'
+import { Link } from '@inertiajs/react'
+import { BookOpen, Calendar, ChevronLeft, ChevronRight, Clock } from 'lucide-react'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
+import { SeoHead } from '@/components/seo-head'
 import { useSite } from '@/context/site-context'
 
 interface BlogPost {
@@ -28,7 +29,7 @@ interface Props {
 }
 
 export default function BlogShow({ post, related = [] }: Props) {
-    const { t, locale } = useSite()
+    const { locale } = useSite()
     const ArrowBack = locale === 'ar' ? ChevronRight : ChevronLeft
 
     const title = (p: BlogPost) => p.title || p.title_ar || p.title_en || ''
@@ -44,9 +45,18 @@ export default function BlogShow({ post, related = [] }: Props) {
         })
     }
 
+    const coverImage = post.cover_image
+        ? (post.cover_image.startsWith('http') ? post.cover_image : `/storage/${post.cover_image}`)
+        : undefined
+
     return (
         <>
-            <Head title={`${title(post)} | ${t.brandShort}`} />
+            <SeoHead
+                title={title(post)}
+                description={excerpt(post)}
+                image={coverImage}
+                type="article"
+            />
             <div className="flex min-h-screen flex-col">
                 <SiteHeader />
                 <main className="flex-1">

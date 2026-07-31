@@ -12,7 +12,7 @@ class NewsletterSubscriber extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'email', 'is_active', 'subscribed_at', 'unsubscribed_at',
+        'name', 'email', 'is_active', 'subscribed_at', 'unsubscribed_at', 'unsubscribe_token',
     ];
 
     protected $casts = [

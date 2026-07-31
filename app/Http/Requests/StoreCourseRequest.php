@@ -47,6 +47,15 @@ class StoreCourseRequest extends FormRequest
             'instructors' => 'nullable|array',
             'instructors.*.id' => 'exists:instructors,id',
             'instructors.*.is_lead' => 'boolean',
+            'curriculums' => 'nullable|array',
+            'curriculums.*.section_title_ar' => 'nullable|string|max:255',
+            'curriculums.*.section_title_en' => 'nullable|string|max:255',
+            'curriculums.*.lessons' => 'nullable|array',
+            'curriculums.*.lessons.*.title_ar' => 'nullable|string|max:255',
+            'curriculums.*.lessons.*.title_en' => 'nullable|string|max:255',
+            'curriculums.*.lessons.*.duration_minutes' => 'nullable|integer|min:0',
+            'attachment_files' => 'nullable|array',
+            'attachment_files.*' => 'nullable|file|max:20480|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,zip',
         ];
     }
 }

@@ -30,6 +30,22 @@ class CertificateController extends Controller
         ]);
     }
 
+    public function download(Certificate $certificate)
+    {
+        $certificate->load(['course', 'student', 'issuer']);
+
+        return view('certificates.pdf', ['certificate' => $certificate]);
+    }
+
+    public function publicDownload(string $number)
+    {
+        $certificate = Certificate::with(['course', 'student', 'issuer'])
+            ->where('certificate_number', $number)
+            ->firstOrFail();
+
+        return view('certificates.pdf', ['certificate' => $certificate]);
+    }
+
     public function index(Request $request)
     {
         $query = Certificate::with(['course', 'student']);

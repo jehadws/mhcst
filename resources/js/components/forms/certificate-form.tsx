@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface Props {
   enrollments: { id: number; full_name: string; course: { title_ar: string } }[];
@@ -22,7 +23,11 @@ export default function CertificateForm({ enrollments }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post(route('dashboard.certificates.store'), { forceFormData: true });
+    post(route('dashboard.certificates.store'), {
+      forceFormData: true,
+      onSuccess: () => toast.success(d.toast.savedSuccess),
+      onError: () => toast.error(d.toast.operationFailed),
+    });
   };
 
   return (

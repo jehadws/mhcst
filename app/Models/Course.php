@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Traits\HasImage;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Course extends Model
 {
-    use HasImage, LogsActivity;
+    use HasFactory, HasImage, LogsActivity;
 
     protected string $imageField = 'cover_image';
 
@@ -55,6 +56,16 @@ class Course extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function curriculums()
+    {
+        return $this->hasMany(CourseCurriculum::class)->orderBy('sort_order');
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(CourseAttachment::class);
     }
 
     public function creator()

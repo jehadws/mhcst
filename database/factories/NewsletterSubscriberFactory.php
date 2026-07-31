@@ -23,6 +23,7 @@ class NewsletterSubscriberFactory extends Factory
             'is_active' => true,
             'subscribed_at' => now(),
             'unsubscribed_at' => null,
+            'unsubscribe_token' => fake()->unique()->regexify('[A-Za-z0-9]{32}'),
         ];
     }
 

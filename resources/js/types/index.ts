@@ -71,6 +71,31 @@ export interface Instructor {
     };
 }
 
+export interface CourseCurriculum {
+    id: number;
+    course_id?: number;
+    section_title_ar: string;
+    section_title_en?: string;
+    lessons: Array<{
+        title_ar?: string;
+        title_en?: string;
+        duration_minutes?: number;
+        is_free?: boolean;
+    }>;
+    sort_order?: number;
+}
+
+export interface CourseAttachment {
+    id: number;
+    course_id?: number;
+    title_ar: string;
+    title_en?: string;
+    file_path: string;
+    file_type?: string;
+    file_size_bytes?: number;
+    download_url?: string;
+}
+
 export interface Course {
     id: number;
     category_id?: number;
@@ -91,6 +116,8 @@ export interface Course {
     category?: Category;
     instructors?: Instructor[];
     cover_image?: string;
+    curriculums?: CourseCurriculum[];
+    attachments?: CourseAttachment[];
     created_by?: number;
     created_at?: string;
     updated_at?: string;
@@ -259,4 +286,47 @@ export interface NewsletterSubscriber {
     subscribed_at: string;
     unsubscribed_at?: string;
     created_at: string;
+}
+
+export interface NewsletterCampaign {
+    id: number;
+    subject: string;
+    content: string;
+    status: 'draft' | 'sending' | 'sent' | 'cancelled';
+    sent_by?: number;
+    sent_at?: string;
+    recipient_count: number;
+    sent_count: number;
+    failed_count: number;
+    created_at: string;
+    sender?: { id: number; name: string };
+}
+
+export interface DashboardStats {
+    students_count: number;
+    students_delta?: number | null;
+    courses_count: number;
+    total_courses: number;
+    enrollments_this_month: number;
+    enrollments_delta?: number | null;
+    pending_enrollments: number;
+    total_revenue: number;
+    revenue_this_month: number;
+    revenue_delta?: number | null;
+    new_leads: number;
+}
+
+export interface ChartPoint {
+    month: string;
+    value: number;
+}
+
+export interface StatusCount {
+    status: string;
+    count: number;
+}
+
+export interface TopCourse {
+    title: string;
+    count: number;
 }

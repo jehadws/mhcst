@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import ImageUploader from "@/components/image-uploader";
 import KeyValueInput from "@/components/shared/key-value-input";
+import { toast } from "sonner";
 
 interface Props {
   instructor?: Instructor;
@@ -41,9 +42,15 @@ export default function InstructorForm({ instructor }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditing) {
-      put(route('dashboard.instructors.update', instructor!.id));
+      put(route('dashboard.instructors.update', instructor!.id), {
+        onSuccess: () => toast.success(d.toast.updatedSuccess),
+        onError: () => toast.error(d.toast.operationFailed),
+      });
     } else {
-      post(route('dashboard.instructors.store'));
+      post(route('dashboard.instructors.store'), {
+        onSuccess: () => toast.success(d.toast.savedSuccess),
+        onError: () => toast.error(d.toast.operationFailed),
+      });
     }
   };
 

@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useSite } from '@/context/site-context';
+import { toast } from 'sonner';
 
 export default function Password() {
     const { t } = useSite();
@@ -32,7 +33,10 @@ export default function Password() {
         e.preventDefault();
         put(route('password.update'), {
             preserveScroll: true,
-            onSuccess: () => reset(),
+            onSuccess: () => {
+                reset();
+                toast.success(t.dashboard.toast.updatedSuccess);
+            },
             onError: (errors) => {
                 if (errors.password) {
                     reset('password', 'password_confirmation');

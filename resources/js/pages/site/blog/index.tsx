@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { Head, Link } from '@inertiajs/react'
-import { Calendar, ChevronRight, Clock, Tag, BookOpen, Sparkles } from 'lucide-react'
+import { Link } from '@inertiajs/react'
+import { Calendar, ChevronRight, Clock, BookOpen } from 'lucide-react'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
+import { SeoHead } from '@/components/seo-head'
 import { useSite } from '@/context/site-context'
 
 interface BlogPost {
@@ -26,7 +26,7 @@ interface Props {
 }
 
 export default function BlogIndex({ posts = [] }: Props) {
-    const { t, locale } = useSite()
+    const { locale } = useSite()
 
     const title = (p: BlogPost) => p.title || p.title_ar || p.title_en || ''
     const excerpt = (p: BlogPost) => p.excerpt || p.excerpt_ar || p.excerpt_en || ''
@@ -44,7 +44,12 @@ export default function BlogIndex({ posts = [] }: Props) {
 
     return (
         <>
-            <Head title={`${locale === 'ar' ? 'المدونة' : 'Blog'} | ${t.brandShort}`} />
+            <SeoHead
+                title={locale === 'ar' ? 'المدونة' : 'Blog'}
+                description={locale === 'ar'
+                    ? 'مقالات ونصائح من المعهد الحديث العالي للعلوم والتكنولوجيا حول التدريب والتطوير المهني'
+                    : 'Articles and insights from MHCST on training and professional development'}
+            />
             <div className="flex min-h-screen flex-col">
                 <SiteHeader />
                 <main className="flex-1">

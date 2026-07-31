@@ -1,21 +1,31 @@
-import { Head } from '@inertiajs/react'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
+import { SeoHead } from '@/components/seo-head'
 import { Faq } from '@/components/site/faq'
 import { FloatingButtons } from '@/components/site/floating-buttons'
 import { useSite } from '@/context/site-context'
 import { HelpCircle } from 'lucide-react'
 
+interface FaqItem {
+    question: string;
+    answer: string;
+}
+
 interface Props {
-    faqs?: any[]
+    faqs?: FaqItem[];
 }
 
 export default function PublicFaqPage({ faqs }: Props) {
-    const { t } = useSite()
+    const { t, locale } = useSite()
 
     return (
         <>
-            <Head title={`${t.nav.faq} | ${t.brandShort}`} />
+            <SeoHead
+                title={t.nav.faq}
+                description={locale === 'ar'
+                    ? 'الأسئلة الشائعة حول التسجيل والدفع والشهادات في المعهد الحديث العالي للعلوم والتكنولوجيا'
+                    : 'Frequently asked questions about enrollment, payment, and certificates at MHCST'}
+            />
             <div className="flex min-h-screen flex-col">
                 <SiteHeader />
                 <main className="flex-1">

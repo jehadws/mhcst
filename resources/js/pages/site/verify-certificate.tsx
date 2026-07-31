@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Head, Link, router } from '@inertiajs/react'
+import { Link, router } from '@inertiajs/react'
 import { Award, BadgeCheck, Calendar, CheckCircle2, FileBadge, Search, ShieldCheck, User, XCircle } from 'lucide-react'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
+import { SeoHead } from '@/components/seo-head'
 import { useSite } from '@/context/site-context'
 
 interface VerifiedCertificate {
@@ -50,7 +51,12 @@ export default function VerifyCertificate({ number = '', certificate = null, not
 
     return (
         <>
-            <Head title={`${locale === 'ar' ? 'التحقق من الشهادات' : 'Certificate Verification'} | ${t.brandShort}`} />
+            <SeoHead
+                title={locale === 'ar' ? 'التحقق من الشهادات' : 'Certificate Verification'}
+                description={locale === 'ar'
+                    ? 'تحقق من صحة الشهادات الصادرة عن المعهد الحديث العالي للعلوم والتكنولوجيا'
+                    : 'Verify the authenticity of certificates issued by MHCST'}
+            />
             <div className="flex min-h-screen flex-col">
                 <SiteHeader />
                 <main className="flex-1">
@@ -118,16 +124,26 @@ export default function VerifyCertificate({ number = '', certificate = null, not
                         {/* Result */}
                         {certificate && !notFound && (
                             <div className="mt-8 overflow-hidden rounded-3xl border border-emerald-500/30 bg-card shadow-xl">
-                                <div className="flex items-center gap-3 border-b border-border/60 bg-emerald-500/10 px-6 py-4">
-                                    <BadgeCheck className="size-6 text-emerald-600 dark:text-emerald-400" />
-                                    <div>
-                                        <p className="font-serif text-lg font-bold text-foreground">
-                                            {locale === 'ar' ? 'شهادة صحيحة' : 'Valid Certificate'}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            {locale === 'ar' ? 'تم التحقق من صحة هذه الشهادة' : 'This certificate has been verified as authentic'}
-                                        </p>
+                                <div className="flex items-center justify-between border-b border-border/60 bg-emerald-500/10 px-6 py-4">
+                                    <div className="flex items-center gap-3">
+                                        <BadgeCheck className="size-6 text-emerald-600 dark:text-emerald-400" />
+                                        <div>
+                                            <p className="font-serif text-lg font-bold text-foreground">
+                                                {locale === 'ar' ? 'شهادة صحيحة' : 'Valid Certificate'}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {locale === 'ar' ? 'تم التحقق من صحة هذه الشهادة' : 'This certificate has been verified as authentic'}
+                                            </p>
+                                        </div>
                                     </div>
+                                    <a
+                                        href={`/verify-certificate/${certificate.certificate_number}/download`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-md transition-colors hover:bg-primary/90"
+                                    >
+                                        <span>{locale === 'ar' ? 'طباعة / تحصيل الشهادة' : 'Print / Download Certificate'}</span>
+                                    </a>
                                 </div>
                                 <div className="p-6 sm:p-8">
                                     <div className="flex flex-col items-center text-center">

@@ -52,7 +52,7 @@ class SiteController extends Controller
 
     public function course(string $slug): Response
     {
-        $course = Course::with(['instructors', 'category', 'reviews.student'])
+        $course = Course::with(['instructors', 'category', 'reviews.student', 'curriculums', 'attachments'])
             ->where('slug', $slug)
             ->orWhere('id', $slug)
             ->first();

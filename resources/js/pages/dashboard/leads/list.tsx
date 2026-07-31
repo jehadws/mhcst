@@ -75,7 +75,7 @@ export default function LeadsListPage() {
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => router.get(route('dashboard.leads.show', item.id))}><Eye className="w-4 h-4 ms-2" /> {d.actions.view}</DropdownMenuItem>
                             {item.status === 'new' && (
-                                <DropdownMenuItem onClick={() => router.put(route('dashboard.leads.update', item.id), { status: 'in_progress' })}><CheckCircle className="w-4 h-4 ms-2 text-green-600" /> {d.actions.process}</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => router.put(route('dashboard.leads.update', item.id), { status: 'in_progress' }, { onSuccess: () => toast.success(d.toast.updatedSuccess), onError: () => toast.error(d.toast.operationFailed) })}><CheckCircle className="w-4 h-4 ms-2 text-green-600" /> {d.actions.process}</DropdownMenuItem>
                             )}
                             <DropdownMenuItem onClick={() => setDeleteDialog({ isOpen: true, loading: false, item })} className="text-destructive"><Trash2 className="w-4 h-4 ms-2 text-destructive" /> {d.actions.delete}</DropdownMenuItem>
                         </DropdownMenuContent>
@@ -89,8 +89,12 @@ export default function LeadsListPage() {
         {
             label: d.actions.process,
             action: (selectedRows: Lead[]) => {
-                selectedRows.forEach(row => router.put(route('dashboard.leads.update', row.id), { status: 'in_progress' }));
-                toast.success(d.toast.updatedSuccess);
+                selectedRows.forEach((row) => {
+                    router.put(route('dashboard.leads.update', row.id), { status: 'in_progress' }, {
+                        onSuccess: () => toast.success(d.toast.updatedSuccess),
+                        onError: () => toast.error(d.toast.operationFailed),
+                    });
+                });
             },
         },
         {

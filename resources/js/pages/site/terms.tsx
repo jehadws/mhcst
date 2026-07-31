@@ -1,15 +1,20 @@
-import { Head } from '@inertiajs/react'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
+import { SeoHead } from '@/components/seo-head'
 import { useSite } from '@/context/site-context'
 import { FileText } from 'lucide-react'
 
 export default function TermsPage() {
-    const { t, locale } = useSite()
+    const { locale } = useSite()
 
     return (
         <>
-            <Head title={`${locale === 'ar' ? 'الشروط والأحكام' : 'Terms of Use'} | ${t.brandShort}`} />
+            <SeoHead
+                title={locale === 'ar' ? 'الشروط والأحكام' : 'Terms of Use'}
+                description={locale === 'ar'
+                    ? 'الشروط والأحكام لاستخدام موقع المعهد الحديث العالي للعلوم والتكنولوجيا'
+                    : 'Terms of use for the MHCST website'}
+            />
             <div className="flex min-h-screen flex-col">
                 <SiteHeader />
                 <main className="flex-1">
