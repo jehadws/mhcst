@@ -2,19 +2,18 @@ import { Head } from '@inertiajs/react'
 import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
 import { Contact } from '@/components/site/contact'
+import { EnrollForm } from '@/components/site/enroll-form'
 import { FloatingButtons } from '@/components/site/floating-buttons'
 import { useSite } from '@/context/site-context'
 import { Mail } from 'lucide-react'
-import { useState } from 'react'
-import Editor from '@/components/editor'
 
 interface Props {
     courses?: any[]
 }
 
-export default function PublicContactPage({ courses }: Props) {
-    const { t,tr } = useSite()
-  const [body, setBody] = useState('')
+export default function PublicContactPage({ courses = [] }: Props) {
+    const { t } = useSite()
+
     return (
         <>
             <Head title={`${t.nav.contact} | ${t.brandShort}`} />
@@ -37,6 +36,22 @@ export default function PublicContactPage({ courses }: Props) {
                         </div>
                     </div>
                     <Contact />
+
+                    {courses.length > 0 && (
+                        <section className="border-t border-border/60 bg-background py-16 sm:py-20">
+                            <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-start">
+                                <div>
+                                    <h2 className="font-serif text-2xl font-bold text-foreground sm:text-3xl">
+                                        {t.enroll.title}
+                                    </h2>
+                                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+                                        {t.enroll.subtitle}
+                                    </p>
+                                </div>
+                                <EnrollForm courses={courses} />
+                            </div>
+                        </section>
+                    )}
                 </main>
                 <SiteFooter />
                 <FloatingButtons />

@@ -8,6 +8,24 @@ use Inertia\Inertia;
 
 class LeadController extends Controller
 {
+    public function publicStore(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string|max:20',
+            'subject' => 'nullable|string|max:255',
+            'message' => 'required|string',
+        ]);
+
+        $data['type'] = 'contact';
+        $data['status'] = 'new';
+
+        Lead::create($data);
+
+        return back()->with('success', 'Your message has been received. We will get back to you shortly.');
+    }
+
     public function index(Request $request)
     {
         $query = Lead::query();

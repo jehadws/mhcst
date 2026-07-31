@@ -14,6 +14,52 @@ use Inertia\Inertia;
 
 class EnrollmentController extends Controller
 {
+    public function publicStore(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|max:20',
+            'course' => 'required|string',
+            'message' => 'nullable|string|max:1000',
+        ]);
+
+        $course = Course::where('slug', $data['course'])->first();
+
+        if (! $course) {
+            return back()->withErrors(['course' => 'The selected course is invalid.'])->withInput();
+        }
+
+        $student = Student::firstOrCreate(
+            ['email' => $data['email']],
+            ['full_name' => $data['name'], 'phone' => $data['phone']]
+        );
+
+        $enrollment = Enrollment::create([
+            'course_id' => $course->id,
+            'student_id' => $student->id,
+            'full_name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'status' => 'pending',
+            'payment_status' => 'unpaid',
+            'amount_due' => $course->price ?? 0,
+            'amount_paid' => 0,
+            'source' => 'website',
+            'notes' => $data['message'] ?? null,
+        ]);
+
+        EnrollmentStatusHistory::create([
+            'enrollment_id' => $enrollment->id,
+            'old_status' => null,
+            'new_status' => 'pending',
+            'changed_by' => null,
+            'created_at' => now(),
+        ]);
+
+        return back()->with('success', 'Your enrollment request has been received. We will contact you shortly.');
+    }
+
     public function index(Request $request)
     {
         $query = Enrollment::with(['course', 'student']);

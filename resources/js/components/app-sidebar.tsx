@@ -12,6 +12,7 @@ import {
     HelpCircle,
     Image,
     LayoutGrid,
+    MailPlus,
     Presentation,
     Settings,
     Star,
@@ -63,6 +64,7 @@ export function AppSidebar() {
                     label={sidebar.crm}
                     items={[
                         { title: sidebar.items.leads, url: '/dashboard/leads/list', icon: Briefcase },
+                        { title: sidebar.items.newsletter, url: '/dashboard/newsletter/list', icon: MailPlus },
                     ]}
                 />
 

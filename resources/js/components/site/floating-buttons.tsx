@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { ArrowUp, MessageCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useSiteSettings } from '@/hooks/use-site-settings'
 
 export function FloatingButtons() {
+    const settings = useSiteSettings()
     const [showTop, setShowTop] = useState(false)
 
     useEffect(() => {
@@ -11,13 +13,15 @@ export function FloatingButtons() {
         return () => window.removeEventListener('scroll', onScroll)
     }, [])
 
+    const whatsapp = (settings.whatsapp_number || '218912345678').replace(/\D/g, '')
+
     const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
     return (
         <div className="fixed bottom-6 end-6 z-50 flex flex-col items-end gap-3">
             {/* WhatsApp Button */}
             <a
-                href="https://wa.me/218912345678"
+                href={`https://wa.me/${whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Chat on WhatsApp"

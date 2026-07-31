@@ -1,34 +1,45 @@
 import { Link } from '@inertiajs/react'
 import { Facebook, GraduationCap, Instagram, Linkedin, MessageCircle, Twitter } from 'lucide-react'
 import { useSite } from '@/context/site-context'
+import { useSiteSettings } from '@/hooks/use-site-settings'
+import { NewsletterForm } from './newsletter-form'
 
 export function SiteFooter() {
     const { t, tr, locale } = useSite()
+    const settings = useSiteSettings()
+
+    const brandName = settings.site_name || t.brandShort
+    const contactPhone = settings.contact_phone || '+218 91 234 5678'
+    const contactEmail = settings.contact_email || 'info@mset.ly'
+    const address = settings.address || t.location.addressLine
+    const whatsapp = settings.whatsapp_number || '218912345678'
+    const socialLinks = settings.social_links || {}
 
     const navLinks = [
         { href: '/courses', label: t.nav.courses },
         { href: '/about', label: t.nav.about },
-        { href: '/blog', label: locale === 'ar' ? 'المدونة' : 'Blog' },
+        { href: '/blog-posts', label: locale === 'ar' ? 'المدونة' : 'Blog' },
         { href: '/faq', label: t.nav.faq },
         { href: '/contact', label: t.nav.contact },
     ]
 
     const legalLinks = [
+        { href: '/verify-certificate', label: locale === 'ar' ? 'التحقق من الشهادة' : 'Verify Certificate' },
         { href: '/privacy-policy', label: locale === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy' },
         { href: '/terms-of-use', label: locale === 'ar' ? 'الشروط والأحكام' : 'Terms of Use' },
     ]
 
     const socials = [
-        { href: 'https://facebook.com', icon: Facebook, label: 'Facebook' },
-        { href: 'https://instagram.com', icon: Instagram, label: 'Instagram' },
-        { href: 'https://linkedin.com', icon: Linkedin, label: 'LinkedIn' },
-        { href: 'https://twitter.com', icon: Twitter, label: 'X / Twitter' },
+        { href: socialLinks.facebook || 'https://facebook.com', icon: Facebook, label: 'Facebook' },
+        { href: socialLinks.instagram || 'https://instagram.com', icon: Instagram, label: 'Instagram' },
+        { href: socialLinks.linkedin || 'https://linkedin.com', icon: Linkedin, label: 'LinkedIn' },
+        { href: socialLinks.twitter || 'https://twitter.com', icon: Twitter, label: 'X / Twitter' },
     ]
 
     return (
         <footer className="border-t border-border bg-card">
             <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-                <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
                     {/* Brand */}
                     <div className="sm:col-span-2 lg:col-span-1">
                         <Link href="/" className="flex items-center gap-2.5">
@@ -36,7 +47,7 @@ export function SiteFooter() {
                                 <GraduationCap className="size-5" />
                             </span>
                             <span className="flex flex-col leading-none">
-                                <span className="font-serif text-base font-bold">{t.brandShort}</span>
+                                <span className="font-serif text-base font-bold">{brandName}</span>
                                 <span className="text-[11px] text-muted-foreground">
                                     {locale === 'en' ? 'Education & Training' : 'للتعليم والتدريب'}
                                 </span>
@@ -61,6 +72,15 @@ export function SiteFooter() {
                         </div>
                     </div>
 
+                    {/* Newsletter */}
+                    <div>
+                        <h3 className="font-serif text-sm font-bold text-foreground">{t.newsletter.title}</h3>
+                        <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{t.newsletter.subtitle}</p>
+                        <div className="mt-4">
+                            <NewsletterForm compact />
+                        </div>
+                    </div>
+
                     {/* Quick Links */}
                     <div>
                         <h3 className="font-serif text-sm font-bold text-foreground">{t.footer.quickLinks}</h3>
@@ -82,13 +102,13 @@ export function SiteFooter() {
                     <div>
                         <h3 className="font-serif text-sm font-bold text-foreground">{t.footer.contact}</h3>
                         <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-                            <li>{t.location.addressLine}</li>
-                            <li dir="ltr" className={locale === 'ar' ? 'text-end' : ''}>+218 91 234 5678</li>
-                            <li dir="ltr" className={locale === 'ar' ? 'text-end' : ''}>info@mset.ly</li>
+                            <li>{address}</li>
+                            <li dir="ltr" className={locale === 'ar' ? 'text-end' : ''}>{contactPhone}</li>
+                            <li dir="ltr" className={locale === 'ar' ? 'text-end' : ''}>{contactEmail}</li>
                             <li className="text-xs">{t.location.hoursValue}</li>
                             <li className="pt-1">
                                 <a
-                                    href="https://wa.me/218912345678"
+                                    href={`https://wa.me/${whatsapp.replace(/\D/g, '')}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-600 transition-all hover:bg-emerald-500/20 dark:text-emerald-400"
@@ -137,9 +157,13 @@ export function SiteFooter() {
             <div className="border-t border-border">
                 <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:px-6 lg:px-8">
                     <p>
-                        © {new Date().getFullYear()}{' '}
-                        {tr({ en: 'Modern Standards for Education & Training', ar: 'المعايير الحديثة للتعليم والتدريب' })}.{' '}
-                        {t.footer.rights}
+                        {settings.footer_text || (
+                            <>
+                                © {new Date().getFullYear()}{' '}
+                                {tr({ en: 'Modern Standards for Education & Training', ar: 'المعايير الحديثة للتعليم والتدريب' })}.{' '}
+                                {t.footer.rights}
+                            </>
+                        )}
                     </p>
                     <div className="flex items-center gap-4">
                         {legalLinks.map((l) => (

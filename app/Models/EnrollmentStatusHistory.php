@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class EnrollmentStatusHistory extends Model
 {
-    protected $table = 'enrollment_status_history';
+    protected $table = 'enrollment_status_histories';
 
     public $timestamps = false;
 

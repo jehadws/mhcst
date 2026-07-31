@@ -4,7 +4,7 @@ import { categories, levelLabels } from '@/data/courses'
 import { useSite } from '@/context/site-context'
 import { EnrollForm } from './enroll-form'
 
-export function CourseDetail({ course }: { course: any }) {
+export function CourseDetail({ course, courses = [] }: { course: any; courses?: any[] }) {
     const { t, tr, locale } = useSite()
     const Back = locale === 'ar' ? ArrowRight : ArrowLeft
 
@@ -192,7 +192,7 @@ export function CourseDetail({ course }: { course: any }) {
                 <div className="lg:col-span-1">
                     <div id="enroll" className="scroll-mt-20 lg:sticky lg:top-20">
                         <h2 className="mb-4 font-serif text-xl font-semibold tracking-tight">{t.course.enroll}</h2>
-                        <EnrollForm defaultCourse={course.slug} />
+                        <EnrollForm defaultCourse={course.slug} courses={courses.length > 0 ? courses : [{ slug: course.slug, title_ar: course.title_ar, title_en: course.title_en }]} />
                     </div>
                 </div>
             </section>

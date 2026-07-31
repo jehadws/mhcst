@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\SiteSetting;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -48,6 +49,14 @@ class HandleInertiaRequests extends Middleware
             ],
             'locale' => $locale,
             'direction' => $direction,
+            'siteSettings' => SiteSetting::all()->mapWithKeys(function (SiteSetting $setting) {
+                $value = $setting->type === 'json' ? json_decode($setting->value, true) : $setting->value;
+
+                return [$setting->key => $value];
+            }),
+            'flash' => [
+                'success' => $request->session()->get('success'),
+            ],
         ]);
     }
 }

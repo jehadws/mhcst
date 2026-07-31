@@ -12,6 +12,7 @@ use App\Http\Controllers\FaqController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NotificationTemplateController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SiteContentController;
@@ -31,15 +32,19 @@ Route::get('/about', [SiteController::class, 'about'])->name('about');
 Route::get('/faq', [SiteController::class, 'faq'])->name('faq');
 Route::get('/contact', [SiteController::class, 'contact'])->name('contact');
 Route::get('/reviews', [SiteController::class, 'reviews'])->name('reviews');
-Route::get('/blog', [BlogController::class, 'index'])->name('blog');
-Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+Route::get('/blog-posts', [BlogController::class, 'index'])->name('blog');
+Route::get('/blog-posts/{slug}', [BlogController::class, 'show'])->name('blog.show');
+Route::redirect('/blog', '/blog-posts');
+Route::redirect('/blog/{slug}', '/blog-posts/{slug}');
+Route::get('/verify-certificate', [CertificateController::class, 'verify'])->name('verify-certificate');
 Route::get('/terms-of-use', fn () => app(SiteContentController::class)->show('terms-of-use'))->name('terms-of-use');
 Route::get('/privacy-policy', fn () => app(SiteContentController::class)->show('privacy-policy'))->name('privacy-policy');
 
 // Public form submissions
 Route::post('/contact', [LeadController::class, 'publicStore'])->name('contact.store');
-Route::post('/enroll', [EnrollmentController::class, 'publicStore'])->name('enrollment.public.store');
-Route::post('/review', [ReviewController::class, 'publicStore'])->name('review.public.store');
+Route::post('/enroll', [EnrollmentController::class, 'publicStore'])->name('enroll.store');
+Route::post('/review', [ReviewController::class, 'publicStore'])->name('review.store');
+Route::post('/newsletter', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -225,6 +230,13 @@ Route::middleware(['auth'])->group(function () {
     // ═══════════════════════════════════════════════════════
     Route::get('dashboard/site-settings', [SiteSettingController::class, 'edit'])->name('dashboard.site-settings.edit');
     Route::put('dashboard/site-settings', [SiteSettingController::class, 'update'])->name('dashboard.site-settings.update');
+
+    // ═══════════════════════════════════════════════════════
+    // NEWSLETTER SUBSCRIBERS
+    // ═══════════════════════════════════════════════════════
+    Route::get('dashboard/newsletter/list', [NewsletterController::class, 'index'])->name('dashboard.newsletter.list');
+    Route::delete('dashboard/newsletter/{subscriber}', [NewsletterController::class, 'destroy'])->name('dashboard.newsletter.destroy');
+    Route::post('dashboard/newsletter/bulk-actions', [NewsletterController::class, 'bulkActions'])->name('dashboard.newsletter.bulk-actions');
 
 });
 

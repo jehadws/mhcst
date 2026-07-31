@@ -7,10 +7,13 @@ import { useSite } from '@/context/site-context'
 interface BlogPost {
     id: number
     slug: string
-    title_ar: string
-    title_en: string
+    title: string
+    title_ar?: string
+    title_en?: string
+    content?: string
     content_ar?: string
     content_en?: string
+    excerpt?: string
     excerpt_ar?: string
     excerpt_en?: string
     cover_image?: string
@@ -28,9 +31,9 @@ export default function BlogShow({ post, related = [] }: Props) {
     const { t, locale } = useSite()
     const ArrowBack = locale === 'ar' ? ChevronRight : ChevronLeft
 
-    const title = (p: BlogPost) => (locale === 'ar' ? p.title_ar : p.title_en || p.title_ar)
-    const content = locale === 'ar' ? post.content_ar : post.content_en || post.content_ar
-    const excerpt = (p: BlogPost) => (locale === 'ar' ? p.excerpt_ar : p.excerpt_en || p.excerpt_ar)
+    const title = (p: BlogPost) => p.title || p.title_ar || p.title_en || ''
+    const content = post.content || (locale === 'ar' ? post.content_ar : post.content_en) || post.content_ar || ''
+    const excerpt = (p: BlogPost) => p.excerpt || p.excerpt_ar || p.excerpt_en || ''
 
     const formatDate = (d?: string) => {
         if (!d) return ''
@@ -62,7 +65,7 @@ export default function BlogShow({ post, related = [] }: Props) {
                     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
                         {/* Back Link */}
                         <Link
-                            href="/blog"
+                            href="/blog-posts"
                             className="inline-flex items-center gap-2 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-xs transition-all hover:border-primary/40 hover:text-foreground mb-8"
                         >
                             <ArrowBack className="size-3.5" />
@@ -117,7 +120,7 @@ export default function BlogShow({ post, related = [] }: Props) {
                                     {related.map((p) => (
                                         <Link
                                             key={p.id}
-                                            href={`/blog/${p.slug}`}
+                                            href={`/blog-posts/${p.slug}`}
                                             className="group flex flex-col overflow-hidden rounded-2xl border border-border/80 bg-card shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
                                         >
                                             <div className="relative aspect-video overflow-hidden bg-muted">

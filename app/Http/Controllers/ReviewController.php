@@ -10,6 +10,22 @@ use Inertia\Inertia;
 
 class ReviewController extends Controller
 {
+    public function publicStore(Request $request)
+    {
+        $data = $request->validate([
+            'course_id' => 'required|exists:courses,id',
+            'reviewer_name' => 'required|string|max:255',
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string',
+        ]);
+
+        $data['is_published'] = false;
+
+        Review::create($data);
+
+        return back()->with('success', 'Thank you for your review. It will be published after moderation.');
+    }
+
     public function index(Request $request)
     {
         $query = Review::with('course');

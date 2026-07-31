@@ -1,16 +1,24 @@
 import { useForm } from '@inertiajs/react'
 import { CheckCircle2, Send } from 'lucide-react'
-import { courses } from '@/data/courses'
 import { useSite } from '@/context/site-context'
 import { cn } from '@/lib/utils'
 
+interface CourseOption {
+    id?: number
+    slug: string
+    title_ar: string
+    title_en?: string
+    title?: { en: string; ar: string } | string
+}
+
 interface EnrollFormProps {
     defaultCourse?: string
+    courses?: CourseOption[]
     flash?: { success?: string }
 }
 
-export function EnrollForm({ defaultCourse, flash }: EnrollFormProps) {
-    const { t, tr } = useSite()
+export function EnrollForm({ defaultCourse, courses = [], flash }: EnrollFormProps) {
+    const { t, tr, locale } = useSite()
     const { data, setData, post, processing, errors, reset, wasSuccessful } = useForm({
         name: '',
         email: '',
@@ -27,6 +35,16 @@ export function EnrollForm({ defaultCourse, flash }: EnrollFormProps) {
         post(route('enroll.store'), {
             onSuccess: () => reset(),
         })
+    }
+
+    const courseLabel = (c: CourseOption): string => {
+        if (c.title_ar || c.title_en) {
+            return locale === 'ar' ? c.title_ar : c.title_en || c.title_ar
+        }
+        if (c.title && typeof c.title === 'object') {
+            return tr(c.title)
+        }
+        return String(c.title ?? c.slug)
     }
 
     if (wasSuccessful || flash?.success) {
@@ -120,7 +138,7 @@ export function EnrollForm({ defaultCourse, flash }: EnrollFormProps) {
                         </option>
                         {courses.map((c) => (
                             <option key={c.slug} value={c.slug}>
-                                {tr(c.title)}
+                                {courseLabel(c)}
                             </option>
                         ))}
                     </select>

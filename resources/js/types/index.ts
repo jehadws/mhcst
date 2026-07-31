@@ -25,6 +25,10 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    locale: string;
+    direction: 'ltr' | 'rtl';
+    siteSettings: SiteSettings;
+    flash: { success?: string | null };
     [key: string]: unknown;
 }
 
@@ -227,4 +231,32 @@ export interface SiteSetting {
     key: string;
     value: string;
     type: 'text' | 'image' | 'json';
+}
+
+export interface SiteSettings {
+    site_name?: string;
+    site_tagline?: string;
+    site_logo?: string;
+    contact_email?: string;
+    contact_phone?: string;
+    whatsapp_number?: string;
+    address?: string;
+    social_links?: {
+        facebook?: string;
+        instagram?: string;
+        linkedin?: string;
+        twitter?: string;
+    };
+    footer_text?: string;
+    meta_description?: string;
+}
+
+export interface NewsletterSubscriber {
+    id: number;
+    name?: string;
+    email: string;
+    is_active: boolean;
+    subscribed_at: string;
+    unsubscribed_at?: string;
+    created_at: string;
 }

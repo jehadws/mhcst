@@ -8,8 +8,10 @@ import { useSite } from '@/context/site-context'
 interface BlogPost {
     id: number
     slug: string
-    title_ar: string
-    title_en: string
+    title: string
+    title_ar?: string
+    title_en?: string
+    excerpt?: string
     excerpt_ar?: string
     excerpt_en?: string
     cover_image?: string
@@ -26,8 +28,8 @@ interface Props {
 export default function BlogIndex({ posts = [] }: Props) {
     const { t, locale } = useSite()
 
-    const title = (p: BlogPost) => (locale === 'ar' ? p.title_ar : p.title_en || p.title_ar)
-    const excerpt = (p: BlogPost) => (locale === 'ar' ? p.excerpt_ar : p.excerpt_en || p.excerpt_ar)
+    const title = (p: BlogPost) => p.title || p.title_ar || p.title_en || ''
+    const excerpt = (p: BlogPost) => p.excerpt || p.excerpt_ar || p.excerpt_en || ''
 
     const formatDate = (d?: string) => {
         if (!d) return ''
@@ -81,8 +83,8 @@ export default function BlogIndex({ posts = [] }: Props) {
                             <>
                                 {/* Featured Article */}
                                 {featured && (
-                                    <Link
-                                        href={`/blog/${featured.slug}`}
+                                            <Link
+                                                href={`/blog-posts/${featured.slug}`}
                                         className="group mb-12 grid overflow-hidden rounded-3xl border border-border/80 bg-card shadow-md transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl lg:grid-cols-2"
                                     >
                                         <div className="relative aspect-video overflow-hidden bg-muted lg:aspect-auto">
@@ -136,7 +138,7 @@ export default function BlogIndex({ posts = [] }: Props) {
                                         {rest.map((post) => (
                                             <Link
                                                 key={post.id}
-                                                href={`/blog/${post.slug}`}
+                                                href={`/blog-posts/${post.slug}`}
                                                 className="group flex flex-col overflow-hidden rounded-2xl border border-border/80 bg-card shadow-xs transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-xl"
                                             >
                                                 <div className="relative aspect-[16/9] overflow-hidden bg-muted">

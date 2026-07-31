@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BlogPost;
 use App\Models\Category;
 use App\Models\Course;
 use App\Models\Faq;
@@ -20,11 +21,17 @@ class SiteController extends Controller
 
         $faqs = Faq::where('is_published', true)->get();
         $testimonials = Testimonial::where('is_published', true)->get();
+        $posts = BlogPost::with('author')
+            ->where('status', 'published')
+            ->latest('published_at')
+            ->limit(3)
+            ->get();
 
         return Inertia::render('welcome', [
             'courses' => $courses,
             'faqs' => $faqs,
             'testimonials' => $testimonials,
+            'posts' => $posts,
         ]);
     }
 
@@ -50,8 +57,12 @@ class SiteController extends Controller
             ->orWhere('id', $slug)
             ->first();
 
+        $courses = Course::where('status', 'published')
+            ->get(['id', 'title_ar', 'title_en', 'slug']);
+
         return Inertia::render('site/courses/show', [
             'course' => $course,
+            'courses' => $courses,
         ]);
     }
 

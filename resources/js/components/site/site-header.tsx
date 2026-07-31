@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react'
 import { Link } from '@inertiajs/react'
 import { Globe, GraduationCap, Menu, Moon, Sun, X } from 'lucide-react'
 import { useSite } from '@/context/site-context'
+import { useSiteSettings } from '@/hooks/use-site-settings'
 import { cn } from '@/lib/utils'
 import { Button } from '../ui/button'
 
 export function SiteHeader() {
     const { t, theme, toggleTheme, toggleLocale, locale } = useSite()
+    const settings = useSiteSettings()
     const [open, setOpen] = useState(false)
     const [scrolled, setScrolled] = useState(false)
 
@@ -19,7 +21,7 @@ export function SiteHeader() {
 
     const links = [
         { href: '/courses', label: t.nav.courses },
-        { href: '/blog', label: locale === 'ar' ? 'المدونة' : 'Blog' },
+        { href: '/blog-posts', label: locale === 'ar' ? 'المدونة' : 'Blog' },
         { href: '/about', label: t.nav.about },
         { href: '/contact', label: t.nav.contact },
     ]
@@ -37,7 +39,7 @@ export function SiteHeader() {
                         <GraduationCap className="size-5" />
                     </span>
                     <span className="flex flex-col leading-none">
-                        <span className="font-serif text-base font-semibold tracking-tight">{t.brandShort}</span>
+                        <span className="font-serif text-base font-semibold tracking-tight">{settings.site_name || t.brandShort}</span>
                         <span className="text-[11px] text-muted-foreground">
                             {locale === 'en' ? 'Education & Training' : 'للتعليم والتدريب'}
                         </span>

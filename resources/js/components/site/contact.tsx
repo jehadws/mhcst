@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Clock, Mail, MapPin, Phone, Send, Sparkles } from 'lucide-react'
 import { useSite } from '@/context/site-context'
+import { useSiteSettings } from '@/hooks/use-site-settings'
 import { toast } from 'sonner'
 import { router } from '@inertiajs/react'
 
 export function Contact() {
     const { t, locale } = useSite()
+    const settings = useSiteSettings()
     const [submitting, setSubmitting] = useState(false)
     const [form, setForm] = useState({
         name: '',
@@ -14,6 +16,10 @@ export function Contact() {
         subject: '',
         message: '',
     })
+
+    const contactEmail = settings.contact_email || 'info@mset.ly'
+    const contactPhone = settings.contact_phone || '+218 91 234 5678'
+    const address = settings.address || t.location.addressLine
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -33,9 +39,9 @@ export function Contact() {
     }
 
     const cards = [
-        { icon: MapPin, title: t.location.address, detail: t.location.addressLine, color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' },
-        { icon: Phone, title: t.location.phone, detail: '+218 91 234 5678', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
-        { icon: Mail, title: t.location.email, detail: 'info@mset.ly', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' },
+        { icon: MapPin, title: t.location.address, detail: address, color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' },
+        { icon: Phone, title: t.location.phone, detail: contactPhone, color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
+        { icon: Mail, title: t.location.email, detail: contactEmail, color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' },
         { icon: Clock, title: t.location.hours, detail: t.location.hoursValue, color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400' },
     ]
 

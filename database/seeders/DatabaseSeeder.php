@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             BlogPostSeeder::class,
             ReviewSeeder::class,
             LeadSeeder::class,
+            NewsletterSubscriberSeeder::class,
         ]);
     }
 }

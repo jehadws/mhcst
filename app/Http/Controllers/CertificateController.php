@@ -12,6 +12,24 @@ use Inertia\Inertia;
 
 class CertificateController extends Controller
 {
+    public function verify(Request $request)
+    {
+        $number = $request->query('number');
+        $certificate = null;
+
+        if ($number) {
+            $certificate = Certificate::with(['course', 'student', 'issuer'])
+                ->where('certificate_number', $number)
+                ->first();
+        }
+
+        return Inertia::render('site/verify-certificate', [
+            'number' => $number,
+            'certificate' => $certificate,
+            'notFound' => $number ? ! $certificate : false,
+        ]);
+    }
+
     public function index(Request $request)
     {
         $query = Certificate::with(['course', 'student']);
