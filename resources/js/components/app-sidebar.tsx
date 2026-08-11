@@ -10,7 +10,6 @@ import {
     FileText,
     GraduationCap,
     HelpCircle,
-    Image,
     LayoutGrid,
     MailPlus,
     Presentation,
@@ -50,33 +49,36 @@ export function AppSidebar() {
                 />
 
                 <NavMain
-                    label={sidebar.training}
+                    label={isRTL ? 'النظام الأكاديمي (CMS)' : 'College Management (CMS)'}
                     items={[
-                        { title: sidebar.items.courses, url: '/dashboard/courses/list', icon: Presentation },
-                        { title: sidebar.items.categories, url: '/dashboard/categories/list', icon: Tag },
-                        { title: sidebar.items.instructors, url: '/dashboard/instructors/list', icon: UserCheck },
-                        { title: sidebar.items.enrollments, url: '/dashboard/enrollments/list', icon: GraduationCap },
-                        { title: sidebar.items.students, url: '/dashboard/students/list', icon: Users },
-                        { title: sidebar.items.certificates, url: '/dashboard/certificates/list', icon: Award },
+                        { title: isRTL ? 'الأقسام الأكاديمية' : 'Departments', url: '/cms/departments', icon: Presentation },
+                        { title: isRTL ? 'الصفوف والشهادات' : 'Levels & Sections', url: '/cms/levels', icon: Tag },
+                        { title: isRTL ? 'أعضاء هيئة التدريس' : 'Teachers', url: '/cms/teachers', icon: UserCheck },
+                        { title: isRTL ? 'المواد الدراسية' : 'Subjects', url: '/cms/subjects', icon: BookOpen },
+                        { title: isRTL ? 'الطلاب الأكاديميون' : 'CMS Students', url: '/cms/students', icon: Users },
+                        { title: isRTL ? 'التسجيلات الأكاديمية' : 'CMS Enrollments', url: '/cms/enrollments', icon: GraduationCap },
+                        { title: isRTL ? 'رصد الدرجات' : 'Grades', url: '/cms/grades', icon: Award },
+                        { title: isRTL ? 'سجل الحضور' : 'Attendance', url: '/cms/attendance', icon: UserCheck },
+                        { title: isRTL ? 'الجدول الدراسي' : 'Schedules', url: '/cms/schedules', icon: Briefcase },
+                        { title: isRTL ? 'التقارير الأكاديمية' : 'Reports', url: '/cms/reports', icon: FileText },
                     ]}
                 />
 
-                    <NavMain
-                        label={sidebar.crm}
-                        items={[
-                            { title: sidebar.items.leads, url: '/dashboard/leads/list', icon: Briefcase },
-                            { title: sidebar.items.newsletter, url: '/dashboard/newsletter/list', icon: MailPlus },
-                            { title: sidebar.items.newsletterCampaigns, url: '/dashboard/newsletter/campaigns/list', icon: Send },
-                        ]}
-                    />
+                <NavMain
+                    label={sidebar.crm}
+                    items={[
+                        { title: sidebar.items.newsletter, url: '/dashboard/newsletter/list', icon: MailPlus },
+                        { title: sidebar.items.newsletterCampaigns, url: '/dashboard/newsletter/campaigns/list', icon: Send },
+                    ]}
+                />
 
                 <NavMain
                     label={sidebar.content}
                     items={[
-                        { title: sidebar.items.blogPosts, url: '/dashboard/blog-posts/list', icon: FileText },
-                        { title: sidebar.items.banners, url: '/dashboard/banners/list', icon: Image },
+                        { title: isRTL ? 'الأخبار والإعلانات' : 'News & Posts', url: '/dashboard/blog-posts/list', icon: FileText },
                         { title: sidebar.items.testimonials, url: '/dashboard/testimonials/list', icon: Star },
                         { title: sidebar.items.faqs, url: '/dashboard/faqs/list', icon: HelpCircle },
+                        { title: sidebar.items.certificates, url: '/dashboard/certificates/list', icon: Award },
                     ]}
                 />
 

@@ -21,10 +21,10 @@ export function SiteHeader() {
   }, []);
 
   const links = [
-    { href: '/courses', label: t.nav.courses },
-    { href: '/student/portal', label: locale === 'ar' ? 'بوابة المتدربين' : 'Learner Portal' },
-    { href: '/blog-posts', label: locale === 'ar' ? 'المدونة' : 'Blog' },
+    { href: '/departments', label: locale === 'ar' ? 'الأقسام الأكاديمية' : 'Departments' },
+    { href: '/blog-posts', label: locale === 'ar' ? 'الأخبار والإعلانات' : 'News' },
     { href: '/about', label: t.nav.about },
+    { href: '/faq', label: t.nav.faq },
     { href: '/contact', label: t.nav.contact },
   ];
 
@@ -40,7 +40,7 @@ export function SiteHeader() {
           <img src={logoUrl} alt={settings?.site_name || t.brandShort} className="size-9 rounded-lg object-cover" />
           <span className="flex flex-col leading-none">
             <span className="font-serif text-base font-semibold tracking-tight">{settings.site_name || t.brandShort}</span>
-            <span className="text-muted-foreground text-[11px]">{locale === 'en' ? 'Education & Training' : 'للتعليم والتدريب'}</span>
+            <span className="text-muted-foreground text-[11px]">{locale === 'en' ? 'Education & Training' : "للعلوم والتقنية"}</span>
           </span>
         </Link>
 

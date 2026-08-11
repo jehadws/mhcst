@@ -17,15 +17,16 @@ export function SiteFooter() {
   const socialLinks = settings.social_links || {};
 
   const navLinks = [
-    { href: '/courses', label: t.nav.courses },
+    { href: '/departments', label: locale === 'ar' ? 'الأقسام الأكاديمية' : 'Departments' },
     { href: '/about', label: t.nav.about },
-    { href: '/blog-posts', label: locale === 'ar' ? 'المدونة' : 'Blog' },
+    { href: '/blog-posts', label: locale === 'ar' ? 'الأخبار والإعلانات' : 'News' },
     { href: '/faq', label: t.nav.faq },
     { href: '/contact', label: t.nav.contact },
   ];
 
   const legalLinks = [
     { href: '/verify-certificate', label: locale === 'ar' ? 'التحقق من الشهادة' : 'Verify Certificate' },
+    { href: '/student/portal', label: locale === 'ar' ? 'بوابة المتدربين' : 'Learner Portal' },
     { href: '/privacy-policy', label: locale === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy' },
     { href: '/terms-of-use', label: locale === 'ar' ? 'الشروط والأحكام' : 'Terms of Use' },
   ];

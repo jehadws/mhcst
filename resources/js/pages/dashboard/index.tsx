@@ -1,120 +1,162 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { useSite } from '@/context/site-context';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, ChartPoint, DashboardStats, Enrollment, StatusCount, TopCourse } from '@/types';
+import { BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ArrowUpRight, BookOpen, GraduationCap, Mail, Users, Wallet } from 'lucide-react';
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis } from 'recharts';
+import { ArrowUpRight, BookOpen, Building2, Calendar, CalendarCheck, ClipboardList, GraduationCap, Users, UserCheck } from 'lucide-react';
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 const COLORS = {
   primary: 'hsl(var(--primary))',
   emerald: 'hsl(160 84% 39%)',
   amber: 'hsl(38 92% 50%)',
-  rose: 'hsl(0 72% 51%)',
   sky: 'hsl(199 89% 48%)',
   violet: 'hsl(258 90% 66%)',
-  slate: 'hsl(215 20% 65%)',
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: COLORS.amber,
-  confirmed: COLORS.sky,
-  completed: COLORS.emerald,
-  cancelled: COLORS.rose,
-};
+interface CmsStudent {
+  id: number;
+  student_no: string;
+  name: string;
+  email?: string;
+  created_at: string;
+  level?: {
+    year: number;
+    section: string;
+    department?: {
+      name: string;
+    };
+  };
+}
+
+interface CmsGrade {
+  id: number;
+  total?: number;
+  grade_letter?: string;
+  entered_at?: string;
+  enrollment?: {
+    student?: { id: number; name: string; student_no: string };
+    subject?: { id: number; code: string; name: string };
+  };
+}
+
+interface CmsSchedule {
+  id: number;
+  day: string;
+  start_time: string;
+  end_time: string;
+  room?: string;
+  subject?: {
+    name: string;
+    code: string;
+  };
+  teacher?: {
+    name: string;
+  };
+  level?: {
+    year: number;
+    section: string;
+    department?: {
+      name: string;
+    };
+  };
+}
 
 export default function Dashboard() {
-  const { stats, recentEnrollments, enrollmentsByMonth, revenueByMonth, leadsByMonth, enrollmentsByStatus, topCourses } = usePage<{
-    stats: DashboardStats;
-    recentEnrollments: Enrollment[];
-    enrollmentsByMonth: ChartPoint[];
-    revenueByMonth: ChartPoint[];
-    leadsByMonth: ChartPoint[];
-    enrollmentsByStatus: StatusCount[];
-    topCourses: TopCourse[];
+  const { stats, studentsByDepartment, recentStudents, recentGrades, todaySchedules, attendanceByMonth } = usePage<{
+    stats: {
+      students_count: number;
+      students_delta?: number;
+      teachers_count: number;
+      departments_count: number;
+      subjects_count: number;
+      enrollments_count: number;
+      active_students: number;
+      attendance_today_count: number;
+    };
+    studentsByDepartment: Array<{ name: string; count: number }>;
+    recentStudents: CmsStudent[];
+    recentGrades: CmsGrade[];
+    todaySchedules: CmsSchedule[];
+    attendanceByMonth: Array<{ month: string; value: number }>;
   }>().props;
-  const { t, locale, isRTL } = useSite();
+
+  const { t, locale } = useSite();
   const d = t.dashboard;
-  const i = d.index;
   const breadcrumbs: BreadcrumbItem[] = [{ title: d.sidebar.items.dashboard, href: '/dashboard' }];
 
   const numberFmt = new Intl.NumberFormat(locale === 'ar' ? 'ar-LY' : 'en-GB');
-  const currencyFmt = new Intl.NumberFormat(locale === 'ar' ? 'ar-LY' : 'en-GB', {
-    style: 'currency',
-    currency: 'LYD',
-    maximumFractionDigits: 0,
-  });
 
-  const enrollmentChartConfig = {
-    enrollments: { label: i.enrollmentsLabel, color: COLORS.primary },
+  const attendanceChartConfig = {
+    records: { label: locale === 'ar' ? 'سجلات الحضور' : 'Attendance Records', color: COLORS.emerald },
   };
-  const revenueChartConfig = {
-    revenue: { label: i.revenueLabel, color: COLORS.emerald },
-  };
-  const leadsChartConfig = {
-    leads: { label: i.leadsLabel, color: COLORS.sky },
-  };
-  const statusChartConfig = {
-    pending: { label: d.status.pending, color: COLORS.amber },
-    confirmed: { label: d.status.confirmed, color: COLORS.sky },
-    completed: { label: d.status.completed, color: COLORS.emerald },
-    cancelled: { label: d.status.cancelled, color: COLORS.rose },
-  };
-  const topCoursesConfig = {
-    count: { label: i.enrollmentsLabel, color: COLORS.violet },
+  const deptChartConfig = {
+    students: { label: locale === 'ar' ? 'الطلاب' : 'Students', color: COLORS.primary },
   };
 
   const statCards = [
     {
-      label: i.students,
+      label: locale === 'ar' ? 'الطلاب الأكاديميون' : 'Academic Students',
       value: numberFmt.format(stats.students_count),
-      icon: Users,
+      icon: GraduationCap,
       color: COLORS.primary,
       delta: stats.students_delta,
     },
     {
-      label: i.enrollmentsThisMonth,
-      value: numberFmt.format(stats.enrollments_this_month),
-      icon: GraduationCap,
+      label: locale === 'ar' ? 'أعضاء هيئة التدريس' : 'Teaching Staff',
+      value: numberFmt.format(stats.teachers_count),
+      icon: UserCheck,
       color: COLORS.emerald,
-      delta: stats.enrollments_delta,
+      delta: null,
     },
     {
-      label: i.revenueThisMonth,
-      value: currencyFmt.format(stats.revenue_this_month),
-      icon: Wallet,
+      label: locale === 'ar' ? 'الأقسام الأكاديمية' : 'Departments',
+      value: numberFmt.format(stats.departments_count),
+      icon: Building2,
       color: COLORS.amber,
-      delta: stats.revenue_delta,
+      delta: null,
     },
     {
-      label: i.newLeads,
-      value: numberFmt.format(stats.new_leads),
-      icon: Mail,
+      label: locale === 'ar' ? 'المواد الدراسية' : 'Subjects',
+      value: numberFmt.format(stats.subjects_count),
+      icon: BookOpen,
       color: COLORS.sky,
+      delta: null,
+    },
+    {
+      label: locale === 'ar' ? 'التسجيلات الفعالة' : 'Active Enrollments',
+      value: numberFmt.format(stats.enrollments_count),
+      icon: ClipboardList,
+      color: COLORS.violet,
+      delta: null,
+    },
+    {
+      label: locale === 'ar' ? 'حضور اليوم' : "Today's Attendance",
+      value: numberFmt.format(stats.attendance_today_count),
+      icon: CalendarCheck,
+      color: COLORS.amber,
       delta: null,
     },
   ];
 
-  const statusData = enrollmentsByStatus.map((s) => ({
-    ...s,
-    fill: STATUS_COLORS[s.status] || COLORS.slate,
-  }));
-
-  const topCoursesData = isRTL ? [...topCourses].reverse() : topCourses;
-
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={i.title} />
+      <Head title={locale === 'ar' ? 'لوحة التحكم الكلية' : 'College Dashboard'} />
       <div className="flex h-full flex-1 flex-col gap-4 p-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight">{i.welcome}</h1>
-          <p className="text-muted-foreground text-sm">{i.overview}</p>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {locale === 'ar' ? 'مرحباً بك في النظام الأكاديمي' : 'Welcome to Academic Dashboard'}
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            {locale === 'ar' ? 'نظرة عامة على الكلية والأحصائيات الأكاديمية' : 'Overview of college statistics and schedules'}
+          </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {/* ─── Stat Cards ─── */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {statCards.map((card) => (
             <Card key={card.label} className="relative overflow-hidden">
               <CardContent className="flex items-center justify-between p-5">
@@ -126,7 +168,7 @@ export default function Dashboard() {
                       className={`flex items-center gap-1 text-xs font-medium ${card.delta >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}
                     >
                       <ArrowUpRight className={`h-3.5 w-3.5 ${card.delta < 0 ? 'rotate-90' : ''}`} />
-                      {Math.abs(card.delta)}% {i.vsLastMonth}
+                      {Math.abs(card.delta)}% {locale === 'ar' ? 'مقارنة بالشهر الماضي' : 'vs last month'}
                     </p>
                   )}
                 </div>
@@ -138,19 +180,40 @@ export default function Dashboard() {
           ))}
         </div>
 
+        {/* ─── Charts ─── */}
         <div className="grid gap-4 lg:grid-cols-2">
+          {/* Department Distribution */}
           <Card>
             <CardHeader>
-              <CardTitle>{i.enrollmentsChartTitle}</CardTitle>
-              <CardDescription>{i.enrollmentsChartDesc}</CardDescription>
+              <CardTitle>{locale === 'ar' ? 'توزيع الطلاب حسب القسم' : 'Students per Department'}</CardTitle>
+              <CardDescription>{locale === 'ar' ? 'عدد الطلاب المقيدين بكل قسم أكاديمي' : 'Registered student breakdown by department'}</CardDescription>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={enrollmentChartConfig} className="h-[260px] w-full">
-                <AreaChart data={enrollmentsByMonth} margin={{ left: 12, right: 12, top: 8 }}>
+              <ChartContainer config={deptChartConfig} className="h-[260px] w-full">
+                <BarChart data={studentsByDepartment} margin={{ left: 12, right: 12, top: 8 }}>
+                  <CartesianGrid vertical={false} className="stroke-border/60" />
+                  <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
+                  <YAxis tickLine={false} axisLine={false} tickMargin={8} allowDecimals={false} width={30} />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                  <Bar dataKey="count" name="count" fill="var(--color-students)" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+
+          {/* Attendance Trend */}
+          <Card>
+            <CardHeader>
+              <CardTitle>{locale === 'ar' ? 'سجل الحضور الشهري' : 'Monthly Attendance Records'}</CardTitle>
+              <CardDescription>{locale === 'ar' ? 'معدل تسجيل الحضور والغياب خلال الأشهر الماضية' : 'Monthly recorded attendance activity'}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={attendanceChartConfig} className="h-[260px] w-full">
+                <AreaChart data={attendanceByMonth} margin={{ left: 12, right: 12, top: 8 }}>
                   <defs>
-                    <linearGradient id="fillEnrollments" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.35} />
-                      <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0.02} />
+                    <linearGradient id="fillAttendance" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={COLORS.emerald} stopOpacity={0.35} />
+                      <stop offset="95%" stopColor={COLORS.emerald} stopOpacity={0.02} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid vertical={false} className="stroke-border/60" />
@@ -160,158 +223,174 @@ export default function Dashboard() {
                   <Area
                     dataKey="value"
                     type="natural"
-                    name="enrollments"
-                    stroke="var(--color-enrollments)"
+                    name="records"
+                    stroke="var(--color-records)"
                     strokeWidth={2}
-                    fill="url(#fillEnrollments)"
+                    fill="url(#fillAttendance)"
                   />
-                </AreaChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{i.revenueChartTitle}</CardTitle>
-              <CardDescription>{i.revenueChartDesc}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={revenueChartConfig} className="h-[260px] w-full">
-                <BarChart data={revenueByMonth} margin={{ left: 12, right: 12, top: 8 }}>
-                  <CartesianGrid vertical={false} className="stroke-border/60" />
-                  <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
-                  <YAxis tickLine={false} axisLine={false} tickMargin={8} width={45} tickFormatter={(value) => numberFmt.format(value)} />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent formatter={(value) => currencyFmt.format(Number(value))} />} />
-                  <Bar dataKey="value" name="revenue" fill="var(--color-revenue)" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid gap-4 lg:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle>{i.statusChartTitle}</CardTitle>
-              <CardDescription>{i.statusChartDesc}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={statusChartConfig} className="h-[260px] w-full">
-                <PieChart>
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                  <Pie data={statusData} dataKey="count" nameKey="status" innerRadius={60} outerRadius={90} paddingAngle={3}>
-                    {statusData.map((entry) => (
-                      <Cell key={entry.status} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <ChartLegend content={<ChartLegendContent nameKey="status" />} />
-                </PieChart>
-              </ChartContainer>
-              {statusData.length === 0 && <p className="text-muted-foreground py-8 text-center text-sm">{i.noEnrollments}</p>}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{i.topCoursesTitle}</CardTitle>
-              <CardDescription>{i.topCoursesDesc}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={topCoursesConfig} className="h-[260px] w-full">
-                <BarChart data={topCoursesData} layout="vertical" margin={{ left: isRTL ? 0 : 8, right: isRTL ? 8 : 0, top: 8 }}>
-                  <CartesianGrid horizontal={false} className="stroke-border/60" />
-                  <XAxis
-                    type="number"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    allowDecimals={false}
-                    domain={isRTL ? ['dataMax', 0] : [0, 'dataMax']}
-                  />
-                  <YAxis
-                    type="category"
-                    dataKey="title"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    width={110}
-                    orientation={isRTL ? 'right' : 'left'}
-                  />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                  <Bar dataKey="count" name="count" fill="var(--color-count)" radius={isRTL ? [4, 0, 0, 4] : [0, 4, 4, 0]} />
-                </BarChart>
-              </ChartContainer>
-              {topCourses.length === 0 && <p className="text-muted-foreground py-8 text-center text-sm">{i.noEnrollments}</p>}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{i.leadsChartTitle}</CardTitle>
-              <CardDescription>{i.leadsChartDesc}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={leadsChartConfig} className="h-[260px] w-full">
-                <AreaChart data={leadsByMonth} margin={{ left: 12, right: 12, top: 8 }}>
-                  <defs>
-                    <linearGradient id="fillLeads" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={COLORS.sky} stopOpacity={0.35} />
-                      <stop offset="95%" stopColor={COLORS.sky} stopOpacity={0.02} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid vertical={false} className="stroke-border/60" />
-                  <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
-                  <YAxis tickLine={false} axisLine={false} tickMargin={8} allowDecimals={false} width={30} />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                  <Area dataKey="value" type="natural" name="leads" stroke="var(--color-leads)" strokeWidth={2} fill="url(#fillLeads)" />
                 </AreaChart>
               </ChartContainer>
             </CardContent>
           </Card>
         </div>
 
+        {/* ─── Tables ─── */}
+        <div className="grid gap-4 lg:grid-cols-2">
+          {/* Today's Schedule Overview */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <div className="space-y-1">
+                <CardTitle>{locale === 'ar' ? 'الجدول الدراسي اليومي' : "Today's Schedule"}</CardTitle>
+                <CardDescription>{locale === 'ar' ? 'المحاضرات والمعامل المقررة اليوم' : 'Classes and labs scheduled'}</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <Link href={route('cms.schedules.index')} className="gap-1">
+                  {locale === 'ar' ? 'عرض الكل' : 'View All'} <Calendar className="h-4 w-4" />
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {todaySchedules.length === 0 ? (
+                <p className="text-muted-foreground py-8 text-center text-sm">
+                  {locale === 'ar' ? 'لا توجد محاضرات في الجدول حالياً' : 'No schedules available'}
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-muted-foreground border-b text-left text-xs [&_th]:px-3 [&_th]:py-2">
+                        <th>{locale === 'ar' ? 'المادة' : 'Subject'}</th>
+                        <th>{locale === 'ar' ? 'الأستاذ' : 'Teacher'}</th>
+                        <th>{locale === 'ar' ? 'القاعة' : 'Room'}</th>
+                        <th>{locale === 'ar' ? 'التوقيت' : 'Time'}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {todaySchedules.map((schedule) => (
+                        <tr key={schedule.id} className="hover:bg-muted/40 border-b last:border-0">
+                          <td className="px-3 py-2.5 font-medium">{schedule.subject?.name || '-'}</td>
+                          <td className="px-3 py-2.5">{schedule.teacher?.name || '-'}</td>
+                          <td className="px-3 py-2.5">
+                            <Badge variant="outline">{schedule.room || '—'}</Badge>
+                          </td>
+                          <td className="text-muted-foreground px-3 py-2.5 text-xs dir-ltr">
+                            {schedule.start_time} - {schedule.end_time}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recent Registered Students */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <div className="space-y-1">
+                <CardTitle>{locale === 'ar' ? 'آخر الطلاب المسجلين' : 'Recently Registered Students'}</CardTitle>
+                <CardDescription>{locale === 'ar' ? 'أحدث الطلبة الانضمام للكلية' : 'Latest enrolled CMS students'}</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <Link href={route('cms.students.index')} className="gap-1">
+                  {locale === 'ar' ? 'عرض الكل' : 'View All'} <Users className="h-4 w-4" />
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {recentStudents.length === 0 ? (
+                <p className="text-muted-foreground py-8 text-center text-sm">
+                  {locale === 'ar' ? 'لا يوجد طلاب مسجلون حديثاً' : 'No recent students found'}
+                </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-muted-foreground border-b text-left text-xs [&_th]:px-3 [&_th]:py-2">
+                        <th>{locale === 'ar' ? 'الرقم الدراسي' : 'Student No'}</th>
+                        <th>{locale === 'ar' ? 'الاسم' : 'Name'}</th>
+                        <th>{locale === 'ar' ? 'القسم' : 'Department'}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {recentStudents.map((student) => (
+                        <tr key={student.id} className="hover:bg-muted/40 border-b last:border-0">
+                          <td className="px-3 py-2.5 font-mono text-xs font-semibold">{student.student_no}</td>
+                          <td className="px-3 py-2.5 font-medium">
+                            <Link href={route('cms.students.show', student.id)} className="hover:underline">
+                              {student.name}
+                            </Link>
+                          </td>
+                          <td className="px-3 py-2.5 text-xs text-muted-foreground">
+                            {student.level?.department?.name || '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* ─── Recent Grades ─── */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <div className="space-y-1">
-              <CardTitle>{i.recentEnrollments}</CardTitle>
-              <CardDescription>{i.recentEnrollmentsDesc}</CardDescription>
+              <CardTitle>{locale === 'ar' ? 'آخر الدرجات المسجلة' : 'Recently Recorded Grades'}</CardTitle>
+              <CardDescription>{locale === 'ar' ? 'أحدث عمليات رصد الدرجات في النظام' : 'Latest grade entries across subjects'}</CardDescription>
             </div>
             <Button variant="outline" size="sm" asChild>
-              <Link href={route('dashboard.enrollments.list')} className="gap-1">
-                {i.viewAll} <BookOpen className="h-4 w-4" />
+              <Link href={route('cms.grades.index')} className="gap-1">
+                {locale === 'ar' ? 'رصد الدرجات' : 'Grades'} <GraduationCap className="h-4 w-4" />
               </Link>
             </Button>
           </CardHeader>
           <CardContent>
-            {recentEnrollments.length === 0 ? (
-              <p className="text-muted-foreground py-8 text-center text-sm">{i.noEnrollments}</p>
+            {recentGrades.length === 0 ? (
+              <p className="text-muted-foreground py-8 text-center text-sm">
+                {locale === 'ar' ? 'لم يتم رصد أي درجات بعد' : 'No grades recorded yet'}
+              </p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-muted-foreground border-b text-left text-xs [&_th]:px-3 [&_th]:py-2">
-                      <th>{d.columns.fullName}</th>
-                      <th>{d.columns.course}</th>
-                      <th>{d.columns.status}</th>
-                      <th>{d.columns.amount}</th>
-                      <th>{d.columns.date}</th>
+                      <th>{locale === 'ar' ? 'الطالب' : 'Student'}</th>
+                      <th>{locale === 'ar' ? 'المادة' : 'Subject'}</th>
+                      <th>{locale === 'ar' ? 'المجموع' : 'Total'}</th>
+                      <th>{locale === 'ar' ? 'التقدير' : 'Grade'}</th>
+                      <th>{locale === 'ar' ? 'التاريخ' : 'Date'}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {recentEnrollments.map((enrollment) => (
-                      <tr key={enrollment.id} className="hover:bg-muted/40 border-b last:border-0">
+                    {recentGrades.map((grade) => (
+                      <tr key={grade.id} className="hover:bg-muted/40 border-b last:border-0">
                         <td className="px-3 py-2.5 font-medium">
-                          <Link href={route('dashboard.enrollments.show', enrollment.id)} className="hover:underline">
-                            {enrollment.full_name}
+                          <Link
+                            href={route('cms.students.show', grade.enrollment?.student?.id)}
+                            className="hover:underline"
+                          >
+                            {grade.enrollment?.student?.name || '-'}
                           </Link>
                         </td>
-                        <td className="px-3 py-2.5">{enrollment.course?.title_ar || enrollment.course?.title_en || '-'}</td>
                         <td className="px-3 py-2.5">
-                          <Badge variant="outline">{d.status[enrollment.status as keyof typeof d.status]}</Badge>
+                          {grade.enrollment?.subject?.code || '-'} - {grade.enrollment?.subject?.name || ''}
                         </td>
-                        <td className="px-3 py-2.5 tabular-nums">{currencyFmt.format(Number(enrollment.amount_due))}</td>
-                        <td className="text-muted-foreground px-3 py-2.5">
-                          {new Date(enrollment.created_at).toLocaleDateString(locale === 'ar' ? 'ar-LY' : 'en-GB')}
+                        <td className="px-3 py-2.5 font-semibold tabular-nums">{grade.total ?? '-'}</td>
+                        <td className="px-3 py-2.5">
+                          {grade.grade_letter ? (
+                            <Badge>{grade.grade_letter}</Badge>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </td>
+                        <td className="text-muted-foreground px-3 py-2.5 text-xs">
+                          {grade.entered_at
+                            ? new Date(grade.entered_at).toLocaleDateString(locale === 'ar' ? 'ar-LY' : 'en-GB')
+                            : '-'}
                         </td>
                       </tr>
                     ))}
@@ -325,3 +404,4 @@ export default function Dashboard() {
     </AppLayout>
   );
 }
+

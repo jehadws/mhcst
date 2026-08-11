@@ -60,11 +60,11 @@ export function Hero() {
                         {/* CTA Buttons */}
                         <div className="mt-8 flex flex-wrap items-center gap-4">
                             <a
-                                href="#courses"
+                                href="/departments"
                                 className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-xl bg-primary px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-lg transition-all duration-300 hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5"
                             >
                                 <Sparkles className="size-4" />
-                                <span>{t.hero.ctaPrimary}</span>
+                                <span>{locale === 'ar' ? 'استكشف الأقسام الأكاديمية' : 'Explore Departments'}</span>
                                 <Arrow className="size-4 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
                             </a>
                             <a

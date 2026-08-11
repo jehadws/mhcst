@@ -56,6 +56,7 @@ class HandleInertiaRequests extends Middleware
             }),
             'flash' => [
                 'success' => $request->session()->get('success'),
+                'import_errors' => $request->session()->get('import_errors'),
             ],
         ]);
     }

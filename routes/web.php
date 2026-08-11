@@ -1,24 +1,26 @@
 <?php
 
-use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BlogPostController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CertificateController;
-use App\Http\Controllers\CourseController;
+use App\Http\Controllers\Cms\CmsAttendanceController;
+use App\Http\Controllers\Cms\CmsDepartmentController;
+use App\Http\Controllers\Cms\CmsEnrollmentController;
+use App\Http\Controllers\Cms\CmsGradeController;
+use App\Http\Controllers\Cms\CmsLevelController;
+use App\Http\Controllers\Cms\CmsReportController;
+use App\Http\Controllers\Cms\CmsScheduleController;
+use App\Http\Controllers\Cms\CmsStudentController;
+use App\Http\Controllers\Cms\CmsSubjectController;
+use App\Http\Controllers\Cms\CmsTeacherController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\FaqController;
-use App\Http\Controllers\InstructorController;
-use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NotificationTemplateController;
-use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SiteContentController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteSettingController;
-use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentPortalController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\UploadController;
@@ -27,12 +29,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [SiteController::class, 'home'])->name('home');
-Route::get('/courses', [SiteController::class, 'courses'])->name('courses');
-Route::get('/courses/{slug}', [SiteController::class, 'course'])->name('courses.show');
 Route::get('/about', [SiteController::class, 'about'])->name('about');
+Route::get('/departments', [SiteController::class, 'departments'])->name('departments');
 Route::get('/faq', [SiteController::class, 'faq'])->name('faq');
 Route::get('/contact', [SiteController::class, 'contact'])->name('contact');
-Route::get('/reviews', [SiteController::class, 'reviews'])->name('reviews');
 Route::get('/blog-posts', [BlogController::class, 'index'])->name('blog');
 Route::get('/blog-posts/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::redirect('/blog', '/blog-posts');
@@ -45,9 +45,7 @@ Route::get('/terms-of-use', fn () => app(SiteContentController::class)->show('te
 Route::get('/privacy-policy', fn () => app(SiteContentController::class)->show('privacy-policy'))->name('privacy-policy');
 
 // Public form submissions
-Route::post('/contact', [LeadController::class, 'publicStore'])->name('contact.store');
-Route::post('/enroll', [EnrollmentController::class, 'publicStore'])->name('enroll.store');
-Route::post('/review', [ReviewController::class, 'publicStore'])->name('review.store');
+Route::post('/contact', [SiteController::class, 'contactStore'])->name('contact.store');
 Route::post('/newsletter', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
 
@@ -72,68 +70,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('dashboard/users/bulk-actions', [UserController::class, 'bulkActions'])->name('dashboard.users.bulk-actions');
 
     // ═══════════════════════════════════════════════════════
-    // STUDENTS
-    // ═══════════════════════════════════════════════════════
-    Route::get('dashboard/students/list', [StudentController::class, 'index'])->name('dashboard.students.list');
-    Route::get('dashboard/students/create', [StudentController::class, 'create'])->name('dashboard.students.create');
-    Route::get('dashboard/students/{student}/edit', [StudentController::class, 'edit'])->name('dashboard.students.edit');
-    Route::get('dashboard/students/{student}', [StudentController::class, 'show'])->name('dashboard.students.show');
-    Route::post('dashboard/students', [StudentController::class, 'store'])->name('dashboard.students.store');
-    Route::put('dashboard/students/{student}', [StudentController::class, 'update'])->name('dashboard.students.update');
-    Route::delete('dashboard/students/{student}', [StudentController::class, 'destroy'])->name('dashboard.students.destroy');
-    Route::post('dashboard/students/bulk-actions', [StudentController::class, 'bulkActions'])->name('dashboard.students.bulk-actions');
-
-    // ═══════════════════════════════════════════════════════
-    // CATEGORIES
-    // ═══════════════════════════════════════════════════════
-    Route::get('dashboard/categories/list', [CategoryController::class, 'index'])->name('dashboard.categories.list');
-    Route::get('dashboard/categories/create', [CategoryController::class, 'create'])->name('dashboard.categories.create');
-    Route::get('dashboard/categories/{category}/edit', [CategoryController::class, 'edit'])->name('dashboard.categories.edit');
-    Route::get('dashboard/categories/{category}', [CategoryController::class, 'show'])->name('dashboard.categories.show');
-    Route::post('dashboard/categories', [CategoryController::class, 'store'])->name('dashboard.categories.store');
-    Route::put('dashboard/categories/{category}', [CategoryController::class, 'update'])->name('dashboard.categories.update');
-    Route::delete('dashboard/categories/{category}', [CategoryController::class, 'destroy'])->name('dashboard.categories.destroy');
-    Route::post('dashboard/categories/bulk-actions', [CategoryController::class, 'bulkActions'])->name('dashboard.categories.bulk-actions');
-
-    // ═══════════════════════════════════════════════════════
-    // INSTRUCTORS
-    // ═══════════════════════════════════════════════════════
-    Route::get('dashboard/instructors/list', [InstructorController::class, 'index'])->name('dashboard.instructors.list');
-    Route::get('dashboard/instructors/create', [InstructorController::class, 'create'])->name('dashboard.instructors.create');
-    Route::get('dashboard/instructors/{instructor}/edit', [InstructorController::class, 'edit'])->name('dashboard.instructors.edit');
-    Route::get('dashboard/instructors/{instructor}', [InstructorController::class, 'show'])->name('dashboard.instructors.show');
-    Route::post('dashboard/instructors', [InstructorController::class, 'store'])->name('dashboard.instructors.store');
-    Route::put('dashboard/instructors/{instructor}', [InstructorController::class, 'update'])->name('dashboard.instructors.update');
-    Route::delete('dashboard/instructors/{instructor}', [InstructorController::class, 'destroy'])->name('dashboard.instructors.destroy');
-    Route::post('dashboard/instructors/bulk-actions', [InstructorController::class, 'bulkActions'])->name('dashboard.instructors.bulk-actions');
-
-    // ═══════════════════════════════════════════════════════
-    // COURSES
-    // ═══════════════════════════════════════════════════════
-    Route::get('dashboard/courses/list', [CourseController::class, 'index'])->name('dashboard.courses.list');
-    Route::get('dashboard/courses/create', [CourseController::class, 'create'])->name('dashboard.courses.create');
-    Route::get('dashboard/courses/{course}/edit', [CourseController::class, 'edit'])->name('dashboard.courses.edit');
-    Route::get('dashboard/courses/{course}', [CourseController::class, 'show'])->name('dashboard.courses.show');
-    Route::post('dashboard/courses', [CourseController::class, 'store'])->name('dashboard.courses.store');
-    Route::put('dashboard/courses/{course}', [CourseController::class, 'update'])->name('dashboard.courses.update');
-    Route::delete('dashboard/courses/{course}', [CourseController::class, 'destroy'])->name('dashboard.courses.destroy');
-    Route::post('dashboard/courses/bulk-actions', [CourseController::class, 'bulkActions'])->name('dashboard.courses.bulk-actions');
-    Route::delete('dashboard/course-attachments/{attachment}', [CourseController::class, 'destroyAttachment'])->name('dashboard.course-attachments.destroy');
-
-    // ═══════════════════════════════════════════════════════
-    // ENROLLMENTS
-    // ═══════════════════════════════════════════════════════
-    Route::get('dashboard/enrollments/list', [EnrollmentController::class, 'index'])->name('dashboard.enrollments.list');
-    Route::get('dashboard/enrollments/create', [EnrollmentController::class, 'create'])->name('dashboard.enrollments.create');
-    Route::get('dashboard/enrollments/{enrollment}/edit', [EnrollmentController::class, 'edit'])->name('dashboard.enrollments.edit');
-    Route::get('dashboard/enrollments/{enrollment}', [EnrollmentController::class, 'show'])->name('dashboard.enrollments.show');
-    Route::post('dashboard/enrollments', [EnrollmentController::class, 'store'])->name('dashboard.enrollments.store');
-    Route::put('dashboard/enrollments/{enrollment}', [EnrollmentController::class, 'update'])->name('dashboard.enrollments.update');
-    Route::post('dashboard/enrollments/{enrollment}/status', [EnrollmentController::class, 'updateStatus'])->name('dashboard.enrollments.status');
-    Route::delete('dashboard/enrollments/{enrollment}', [EnrollmentController::class, 'destroy'])->name('dashboard.enrollments.destroy');
-    Route::post('dashboard/enrollments/bulk-actions', [EnrollmentController::class, 'bulkActions'])->name('dashboard.enrollments.bulk-actions');
-
-    // ═══════════════════════════════════════════════════════
     // CERTIFICATES
     // ═══════════════════════════════════════════════════════
     Route::get('dashboard/certificates/list', [CertificateController::class, 'index'])->name('dashboard.certificates.list');
@@ -143,39 +79,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('dashboard/certificates', [CertificateController::class, 'store'])->name('dashboard.certificates.store');
     Route::delete('dashboard/certificates/{certificate}', [CertificateController::class, 'destroy'])->name('dashboard.certificates.destroy');
     Route::post('dashboard/certificates/bulk-actions', [CertificateController::class, 'bulkActions'])->name('dashboard.certificates.bulk-actions');
-
-    // ═══════════════════════════════════════════════════════
-    // REVIEWS
-    // ═══════════════════════════════════════════════════════
-    Route::get('dashboard/reviews/list', [ReviewController::class, 'index'])->name('dashboard.reviews.list');
-    Route::get('dashboard/reviews/create', [ReviewController::class, 'create'])->name('dashboard.reviews.create');
-    Route::get('dashboard/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('dashboard.reviews.edit');
-    Route::get('dashboard/reviews/{review}', [ReviewController::class, 'show'])->name('dashboard.reviews.show');
-    Route::post('dashboard/reviews', [ReviewController::class, 'store'])->name('dashboard.reviews.store');
-    Route::put('dashboard/reviews/{review}', [ReviewController::class, 'update'])->name('dashboard.reviews.update');
-    Route::delete('dashboard/reviews/{review}', [ReviewController::class, 'destroy'])->name('dashboard.reviews.destroy');
-    Route::post('dashboard/reviews/bulk-actions', [ReviewController::class, 'bulkActions'])->name('dashboard.reviews.bulk-actions');
-
-    // ═══════════════════════════════════════════════════════
-    // TESTIMONIALS
-    // ═══════════════════════════════════════════════════════
-    Route::get('dashboard/testimonials/list', [TestimonialController::class, 'index'])->name('dashboard.testimonials.list');
-    Route::get('dashboard/testimonials/create', [TestimonialController::class, 'create'])->name('dashboard.testimonials.create');
-    Route::get('dashboard/testimonials/{testimonial}/edit', [TestimonialController::class, 'edit'])->name('dashboard.testimonials.edit');
-    Route::get('dashboard/testimonials/{testimonial}', [TestimonialController::class, 'show'])->name('dashboard.testimonials.show');
-    Route::post('dashboard/testimonials', [TestimonialController::class, 'store'])->name('dashboard.testimonials.store');
-    Route::put('dashboard/testimonials/{testimonial}', [TestimonialController::class, 'update'])->name('dashboard.testimonials.update');
-    Route::delete('dashboard/testimonials/{testimonial}', [TestimonialController::class, 'destroy'])->name('dashboard.testimonials.destroy');
-    Route::post('dashboard/testimonials/bulk-actions', [TestimonialController::class, 'bulkActions'])->name('dashboard.testimonials.bulk-actions');
-
-    // ═══════════════════════════════════════════════════════
-    // LEADS (Contact Messages)
-    // ═══════════════════════════════════════════════════════
-    Route::get('dashboard/leads/list', [LeadController::class, 'index'])->name('dashboard.leads.list');
-    Route::get('dashboard/leads/{lead}', [LeadController::class, 'show'])->name('dashboard.leads.show');
-    Route::put('dashboard/leads/{lead}', [LeadController::class, 'update'])->name('dashboard.leads.update');
-    Route::delete('dashboard/leads/{lead}', [LeadController::class, 'destroy'])->name('dashboard.leads.destroy');
-    Route::post('dashboard/leads/bulk-actions', [LeadController::class, 'bulkActions'])->name('dashboard.leads.bulk-actions');
 
     // ═══════════════════════════════════════════════════════
     // CMS PAGES
@@ -198,16 +101,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('dashboard/faqs/bulk-actions', [FaqController::class, 'bulkActions'])->name('dashboard.faqs.bulk-actions');
 
     // ═══════════════════════════════════════════════════════
-    // BANNERS
+    // TESTIMONIALS
     // ═══════════════════════════════════════════════════════
-    Route::get('dashboard/banners/list', [BannerController::class, 'index'])->name('dashboard.banners.list');
-    Route::get('dashboard/banners/create', [BannerController::class, 'create'])->name('dashboard.banners.create');
-    Route::get('dashboard/banners/{banner}/edit', [BannerController::class, 'edit'])->name('dashboard.banners.edit');
-    Route::get('dashboard/banners/{banner}', [BannerController::class, 'show'])->name('dashboard.banners.show');
-    Route::post('dashboard/banners', [BannerController::class, 'store'])->name('dashboard.banners.store');
-    Route::put('dashboard/banners/{banner}', [BannerController::class, 'update'])->name('dashboard.banners.update');
-    Route::delete('dashboard/banners/{banner}', [BannerController::class, 'destroy'])->name('dashboard.banners.destroy');
-    Route::post('dashboard/banners/bulk-actions', [BannerController::class, 'bulkActions'])->name('dashboard.banners.bulk-actions');
+    Route::get('dashboard/testimonials/list', [TestimonialController::class, 'index'])->name('dashboard.testimonials.list');
+    Route::get('dashboard/testimonials/create', [TestimonialController::class, 'create'])->name('dashboard.testimonials.create');
+    Route::get('dashboard/testimonials/{testimonial}/edit', [TestimonialController::class, 'edit'])->name('dashboard.testimonials.edit');
+    Route::get('dashboard/testimonials/{testimonial}', [TestimonialController::class, 'show'])->name('dashboard.testimonials.show');
+    Route::post('dashboard/testimonials', [TestimonialController::class, 'store'])->name('dashboard.testimonials.store');
+    Route::put('dashboard/testimonials/{testimonial}', [TestimonialController::class, 'update'])->name('dashboard.testimonials.update');
+    Route::delete('dashboard/testimonials/{testimonial}', [TestimonialController::class, 'destroy'])->name('dashboard.testimonials.destroy');
+    Route::post('dashboard/testimonials/bulk-actions', [TestimonialController::class, 'bulkActions'])->name('dashboard.testimonials.bulk-actions');
 
     // ═══════════════════════════════════════════════════════
     // BLOG POSTS
@@ -255,7 +158,52 @@ Route::middleware(['auth'])->group(function () {
     Route::post('dashboard/newsletter/campaigns', [NewsletterController::class, 'campaignsStore'])->name('dashboard.newsletter.campaigns.store');
     Route::patch('dashboard/newsletter/campaigns/{campaign}', [NewsletterController::class, 'campaignsUpdate'])->name('dashboard.newsletter.campaigns.update');
     Route::post('dashboard/newsletter/campaigns/{campaign}/send', [NewsletterController::class, 'campaignSend'])->name('dashboard.newsletter.campaigns.send');
-    Route::delete('dashboard/newsletter/campaigns/{campaign}', [NewsletterController::class, 'campaignsDestroy'])->name('dashboard.newsletter.campaigns.destroy');
+    // ═══════════════════════════════════════════════════════
+    // COLLEGE MANAGEMENT SYSTEM (CMS)
+    // ═══════════════════════════════════════════════════════
+    Route::prefix('cms')->name('cms.')->group(function () {
+        Route::redirect('dashboard', '/dashboard')->name('dashboard');
+        Route::resource('departments', CmsDepartmentController::class);
+        Route::resource('levels', CmsLevelController::class);
+        Route::resource('teachers', CmsTeacherController::class);
+        Route::resource('subjects', CmsSubjectController::class);
+
+        // Students (static routes must be registered before the resource to avoid capture by {student})
+        Route::get('students/export', [CmsStudentController::class, 'export'])->name('students.export');
+        Route::get('students/import/template', [CmsStudentController::class, 'importTemplate'])->name('students.import-template');
+        Route::post('students/import', [CmsStudentController::class, 'import'])->name('students.import');
+        Route::get('students/{student}/id-card', [CmsStudentController::class, 'idCard'])->name('students.id-card');
+        Route::resource('students', CmsStudentController::class);
+        Route::resource('enrollments', CmsEnrollmentController::class);
+
+        // Grades
+        Route::get('grades/export', [CmsGradeController::class, 'export'])->name('grades.export');
+        Route::get('grades/import/template', [CmsGradeController::class, 'importTemplate'])->name('grades.import-template');
+        Route::post('grades/import', [CmsGradeController::class, 'import'])->name('grades.import');
+        Route::get('grades', [CmsGradeController::class, 'index'])->name('grades.index');
+        Route::post('grades/update', [CmsGradeController::class, 'update'])->name('grades.update');
+        Route::post('grades/bulk-update', [CmsGradeController::class, 'bulkUpdate'])->name('grades.bulk-update');
+
+        // Attendance
+        Route::get('attendance/export', [CmsAttendanceController::class, 'export'])->name('attendance.export');
+        Route::get('attendance', [CmsAttendanceController::class, 'index'])->name('attendance.index');
+        Route::post('attendance', [CmsAttendanceController::class, 'store'])->name('attendance.store');
+        Route::post('attendance/bulk', [CmsAttendanceController::class, 'bulkRecord'])->name('attendance.bulk');
+
+        // Schedules
+        Route::resource('schedules', CmsScheduleController::class);
+
+        // Bulk Enrollment
+        Route::post('enrollments/bulk', [CmsEnrollmentController::class, 'bulkEnroll'])->name('enrollments.bulk');
+
+        // Reports
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/', [CmsReportController::class, 'index'])->name('index');
+            Route::get('grades', [CmsReportController::class, 'grades'])->name('grades');
+            Route::get('attendance', [CmsReportController::class, 'attendance'])->name('attendance');
+            Route::get('top-students', [CmsReportController::class, 'topStudents'])->name('top-students');
+        });
+    });
 
 });
 

@@ -28,7 +28,7 @@ export interface SharedData {
     locale: string;
     direction: 'ltr' | 'rtl';
     siteSettings: SiteSettings;
-    flash: { success?: string | null };
+    flash: { success?: string | null; import_errors?: string[] | null };
     [key: string]: unknown;
 }
 

@@ -5,7 +5,6 @@ import { SiteHeader } from '@/components/site/site-header'
 import { SiteFooter } from '@/components/site/site-footer'
 import { SeoHead } from '@/components/seo-head'
 import { Faq } from '@/components/site/faq'
-import { EnrollForm } from '@/components/site/enroll-form'
 import { FloatingButtons } from '@/components/site/floating-buttons'
 import { useSite } from '@/context/site-context'
 import { useSiteSettings } from '@/hooks/use-site-settings'
@@ -249,22 +248,7 @@ export default function PublicContactPage({ courses = [], faqs = [] }: Props) {
                         </div>
                     </section>
 
-                    {/* ── Enrollment Form ─────────────────────────────────────── */}
-                    {courses.length > 0 && (
-                        <section className="border-t border-border/60 bg-background py-16 sm:py-20">
-                            <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-start">
-                                <div>
-                                    <h2 className="font-serif text-2xl font-bold text-foreground sm:text-3xl">
-                                        {t.enroll.title}
-                                    </h2>
-                                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                                        {t.enroll.subtitle}
-                                    </p>
-                                </div>
-                                <EnrollForm courses={courses} />
-                            </div>
-                        </section>
-                    )}
+
 
                     {/* ── Map ─────────────────────────────────────────────────── */}
                     <section className="border-t border-border/60 bg-muted/30 py-16 sm:py-20">
