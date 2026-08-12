@@ -1,94 +1,53 @@
 import { useSite } from '@/context/site-context';
-import { ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { ArrowLeft, ArrowRight, ArrowUpLeft, ArrowUpRight } from 'lucide-react';
 
-interface HeroStats {
-  students_count?: number;
-  teachers_count?: number;
-  departments_count?: number;
-}
-
-interface HeroProps {
-  stats?: HeroStats;
-}
-
-export function Hero({ stats }: HeroProps) {
-  const { t, locale } = useSite();
-  const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight;
-
-  const statItems = [
-    { value: t.hero.foundedYear, label: t.hero.foundedLabel },
-    {
-      value: stats?.students_count ? `${stats.students_count.toLocaleString()}+` : '20,000+',
-      label: t.stats.learners,
-    },
-    {
-      value: stats?.departments_count ? String(stats.departments_count) : '12',
-      label: t.stats.satisfaction,
-    },
-    {
-      value: stats?.teachers_count ? `${stats.teachers_count}+` : '50+',
-      label: t.stats.experts,
-    },
-  ];
+export function Hero() {
+  const { t, isRTL } = useSite();
+  const Arrow = isRTL ? ArrowUpLeft : ArrowUpRight;
 
   return (
-    <section className="bg-hero text-hero-foreground relative isolate flex min-h-screen flex-col overflow-hidden pt-[4.25rem]">
-      <img
-        src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=85&w=2000&auto=format&fit=crop"
-        alt=""
-        className="absolute inset-0 -z-20 h-full w-full object-cover opacity-40"
-      />
-      <div className="from-hero via-hero/90 to-hero/80 absolute inset-0 -z-10 bg-gradient-to-b" />
+    <section className="relative flex min-h-screen items-end overflow-hidden">
+      <img src="/images/campus-aerial.png" alt={t.hero.imageAlt} className="absolute inset-0 size-full object-cover" />
+      <div className="from-hero via-hero/70 to-hero/40 absolute inset-0 bg-gradient-to-t" />
+      <div className="bg-hero/30 absolute inset-0" />
 
-      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-4 py-28 sm:px-6 lg:px-8 lg:py-32">
-        <p className="text-hero-muted text-sm font-medium tracking-wide">{t.hero.locationTag}</p>
+      <div className="relative mx-auto w-full max-w-7xl px-4 pb-28 pt-32 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-start text-start">
+          <span className="border-accent/40 text-hero-foreground mb-5 inline-flex items-center gap-2 rounded-full border bg-white/10 px-4 py-1.5 text-xs font-medium backdrop-blur dark:bg-white/5">
+            <span className="bg-accent size-1.5 rounded-full" />
+            {t.hero.locationTag}
+          </span>
 
-        <h1 className="mt-6 max-w-4xl font-serif text-4xl leading-[1.1] font-extrabold tracking-tight sm:text-5xl lg:text-7xl">
-          {t.hero.titleLine1}
-          <span className="text-hero-accent mt-2 block">{t.hero.titleLine2}</span>
-        </h1>
+          <h1 className="text-hero-foreground max-w-3xl text-balance text-4xl font-extrabold leading-[1.15] sm:text-5xl lg:text-6xl">
+            <span className="text-accent block">{t.hero.titleAccent1}</span>
+            <span className="block">
+              {t.hero.titleMain} <span className="text-accent">{t.hero.titleAccent2}</span>
+              {t.hero.titleSuffix ? ` ${t.hero.titleSuffix}` : ''}
+            </span>
+          </h1>
 
-        <p className="text-hero-muted mt-6 max-w-2xl text-base leading-8 sm:text-lg">{t.hero.subtitle}</p>
-
-        <div className="mt-10 flex flex-wrap items-center gap-3">
-          <a
-            href="/departments"
-            className="bg-hero-accent text-hero-accent-foreground hover:bg-hero-accent/90 inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold transition-colors"
-          >
-            {t.hero.ctaPrimary}
-            <Arrow className="size-4" />
-          </a>
-          <a
-            href="/about"
-            className="border-hero-foreground/25 bg-hero-foreground/10 text-hero-foreground hover:bg-hero-foreground/15 inline-flex items-center rounded-full border px-7 py-3.5 text-sm font-semibold backdrop-blur-sm transition-colors"
-          >
-            {t.hero.ctaSecondary}
-          </a>
-          <a href="#contact" className="text-hero-muted hover:text-hero-foreground px-2 text-sm font-medium underline-offset-4 transition-colors hover:underline">
-            {t.hero.ctaContact}
-          </a>
+          <div className="mt-9 flex flex-wrap items-center gap-3">
+            <Link
+              href="/departments"
+              className="border-hero-foreground/30 text-hero-foreground hover:border-accent hover:text-accent inline-flex items-center rounded-md border bg-white/5 px-6 py-3 text-sm font-bold backdrop-blur transition-colors dark:bg-white/5"
+            >
+              {t.hero.ctaPrimary}
+            </Link>
+            <Link
+              href="/about"
+              className="bg-accent text-accent-foreground inline-flex items-center gap-2 rounded-md px-6 py-3 text-sm font-bold transition-transform hover:-translate-y-0.5"
+            >
+              {t.hero.ctaSecondary}
+              <Arrow className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
         </div>
       </div>
 
-      <div className="border-hero-foreground/10 border-t">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-hero-foreground/10 px-4 sm:px-6 lg:grid-cols-4 lg:px-8">
-          {statItems.map((item) => (
-            <div key={item.label} className="px-4 py-8 text-center first:ps-0 lg:py-10 lg:text-start">
-              <p className="font-serif text-3xl font-extrabold tracking-tight sm:text-4xl">{item.value}</p>
-              <p className="text-hero-muted mt-1 text-sm">{item.label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <a
-        href="#departments"
-        className="text-hero-muted hover:text-hero-foreground absolute bottom-6 start-1/2 flex -translate-x-1/2 flex-col items-center gap-1 text-xs tracking-widest uppercase transition-colors max-lg:hidden"
-        aria-label={t.hero.scrollHint}
-      >
-        <span>{t.hero.scrollHint}</span>
-        <ArrowDown className="size-4 animate-bounce" />
-      </a>
+      <span className="text-hero-foreground/60 absolute bottom-5 left-1/2 -translate-x-1/2 text-[11px] font-medium tracking-[0.3em]">
+        SCROLL ↓
+      </span>
     </section>
   );
 }

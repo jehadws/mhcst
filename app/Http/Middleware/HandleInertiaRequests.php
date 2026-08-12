@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\SiteSetting;
+use App\Services\CmsAuthorizationService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -46,7 +47,11 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                'roles' => $request->user()?->getRoleNames()->values()->all() ?? [],
             ],
+            'cmsCapabilities' => $request->user()
+                ? app(CmsAuthorizationService::class)->capabilities($request->user())
+                : ['canManage' => false, 'isTeacher' => false],
             'locale' => $locale,
             'direction' => $direction,
             'siteSettings' => SiteSetting::all()->mapWithKeys(function (SiteSetting $setting) {

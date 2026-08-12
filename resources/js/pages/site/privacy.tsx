@@ -5,7 +5,7 @@ import { useSite } from '@/context/site-context';
 import { Shield } from 'lucide-react';
 
 export default function PrivacyPage() {
-  const { locale } = useSite();
+  const { locale, t } = useSite();
 
   return (
     <>
@@ -13,8 +13,8 @@ export default function PrivacyPage() {
         title={locale === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'}
         description={
           locale === 'ar'
-            ? 'سياسة الخصوصية وحماية البيانات في المعهد الحديث العالي للعلوم والتكنولوجيا'
-            : 'Privacy policy and data protection at MHCST'
+            ? `سياسة الخصوصية وحماية البيانات في ${t.brandFull}`
+            : `Privacy policy and data protection at ${t.brandFull}`
         }
       />
       <div className="flex min-h-screen flex-col">
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
                 <>
                   <h2>مقدمة</h2>
                   <p>
-                    تلتزم المعايير الحديثة للتعليم والتدريب بحماية خصوصيتك وبياناتك الشخصية. تشرح هذه السياسة كيفية جمع معلوماتك واستخدامها وحمايتها.
+                    تلتزم {t.brandFull} بحماية خصوصيتك وبياناتك الشخصية. تشرح هذه السياسة كيفية جمع معلوماتك واستخدامها وحمايتها.
                   </p>
                   <h2>المعلومات التي نجمعها</h2>
                   <p>قد نجمع المعلومات التالية عند تسجيلك أو تواصلك معنا: الاسم الكامل، رقم الهاتف، البريد الإلكتروني، وبيانات التسجيل في الدورات.</p>
@@ -52,13 +52,13 @@ export default function PrivacyPage() {
                   <h2>حقوقك</h2>
                   <p>يحق لك الوصول إلى بياناتك الشخصية وتصحيحها أو طلب حذفها في أي وقت. تواصل معنا عبر البريد الإلكتروني للحصول على المساعدة.</p>
                   <h2>التواصل معنا</h2>
-                  <p>إذا كان لديك أي استفسار حول سياسة الخصوصية، يرجى التواصل معنا على: info@mset.ly</p>
+                  <p>إذا كان لديك أي استفسار حول سياسة الخصوصية، يرجى التواصل معنا على: info@mhcst.ly</p>
                 </>
               ) : (
                 <>
                   <h2>Introduction</h2>
                   <p>
-                    Modern Standards for Education & Training is committed to protecting your privacy and personal data. This policy explains how we
+                    {t.brandFull} is committed to protecting your privacy and personal data. This policy explains how we
                     collect, use, and safeguard your information.
                   </p>
                   <h2>Information We Collect</h2>
@@ -80,7 +80,7 @@ export default function PrivacyPage() {
                     You have the right to access, correct, or request deletion of your personal data at any time. Contact us by email for assistance.
                   </p>
                   <h2>Contact Us</h2>
-                  <p>If you have any questions about this Privacy Policy, please contact us at: info@mset.ly</p>
+                  <p>If you have any questions about this Privacy Policy, please contact us at: info@mhcst.ly</p>
                 </>
               )}
             </div>

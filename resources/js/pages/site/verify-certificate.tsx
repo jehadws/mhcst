@@ -61,8 +61,8 @@ export default function VerifyCertificate({ number = '', certificate = null, not
         title={locale === 'ar' ? 'التحقق من الشهادات' : 'Certificate Verification'}
         description={
           locale === 'ar'
-            ? 'تحقق من صحة الشهادات الصادرة عن المعهد الحديث العالي للعلوم والتكنولوجيا'
-            : 'Verify the authenticity of certificates issued by MHCST'
+            ? `تحقق من صحة الشهادات الصادرة عن ${t.brandFull}`
+            : `Verify the authenticity of certificates issued by ${t.brandFull}`
         }
       />
       <div className="flex min-h-screen flex-col">

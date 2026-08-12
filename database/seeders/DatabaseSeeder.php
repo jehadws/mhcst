@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             ReviewSeeder::class,
             LeadSeeder::class,
             NewsletterSubscriberSeeder::class,
+            CmsDemoDataSeeder::class,
         ]);
     }
 }

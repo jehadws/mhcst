@@ -1,41 +1,62 @@
 import { useSite } from '@/context/site-context';
-import { Check } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { ArrowLeft, Check } from 'lucide-react';
 
-const CAMPUS_IMAGE = 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1000&auto=format&fit=crop';
+interface AboutProps {
+  stats?: {
+    teachers_count?: number;
+  };
+}
 
-export function About() {
+export function About({ stats }: AboutProps) {
   const { t } = useSite();
+  const instructorCount = stats?.teachers_count ?? 40;
 
   return (
-    <section id="about" className="bg-secondary scroll-mt-20 py-20 sm:py-28">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          <div>
-            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">{t.campus.label}</p>
-            <h2 className="text-foreground mt-3 font-serif text-3xl font-bold tracking-tight sm:text-4xl">{t.campus.title}</h2>
-            <p className="text-muted-foreground mt-4 leading-relaxed">{t.campus.description}</p>
+    <section id="about" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-24 sm:px-6 lg:px-8">
+      <div className="grid items-center gap-12 lg:grid-cols-2">
+        <div className="order-2 text-start lg:order-1">
+          <h2 className="text-primary text-3xl font-extrabold sm:text-4xl">
+            {t.campus.title} <span className="text-accent">{t.campus.titleAccent}</span>
+          </h2>
+          <p className="text-muted-foreground mt-4 leading-relaxed">{t.campus.description}</p>
 
-            <ul className="mt-8 space-y-4">
-              {t.campus.bullets.map((item) => (
-                <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-foreground">
-                  <span className="bg-primary/10 text-primary mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full">
-                    <Check className="size-3.5" />
-                  </span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className="mt-8 grid gap-4">
+            {t.campus.bullets.map((f) => (
+              <li key={f} className="flex items-center gap-3 text-start">
+                <span className="bg-accent/15 text-accent flex size-7 shrink-0 items-center justify-center rounded-full">
+                  <Check className="size-4" aria-hidden="true" />
+                </span>
+                <span className="text-primary font-medium">{f}</span>
+              </li>
+            ))}
+          </ul>
 
-          <div className="relative">
-            <div className="border-border bg-card overflow-hidden border shadow-lg">
-              <img src={CAMPUS_IMAGE} alt={t.campus.title} className="aspect-[4/3] w-full object-cover" />
+          <Link
+            href="/about"
+            className="bg-primary text-primary-foreground mt-8 inline-flex items-center gap-2 rounded-md px-6 py-3 text-sm font-bold transition-transform hover:-translate-y-0.5"
+          >
+            {t.campus.discover}
+            <ArrowLeft className="size-4" aria-hidden="true" />
+          </Link>
+        </div>
+
+        <div className="order-1 lg:order-2">
+          <div className="border-border bg-hero shadow-lg shadow-black/15 relative overflow-hidden rounded-3xl border p-8">
+            <img
+              src="/images/campus-aerial.png"
+              alt={t.campus.title}
+              className="absolute inset-0 size-full object-cover opacity-25"
+            />
+            <div className="relative flex flex-col items-start gap-2 text-start">
+              <span className="text-accent text-6xl font-extrabold">{t.hero.foundedYear}</span>
+              <span className="text-hero-foreground text-lg font-bold">{t.campus.estLabel}</span>
             </div>
-
-            <div className="border-border bg-card absolute -bottom-6 -start-4 border px-6 py-5 shadow-xl sm:-start-6">
-              <p className="text-primary text-xs font-bold tracking-widest uppercase">Est.</p>
-              <p className="text-foreground font-serif text-3xl font-extrabold">{t.hero.foundedYear}</p>
-              <p className="text-muted-foreground mt-1 max-w-[180px] text-xs leading-relaxed">{t.campus.estLabel}</p>
+            <div className="relative mt-24 flex items-end justify-start">
+              <div className="rounded-xl bg-white/10 px-5 py-3 text-start backdrop-blur">
+                <span className="text-hero-foreground block text-2xl font-extrabold">+{instructorCount}</span>
+                <span className="text-hero-foreground/70 text-xs">{t.campus.statLabel}</span>
+              </div>
             </div>
           </div>
         </div>

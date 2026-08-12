@@ -1,4 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
+import { useCms } from '@/hooks/use-cms';
+import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem } from '@/types';
 import { CmsDepartment, CmsSubject } from '@/types/cms';
 import { Head, useForm, Link } from '@inertiajs/react';
@@ -9,10 +11,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 
 export default function SubjectEdit({ subject, departments }: { subject: CmsSubject; departments: CmsDepartment[] }) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'المواد الدراسية', href: '/cms/subjects' },
-        { title: 'تعديل مادة', href: `/cms/subjects/${subject.id}/edit` },
-    ];
+    const { c } = useCms();
+
+    const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [
+        { label: c.nav.subjects, href: '/cms/subjects' },
+        { label: c.subjects.editTitle, href: `/cms/subjects/${subject.id}/edit` },
+    ]);
 
     const { data, setData, put, processing, errors } = useForm({
         department_id: String(subject.department_id),
@@ -31,12 +35,12 @@ export default function SubjectEdit({ subject, departments }: { subject: CmsSubj
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`تعديل مادة ${subject.name}`} />
+            <Head title={`${c.subjects.editTitle} ${subject.name}`} />
             <div className="max-w-2xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-6">تعديل المادة الدراسية</h1>
+                <h1 className="text-2xl font-bold mb-6">{c.subjects.editHeading}</h1>
                 <form onSubmit={submit} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border">
                     <div>
-                        <Label htmlFor="department_id">القسم الأكاديمي</Label>
+                        <Label htmlFor="department_id">{c.levels.department}</Label>
                         <select
                             id="department_id"
                             className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
@@ -51,7 +55,7 @@ export default function SubjectEdit({ subject, departments }: { subject: CmsSubj
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <Label htmlFor="code">رمز المادة *</Label>
+                            <Label htmlFor="code">{c.subjects.code} *</Label>
                             <Input
                                 id="code"
                                 value={data.code}
@@ -61,7 +65,7 @@ export default function SubjectEdit({ subject, departments }: { subject: CmsSubj
                         </div>
 
                         <div>
-                            <Label htmlFor="name">اسم المادة *</Label>
+                            <Label htmlFor="name">{c.subjects.name}</Label>
                             <Input
                                 id="name"
                                 value={data.name}
@@ -73,7 +77,7 @@ export default function SubjectEdit({ subject, departments }: { subject: CmsSubj
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <Label htmlFor="credits">عدد الساعات المعتمدة</Label>
+                            <Label htmlFor="credits">{c.subjects.credits}</Label>
                             <Input
                                 id="credits"
                                 type="number"
@@ -83,16 +87,16 @@ export default function SubjectEdit({ subject, departments }: { subject: CmsSubj
                         </div>
 
                         <div>
-                            <Label htmlFor="semester">الفصل الدراسي</Label>
+                            <Label htmlFor="semester">{c.subjects.semester}</Label>
                             <select
                                 id="semester"
                                 className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
                                 value={data.semester}
-                                onChange={(e) => setData('semester', e.target.value as any)}
+                                onChange={(e) => setData('semester', e.target.value as typeof data.semester)}
                             >
-                                <option value="first">الفصل الأول</option>
-                                <option value="second">الفصل الثاني</option>
-                                <option value="summer">الفصل الصيفي</option>
+                                <option value="first">{c.labels.semesters.first}</option>
+                                <option value="second">{c.labels.semesters.second}</option>
+                                <option value="summer">{c.labels.semesters.summer}</option>
                             </select>
                         </div>
                     </div>
@@ -104,12 +108,12 @@ export default function SubjectEdit({ subject, departments }: { subject: CmsSubj
                             onCheckedChange={(checked) => setData('has_lab', !!checked)}
                         />
                         <Label htmlFor="has_lab" className="cursor-pointer font-medium">
-                            تحتوي المادة على جزء عملي / معمل (Lab)
+                            {c.subjects.hasLab}
                         </Label>
                     </div>
 
                     <div>
-                        <Label htmlFor="description">وصف وتفاصيل المادة</Label>
+                        <Label htmlFor="description">{c.subjects.description}</Label>
                         <Textarea
                             id="description"
                             value={data.description}
@@ -119,8 +123,8 @@ export default function SubjectEdit({ subject, departments }: { subject: CmsSubj
                     </div>
 
                     <div className="flex items-center gap-3 pt-4">
-                        <Button type="submit" disabled={processing}>حفظ التغييرات</Button>
-                        <Button variant="outline" asChild><Link href="/cms/subjects">إلغاء</Link></Button>
+                        <Button type="submit" disabled={processing}>{c.common.saveChanges}</Button>
+                        <Button variant="outline" asChild><Link href="/cms/subjects">{c.common.cancel}</Link></Button>
                     </div>
                 </form>
             </div>

@@ -169,16 +169,16 @@
     <div class="cert-container">
         <div class="header">
             <div>
-                <div class="institute-title">المعهد الحديث العالي للعلوم والتكنولوجيا</div>
-                <div class="sub-title">Modern Higher Institute for Science & Technology (MHCST)</div>
+                <div class="institute-title">كلية المعايير الحديثة للعلوم والتقنية</div>
+                <div class="sub-title">Almaayir Alhaditha College for Science and Technology</div>
             </div>
             <div class="cert-badge">شهادة معتمدة</div>
         </div>
 
         <div class="body">
             <div class="cert-heading">شهادة إتمام دورة تدريبية</div>
-            <div class="cert-text">يشهد المعهد الحديث العالي للعلوم والتكنولوجيا بأن المتدرب/ة:</div>
-            <div class="student-name">{{ $certificate->student?->full_name ?? 'متدرب المعهد' }}</div>
+            <div class="cert-text">تشهد كلية المعايير الحديثة للعلوم والتقنية بأن المتدرب/ة:</div>
+            <div class="student-name">{{ $certificate->student?->full_name ?? 'متدرب الكلية' }}</div>
             <div class="cert-text" style="margin-top: 15px;">قد أتم بنجاح كافة متطلبات الدورة التدريبية:</div>
             <div class="course-name">{{ $certificate->course?->title_ar ?? $certificate->course?->title_en }}</div>
         </div>
@@ -191,7 +191,7 @@
             </div>
 
             <div class="signature-box">
-                <div class="signature-line">إدارة المعهد</div>
+                <div class="signature-line">إدارة الكلية</div>
             </div>
         </div>
     </div>

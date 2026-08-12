@@ -25,7 +25,7 @@ function makeSpreadsheetPath(string $filename, array $rows): string
 
 function cmsUserActing(): User
 {
-    return User::factory()->create();
+    return createAdminUser();
 }
 
 test('student list exports to xlsx with the correct headers', function () {

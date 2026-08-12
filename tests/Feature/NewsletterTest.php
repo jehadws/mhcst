@@ -1,7 +1,7 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Models\NewsletterSubscriber;
-use App\Models\User;
 
 test('guests can subscribe to the newsletter', function () {
     $response = $this->post('/newsletter', [
@@ -57,7 +57,7 @@ test('re-subscribing reactivates an inactive subscriber', function () {
 });
 
 test('authenticated users can view the newsletter list', function () {
-    $user = User::factory()->create();
+    $user = createUserWithRoles([UserRole::Support->value]);
 
     $this->actingAs($user)
         ->get('/dashboard/newsletter/list')

@@ -1,7 +1,8 @@
 import { LucideIcon } from 'lucide-react';
 
 export interface Auth {
-    user: User;
+    user: User | null;
+    roles: string[];
 }
 
 export interface BreadcrumbItem {
@@ -25,6 +26,7 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    cmsCapabilities?: { canManage: boolean; isTeacher: boolean };
     locale: string;
     direction: 'ltr' | 'rtl';
     siteSettings: SiteSettings;
@@ -264,6 +266,7 @@ export interface SiteSettings {
     site_name?: string;
     site_name_ar?: string;
     site_tagline?: string;
+    site_tagline_ar?: string;
     site_logo?: string;
     contact_email?: string;
     contact_phone?: string;
@@ -330,4 +333,15 @@ export interface StatusCount {
 export interface TopCourse {
     title: string;
     count: number;
+}
+
+export interface NotificationTemplate {
+    id: number;
+    name: string;
+    channel: 'email' | 'whatsapp';
+    trigger_event: string;
+    subject: string | null;
+    body: string;
+    created_at: string;
+    updated_at: string;
 }

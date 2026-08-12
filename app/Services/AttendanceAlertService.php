@@ -7,8 +7,10 @@ use App\Models\CmsEnrollment;
 
 class AttendanceAlertService
 {
+    public function __construct(private CmsAcademicSettingsService $academicSettings) {}
+
     /**
-     * Check if enrollment exceeds threshold (3 consecutive absences or >= 20% absence rate).
+     * Check if enrollment exceeds configured absence thresholds.
      *
      * @return array{has_alert: bool, consecutive_absences: int, absence_rate: float, alert_reasons: array<string>}
      */
@@ -40,11 +42,14 @@ class AttendanceAlertService
             }
         }
 
+        $consecutiveThreshold = $this->academicSettings->consecutiveAbsenceThreshold();
+        $rateThreshold = $this->academicSettings->absenceRateThreshold();
+
         $reasons = [];
-        if ($consecutiveAbsences >= 3) {
+        if ($consecutiveAbsences >= $consecutiveThreshold) {
             $reasons[] = "Student has {$consecutiveAbsences} consecutive absences.";
         }
-        if ($absenceRate >= 20.0) {
+        if ($absenceRate >= $rateThreshold) {
             $reasons[] = "Absence rate reached {$absenceRate}%.";
         }
 

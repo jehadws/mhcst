@@ -1,3 +1,5 @@
+import { cmsAr, cmsEn } from './cms-i18n'
+
 export type Locale = 'en' | 'ar'
 
 export type Level = 'beginner' | 'intermediate' | 'advanced'
@@ -6,8 +8,8 @@ export type Localized = Record<Locale, string>
 
 export const dictionary = {
     en: {
-        brandShort: 'Modern Standards',
-        brandFull: 'Modern Standards for Education & Training',
+        brandShort: 'Almaayir Alhaditha',
+        brandFull: 'Almaayir Alhaditha College for Science and Technology',
         nav: {
             home: 'Home',
             courses: 'Courses',
@@ -19,15 +21,19 @@ export const dictionary = {
         },
         hero: {
             locationTag: 'Libya · Est. 2010',
+            titleAccent1: 'Education that shapes futures',
+            titleMain: 'Start your journey toward a',
+            titleAccent2: 'professional future',
+            titleSuffix: '',
             titleLine1: 'Education that shapes',
             titleLine2: 'your professional future',
             subtitle:
-                'Modern Standards offers accredited academic programs and vocational training — designed to prepare qualified graduates for the demands of the job market.',
+                'Almaayir Alhaditha offers accredited academic programs and vocational training — designed to prepare qualified graduates for the demands of the job market.',
             ctaPrimary: 'Explore programs',
             ctaSecondary: 'Student life',
             ctaContact: 'Talk to an advisor',
             scrollHint: 'Scroll',
-            imageAlt: 'Students on campus at Modern Standards',
+            imageAlt: 'Students on campus at Almaayir Alhaditha',
             foundedYear: '2010',
             foundedLabel: 'Year founded',
         },
@@ -37,18 +43,28 @@ export const dictionary = {
             learners: 'Graduates',
             satisfaction: 'Departments',
             partners: 'Training partners',
+            subjects: 'Academic subjects',
+        },
+        statsBar: {
+            founded: 'Year founded',
+            graduates: 'Graduates',
+            departments: 'Departments',
+            partners: 'Training partners',
+            instructors: 'Expert instructors',
         },
         departmentsSection: {
             label: 'Departments',
             title: 'Academic departments',
             description:
-                'Modern Standards offers distinguished academic and vocational programs through specialized departments with accredited curricula designed to prepare qualified professionals.',
+                'Almaayir Alhaditha offers distinguished academic and vocational programs through specialized departments with accredited curricula designed to prepare qualified professionals.',
             viewPrograms: 'View programs',
             emptyTitle: 'No departments listed yet',
             emptyBody: 'Academic departments will be published soon.',
         },
         whyUs: {
-            label: 'Why Modern Standards?',
+            label: 'Why Almaayir Alhaditha?',
+            titlePrefix: 'Why',
+            titleAccent: 'Almaayir Alhaditha?',
             title: 'Four facts that make the difference.',
             items: [
                 {
@@ -72,7 +88,9 @@ export const dictionary = {
         applicationSteps: {
             label: 'Enrollment',
             title: 'Your path to enrollment at a glance',
+            titleAccent: 'in brief',
             description: 'From inquiry to the classroom — in just a few clear steps.',
+            cta: 'Start your application',
             steps: [
                 {
                     title: 'Check requirements',
@@ -91,6 +109,7 @@ export const dictionary = {
         campus: {
             label: 'Campus',
             title: 'A complete learning environment',
+            titleAccent: 'environment',
             description:
                 'We designed an academic environment that meets all your needs — combining modern facilities with spaces for focus, collaboration, and student activities.',
             bullets: [
@@ -100,10 +119,107 @@ export const dictionary = {
                 'Dedicated advisory and support services',
             ],
             estLabel: 'Years of excellence in education',
+            discover: 'Explore our facilities',
+            statLabel: 'Expert instructors on campus',
+        },
+        scholarships: {
+            title: 'Student',
+            titleAccent: 'support programs',
+            description:
+                'Almaayir Alhaditha invests in ambition and excellence. We offer a range of financial support and incentive programs to help outstanding students continue their academic journey.',
+            viewAll: 'All programs',
+            readMore: 'Read more',
+            items: [
+                {
+                    badge: '5%–20%',
+                    title: 'Academic excellence grant',
+                    description: 'Awarded to high-achieving students based on cumulative GPA and approved criteria.',
+                },
+                {
+                    badge: '10%–20%',
+                    title: 'Sibling enrollment discount',
+                    description: 'For siblings enrolled at Almaayir Alhaditha — a tuition discount throughout their studies.',
+                },
+                {
+                    badge: '100%',
+                    title: 'Full merit scholarship',
+                    description: 'For top high-school graduates — full tuition coverage through graduation per approved terms.',
+                },
+                {
+                    badge: '20%',
+                    title: 'Talent & achievement grant',
+                    description: 'For students with exceptional abilities and distinguished achievements in academics or activities.',
+                },
+                {
+                    badge: '30%',
+                    title: 'Sports excellence grant',
+                    description: 'Supporting talented student athletes and encouraging their development alongside studies.',
+                },
+            ],
+        },
+        accreditation: {
+            title: 'Trusted by education and professional',
+            titleAccent: 'authorities',
+            description:
+                'Almaayir Alhaditha holds accreditations and recognitions from leading educational and professional bodies in Libya and the region — confirming our commitment to the highest academic and professional quality standards.',
+            bodies: [
+                'Libyan Ministry of Education — Higher Education Directorate',
+                'National Center for Quality Assurance in Education',
+                'Libyan Professional Training Council',
+            ],
+        },
+        partnerships: {
+            title: 'Key',
+            titleAccent: 'partnerships',
+            description:
+                'Partnerships with training centers, universities, and national institutions that give our students real-world experience and expand their career opportunities.',
+            count: '12 partner institutions',
+            items: [
+                'University of Tripoli',
+                'Libyan Academy',
+                'National Oil Corporation Training Center',
+                'Tripoli Chamber of Commerce',
+                'Libyan Business Council',
+                'Al-Fateh University',
+                'Benghazi Technical Institute',
+                'Libyan Red Crescent',
+                'Misrata Training Center',
+                'GECOL Training Academy',
+                'Libyan Banking Association',
+                'Tripoli Health Cluster',
+            ],
+        },
+        news: {
+            title: 'Latest',
+            titleAccent: 'news',
+            viewAll: 'All news',
+            pageTitle: 'News & events',
+            pageDescription:
+                'Follow the latest news, events, and partnerships from Almaayir Alhaditha College for Science and Technology.',
+            readMore: 'Read more',
+            emptyTitle: 'No news yet',
+            emptyBody: 'Check back soon for updates and announcements.',
+            relatedTitle: 'Related articles',
+            backToNews: 'Back to news',
+            categories: {
+                all: 'All',
+                events: 'Events',
+                partnerships: 'Partnerships',
+                academic: 'Academic',
+                community: 'Community',
+            },
+            tags: {
+                events: 'Events',
+                partnerships: 'Partnerships',
+                academic: 'Academic',
+                community: 'Community',
+            },
         },
         ctaBanner: {
             badge: 'Enrollment open',
             title: 'Start your journey today.',
+            titleMain: 'Start your journey',
+            titleAccent: 'today.',
             button: 'Apply now',
         },
         catalog: {
@@ -143,7 +259,7 @@ export const dictionary = {
         },
         about: {
             title: 'A trusted name in professional training',
-            body: 'Modern Standards for Education & Training has spent over a decade helping professionals and organizations grow. Our accredited programs combine practical, hands-on learning with expert instructors and flexible delivery — online, in person, or blended.',
+            body: 'Almaayir Alhaditha College for Science and Technology has spent over a decade helping professionals and organizations grow. Our accredited programs combine practical, hands-on learning with expert instructors and flexible delivery — online, in person, or blended.',
             point1Title: 'Accredited & recognized',
             point1Body: 'Certificates recognized by employers and professional bodies.',
             point2Title: 'Expert instructors',
@@ -152,7 +268,8 @@ export const dictionary = {
             point3Body: 'Study online, in person, or a blend that fits your schedule.',
         },
         testimonials: {
-            title: 'What our learners say',
+            title: 'Graduates',
+            titleAccent: 'speak',
             subtitle: 'Thousands of professionals have advanced their careers with us.',
         },
         faq: {
@@ -188,10 +305,13 @@ export const dictionary = {
             whatsapp: 'Chat on WhatsApp',
         },
         footer: {
-            tagline: 'Building skills. Shaping futures.',
+            tagline: 'Almaayir Alhaditha College for Science and Technology — Tripoli, Libya',
             quickLinks: 'Quick links',
-            contact: 'Contact',
+            contact: 'Contact us',
             rights: 'All rights reserved.',
+            paymentMethods: 'Payment methods',
+            bankTransfer: 'Bank transfer',
+            privacy: 'Privacy policy',
         },
         newsletter: {
             title: 'Subscribe to our newsletter',
@@ -287,6 +407,7 @@ export const dictionary = {
                 city: 'City',
                 date: 'Date',
                 actions: 'Actions',
+                roles: 'Roles',
                 source: 'Source',
                 fullName: 'Full Name',
                 course: 'Course',
@@ -550,7 +671,8 @@ export const dictionary = {
                 fieldLabels: {
                     site_name: 'Site Name (English)',
                     site_name_ar: 'Site Name (Arabic)',
-                    site_tagline: 'Tagline',
+                    site_tagline: 'Brand Subtitle (English)',
+                    site_tagline_ar: 'Brand Subtitle (Arabic)',
                     site_logo: 'Site Logo',
                     meta_description: 'Meta Description',
                     contact_email: 'Contact Email',
@@ -646,6 +768,7 @@ export const dictionary = {
                     name: 'Name',
                     email: 'Email',
                     password: 'Password',
+                    roles: 'Roles',
                     phone: 'Phone',
                     city: 'City',
                     specialization: 'Specialization',
@@ -733,6 +856,7 @@ export const dictionary = {
                 },
             },
         },
+        cms: cmsEn,
         theme: { light: 'Light mode', dark: 'Dark mode' },
         langName: 'English',
     },
@@ -797,6 +921,7 @@ export const dictionary = {
                 city: 'المدينة',
                 date: 'التاريخ',
                 actions: 'الإجراءات',
+                roles: 'الأدوار',
                 source: 'المصدر',
                 fullName: 'الاسم الكامل',
                 course: 'الدورة',
@@ -1060,7 +1185,8 @@ export const dictionary = {
                 fieldLabels: {
                     site_name: 'اسم المنصة (بالإنجليزية)',
                     site_name_ar: 'اسم المنصة (بالعربية)',
-                    site_tagline: 'الشعار النصي',
+                    site_tagline: 'العنوان الفرعي (بالإنجليزية)',
+                    site_tagline_ar: 'العنوان الفرعي (بالعربية)',
                     site_logo: 'شعار الموقع',
                     meta_description: 'وصف الميتا',
                     contact_email: 'البريد الإلكتروني',
@@ -1156,6 +1282,7 @@ export const dictionary = {
                     name: 'الاسم',
                     email: 'البريد الإلكتروني',
                     password: 'كلمة المرور',
+                    roles: 'الأدوار',
                     phone: 'رقم الهاتف',
                     city: 'المدينة',
                     specialization: 'التخصص',
@@ -1244,7 +1371,7 @@ export const dictionary = {
             },
         },
         brandShort: 'المعايير الحديثة',
-        brandFull: 'المعايير الحديثة للتعليم والتدريب',
+        brandFull: 'كلية المعايير الحديثة للعلوم والتقنية',
         nav: {
             home: 'الرئيسية',
             courses: 'الدورات',
@@ -1256,6 +1383,10 @@ export const dictionary = {
         },
         hero: {
             locationTag: 'ليبيا · تأسست ۲۰۱۰',
+            titleAccent1: 'علم يصنع المستقبل',
+            titleMain: 'ابدأ رحلتك',
+            titleAccent2: 'نحو التميز المهني',
+            titleSuffix: 'مشرق',
             titleLine1: 'علم يصنع المستقبل',
             titleLine2: 'ابدأ رحلتك نحو التميز المهني',
             subtitle:
@@ -1274,6 +1405,14 @@ export const dictionary = {
             learners: 'خريجاً',
             satisfaction: 'تخصصات',
             partners: 'شريك تدريب',
+            subjects: 'مقرر أكاديمي',
+        },
+        statsBar: {
+            founded: 'سنة التأسيس',
+            graduates: 'خريجاً',
+            departments: 'أقسام أكاديمية',
+            partners: 'شريك تدريب',
+            instructors: 'مدرّب خبير',
         },
         departmentsSection: {
             label: 'الأقسام',
@@ -1286,6 +1425,8 @@ export const dictionary = {
         },
         whyUs: {
             label: 'لماذا المعايير الحديثة؟',
+            titlePrefix: 'لماذا',
+            titleAccent: 'المعايير الحديثة؟',
             title: 'أربع حقائق تصنع الفرق.',
             items: [
                 {
@@ -1308,8 +1449,10 @@ export const dictionary = {
         },
         applicationSteps: {
             label: 'التقديم',
-            title: 'مسار التقديم في لمحة',
+            title: 'مسار التقديم',
+            titleAccent: 'في لمحة',
             description: 'من الاستفسار إلى قاعة المحاضرات — بأقل عدد من الخطوات.',
+            cta: 'ابدأ التقديم الآن',
             steps: [
                 {
                     title: 'تحقق من الشروط',
@@ -1327,7 +1470,8 @@ export const dictionary = {
         },
         campus: {
             label: 'الحرم',
-            title: 'بيئة تعليمية متكاملة',
+            title: 'بيئة تعليمية',
+            titleAccent: 'متكاملة',
             description:
                 'صممنا لك بيئة أكاديمية تلبي كافة احتياجاتك؛ تجمع بين أحدث التجهيزات ومرافق الراحة والأنشطة، لتمنحك تجربة تعليمية استثنائية.',
             bullets: [
@@ -1337,10 +1481,107 @@ export const dictionary = {
                 'خدمات استشارية ودعم أكاديمي',
             ],
             estLabel: 'مسيرة من التميز في التعليم',
+            discover: 'اكتشف مرافقنا',
+            statLabel: 'مدرّب خبير على الحرم',
+        },
+        scholarships: {
+            title: 'برامج',
+            titleAccent: 'دعم الطلاب',
+            description:
+                'تؤمن المعايير الحديثة بأن الاستثمار في الطموح والتميز هو أساس بناء مستقبل واعد، لذلك تقدم مجموعة من برامج الدعم المالي لتمكين الطلاب المتميزين من مواصلة رحلتهم الأكاديمية.',
+            viewAll: 'جميع البرامج',
+            readMore: 'اقرأ المزيد',
+            items: [
+                {
+                    badge: '5%–20%',
+                    title: 'منحة التفوق الأكاديمي',
+                    description: 'تُمنح للطلبة المتميزين أكاديميًا وفقًا للمعدل التراكمي والشروط والمعايير المعتمدة.',
+                },
+                {
+                    badge: '10%–20%',
+                    title: 'خصم الإخوة المسجلين',
+                    description: 'خصم من الرسوم الدراسية للطلبة من الإخوة والأخوات المسجلين طوال سنوات الدراسة.',
+                },
+                {
+                    badge: '100%',
+                    title: 'منحة النخبة (منحة كاملة)',
+                    description: 'منحة لأوائل خريجي الثانوية العامة بخصم 100% طيلة سنوات الدراسة حتى التخرج.',
+                },
+                {
+                    badge: '20%',
+                    title: 'منحة الموهوبين',
+                    description: 'للطلبة ذوي القدرات العالية والإنجازات المتميزة في المجال الأكاديمي أو الأنشطة.',
+                },
+                {
+                    badge: '30%',
+                    title: 'المنح الرياضية',
+                    description: 'لدعم الطلبة المتميزين رياضيًا وتشجيعهم على تنمية مواهبهم إلى جانب دراستهم.',
+                },
+            ],
+        },
+        accreditation: {
+            title: 'موثوقة من قبل الهيئات التعليمية',
+            titleAccent: 'والمهنية',
+            description:
+                'تحظى المعايير الحديثة باعتمادات واعترافات من أبرز الجهات التعليمية والمهنية في ليبيا والمنطقة، تأكيدًا لالتزامها بتطبيق أعلى معايير الجودة الأكاديمية والمهنية.',
+            bodies: [
+                'وزارة التعليم الليبية — إدارة التعليم العالي',
+                'المركز الوطني لضمان جودة التعليم',
+                'المجلس الليبي للتدريب المهني',
+            ],
+        },
+        partnerships: {
+            title: 'أبرز',
+            titleAccent: 'الشراكات',
+            description:
+                'شراكات مع مراكز تدريب وجامعات ومؤسسات وطنية تتيح لطلبتنا التدريب في بيئات عمل حقيقية وتوسّع فرصهم المهنية.',
+            count: '12 جهة شراكة',
+            items: [
+                'جامعة طرابلس',
+                'الأكاديمية الليبية',
+                'مركز تدريب المؤسسة الوطنية للنفط',
+                'غرفة طرابلس التجارية',
+                'مجلس الأعمال الليبي',
+                'جامعة الفاتح',
+                'المعهد التقني ببنغازي',
+                'الهلال الأحمر الليبي',
+                'مركز تدريب مصراتة',
+                'أكاديمية تدريب GECOL',
+                'رابطة المصارف الليبية',
+                'تجمع طرابلس الصحي',
+            ],
+        },
+        news: {
+            title: 'آخر',
+            titleAccent: 'الأخبار',
+            viewAll: 'كل الأخبار',
+            pageTitle: 'الأخبار والفعاليات',
+            pageDescription:
+                'تابع آخر أخبار كلية المعايير الحديثة للعلوم والتقنية وفعالياتها وشراكاتها مع المؤسسات والمجتمع.',
+            readMore: 'اقرأ المزيد',
+            emptyTitle: 'لا توجد أخبار بعد',
+            emptyBody: 'تابعنا قريباً للاطلاع على آخر المستجدات والإعلانات.',
+            relatedTitle: 'مقالات ذات صلة',
+            backToNews: 'العودة إلى الأخبار',
+            categories: {
+                all: 'الكل',
+                events: 'فعاليات',
+                partnerships: 'شراكات',
+                academic: 'أكاديمي',
+                community: 'مجتمع',
+            },
+            tags: {
+                events: 'فعاليات',
+                partnerships: 'شراكات',
+                academic: 'أكاديمي',
+                community: 'مجتمع',
+            },
         },
         ctaBanner: {
             badge: 'التقديم مفتوح',
             title: 'ابدأ رحلتك اليوم.',
+            titleMain: 'ابدأ رحلتك',
+            titleAccent: 'اليوم.',
             button: 'قدّم الآن',
         },
         catalog: {
@@ -1380,7 +1621,7 @@ export const dictionary = {
         },
         about: {
             title: 'اسم موثوق في التدريب المهني',
-            body: 'أمضت المعايير الحديثة للتعليم والتدريب أكثر من عقد في مساعدة المهنيين والمؤسسات على النمو. تجمع برامجنا المعتمدة بين التعلّم العملي التطبيقي ومدربين خبراء وأساليب تقديم مرنة — عبر الإنترنت أو حضورياً أو بشكل مدمج.',
+            body: 'أمضت كلية المعايير الحديثة للعلوم والتقنية أكثر من عقد في مساعدة المهنيين والمؤسسات على النمو. تجمع برامجنا المعتمدة بين التعلّم العملي التطبيقي ومدربين خبراء وأساليب تقديم مرنة — عبر الإنترنت أو حضورياً أو بشكل مدمج.',
             point1Title: 'معتمدون ومعترف بنا',
             point1Body: 'شهادات معترف بها من أصحاب العمل والجهات المهنية.',
             point2Title: 'مدرّبون خبراء',
@@ -1389,7 +1630,8 @@ export const dictionary = {
             point3Body: 'ادرس عبر الإنترنت أو حضورياً أو بشكل مدمج يناسب جدولك.',
         },
         testimonials: {
-            title: 'ماذا يقول متدربونا',
+            title: 'خريجون',
+            titleAccent: 'يتحدثون',
             subtitle: 'آلاف المهنيين طوّروا مسيرتهم المهنية معنا.',
         },
         faq: {
@@ -1425,10 +1667,13 @@ export const dictionary = {
             whatsapp: 'تواصل عبر واتساب',
         },
         footer: {
-            tagline: 'نبني المهارات. نصنع المستقبل.',
+            tagline: 'كلية المعايير الحديثة للعلوم والتقنية — طرابلس، ليبيا',
             quickLinks: 'روابط سريعة',
-            contact: 'تواصل',
+            contact: 'تواصل معنا',
             rights: 'جميع الحقوق محفوظة.',
+            paymentMethods: 'طرق الدفع المتوفرة',
+            bankTransfer: 'التحويل البنكي',
+            privacy: 'سياسة الخصوصية',
         },
         newsletter: {
             title: 'اشترك في نشرتنا البريدية',
@@ -1464,6 +1709,7 @@ export const dictionary = {
             noPosts: 'لا توجد مقالات بعد',
             noPostsBody: 'تابعنا قريباً لمحتوى متجدد.',
         },
+        cms: cmsAr,
         theme: { light: 'الوضع الفاتح', dark: 'الوضع الداكن' },
         langName: 'العربية',
     },

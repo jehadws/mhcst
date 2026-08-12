@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use App\Models\CmsAttendance;
 use App\Models\CmsDepartment;
 use App\Models\CmsEnrollment;
@@ -11,6 +12,7 @@ use App\Models\CmsSchedule;
 use App\Models\CmsStudent;
 use App\Models\CmsSubject;
 use App\Models\CmsTeacher;
+use App\Models\NotificationTemplate;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -21,9 +23,9 @@ class CmsDemoDataSeeder extends Seeder
     public function run(): void
     {
         // 1. Roles & Default Admin Account
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $teacherRole = Role::firstOrCreate(['name' => 'teacher']);
-        $studentRole = Role::firstOrCreate(['name' => 'student']);
+        Role::firstOrCreate(['name' => UserRole::Admin->value, 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => UserRole::Teacher->value, 'guard_name' => 'web']);
+        Role::firstOrCreate(['name' => UserRole::Student->value, 'guard_name' => 'web']);
 
         $adminUser = User::firstOrCreate(
             ['email' => 'admin@cms.local'],
@@ -32,7 +34,7 @@ class CmsDemoDataSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
-        $adminUser->assignRole($adminRole);
+        $adminUser->syncRoles([UserRole::Admin->value]);
 
         // 2. Departments
         $deptCs = CmsDepartment::create([
@@ -67,7 +69,7 @@ class CmsDemoDataSeeder extends Seeder
                 'email' => $t['email'],
                 'password' => Hash::make('password'),
             ]);
-            $user->assignRole($teacherRole);
+            $user->assignRole(UserRole::Teacher->value);
 
             $teachers[] = CmsTeacher::create([
                 'user_id' => $user->id,
@@ -149,6 +151,21 @@ class CmsDemoDataSeeder extends Seeder
             ]);
         }
 
+        // Link first two students to login accounts for dashboard / transcript testing
+        foreach ([1, 2] as $index) {
+            $student = $students[$index - 1];
+            $studentUser = User::firstOrCreate(
+                ['email' => "student{$index}@cms.local"],
+                [
+                    'name' => $student->name,
+                    'password' => Hash::make('password'),
+                    'is_active' => true,
+                ]
+            );
+            $studentUser->syncRoles([UserRole::Student->value]);
+            $student->update(['user_id' => $studentUser->id]);
+        }
+
         // 7. Enrollments, Grades & Attendance
         foreach ($students as $index => $student) {
             // enroll student in 2 subjects matching department
@@ -208,5 +225,14 @@ class CmsDemoDataSeeder extends Seeder
                 'semester' => 'first',
             ]);
         }
+
+        NotificationTemplate::firstOrCreate(
+            ['trigger_event' => 'attendance.alert', 'channel' => 'email'],
+            [
+                'name' => 'Attendance Alert',
+                'subject' => 'تنبيه غياب — {student_name} — {subject_name}',
+                'body' => "عزيزي/عزيزتي {student_name},\n\nنود إبلاغكم بوجود تنبيه غياب في مادة {subject_name}:\n{reasons}\n\nيرجى مراجعة شؤون الطلاب.",
+            ]
+        );
     }
 }

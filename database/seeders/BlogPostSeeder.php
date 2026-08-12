@@ -19,7 +19,7 @@ class BlogPostSeeder extends Seeder
                 'cover_image' => 'https://picsum.photos/seed/blog1/800/400',
                 'status' => 'published',
                 'published_at' => now()->subDays(5),
-                'seo_title' => 'أهمية التدريب المهني | Mset.ly',
+                'seo_title' => 'أهمية التدريب المهني | MHCST',
                 'seo_description' => 'اكتشف لماذا التدريب المهني مهم لمسيرتك في سوق العمل الليبي',
             ],
             [
@@ -31,7 +31,7 @@ class BlogPostSeeder extends Seeder
                 'cover_image' => 'https://picsum.photos/seed/blog2/800/400',
                 'status' => 'published',
                 'published_at' => now()->subDays(12),
-                'seo_title' => 'أهم 5 مهارات تقنية 2026 | Mset.ly',
+                'seo_title' => 'أهم 5 مهارات تقنية 2026 | MHCST',
                 'seo_description' => 'تعرف على أهم المهارات التقنية المطلوبة في سوق العمل هذا العام',
             ],
             [
@@ -43,7 +43,7 @@ class BlogPostSeeder extends Seeder
                 'cover_image' => 'https://picsum.photos/seed/blog3/800/400',
                 'status' => 'draft',
                 'published_at' => null,
-                'seo_title' => 'دليل PMP الشامل | Mset.ly',
+                'seo_title' => 'دليل PMP الشامل | MHCST',
                 'seo_description' => 'خطتك للنجاح في امتحان إدارة المشاريع الاحترافية PMP',
             ],
         ];

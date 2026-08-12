@@ -7,18 +7,30 @@ use App\Http\Requests\Cms\UpdateGradeRequest;
 use App\Models\CmsEnrollment;
 use App\Models\CmsGrade;
 use App\Models\CmsSubject;
+use App\Services\CmsAuthorizationService;
 use App\Services\CmsGradeImportService;
 use App\Services\CmsSpreadsheetService;
+use App\Services\GradeLockService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CmsGradeController extends Controller
 {
-    public function index(Request $request): Response
+    public function __construct(private CmsAuthorizationService $cmsAuth) {}
+
+    public function index(Request $request, GradeLockService $gradeLock): Response
     {
-        $subjects = CmsSubject::get(['id', 'code', 'name']);
-        $selectedSubjectId = $request->input('subject_id', $subjects->first()?->id);
+        $user = auth()->user();
+        $subjects = $this->cmsAuth->isTeacher($user)
+            ? $this->cmsAuth->teacherSubjects($user)
+            : CmsSubject::orderBy('code')->get(['id', 'code', 'name']);
+
+        $selectedSubjectId = (int) $request->input('subject_id', $subjects->first()?->id);
+
+        if ($selectedSubjectId && $this->cmsAuth->isTeacher($user)) {
+            $this->cmsAuth->ensureTeacherCanAccessSubject($user, $selectedSubjectId);
+        }
 
         $enrollments = [];
         if ($selectedSubjectId) {
@@ -30,13 +42,21 @@ class CmsGradeController extends Controller
 
         return Inertia::render('cms/grades/index', [
             'subjects' => $subjects,
-            'selectedSubjectId' => (int) $selectedSubjectId,
+            'selectedSubjectId' => $selectedSubjectId,
             'enrollments' => $enrollments,
+            'gradesLocked' => $gradeLock->isLocked(),
+            'canEditGrades' => $gradeLock->canEditGrades($user),
         ]);
     }
 
-    public function update(UpdateGradeRequest $request)
+    public function update(UpdateGradeRequest $request, GradeLockService $gradeLock)
     {
+        if (! $gradeLock->canEditGrades(auth()->user())) {
+            return redirect()->back()->withErrors(['grades' => 'Grade entry is locked. Contact an administrator to unlock.']);
+        }
+
+        $this->cmsAuth->ensureTeacherCanAccessEnrollment(auth()->user(), (int) $request->input('enrollment_id'));
+
         $data = $request->validated();
         $enrollmentId = $data['enrollment_id'];
 
@@ -49,8 +69,12 @@ class CmsGradeController extends Controller
         return redirect()->back()->with('success', 'Grade updated successfully.');
     }
 
-    public function bulkUpdate(Request $request)
+    public function bulkUpdate(Request $request, GradeLockService $gradeLock)
     {
+        if (! $gradeLock->canEditGrades(auth()->user())) {
+            return redirect()->back()->withErrors(['grades' => 'Grade entry is locked. Contact an administrator to unlock.']);
+        }
+
         $request->validate([
             'grades' => ['required', 'array'],
             'grades.*.enrollment_id' => ['required', 'exists:cms_enrollments,id'],
@@ -61,7 +85,13 @@ class CmsGradeController extends Controller
             'grades.*.participation' => ['nullable', 'numeric', 'min:0', 'max:100'],
         ]);
 
+        $user = auth()->user();
+
         foreach ($request->input('grades') as $item) {
+            if (! $this->cmsAuth->teacherCanAccessEnrollment($user, (int) $item['enrollment_id'])) {
+                continue;
+            }
+
             $grade = CmsGrade::firstOrNew(['enrollment_id' => $item['enrollment_id']]);
             $grade->midterm = $item['midterm'] ?? null;
             $grade->final = $item['final'] ?? null;
@@ -82,6 +112,7 @@ class CmsGradeController extends Controller
         $title = $request->input('title', 'كشف درجات المواد');
 
         $query = CmsEnrollment::with(['student', 'subject', 'grade'])->where('status', 'active');
+        $this->cmsAuth->scopeEnrollmentsForUser($query, auth()->user());
 
         if ($request->filled('subject_id')) {
             $query->where('subject_id', $request->subject_id);

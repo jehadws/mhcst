@@ -5,15 +5,15 @@ import { useSite } from '@/context/site-context'
 import { FileText } from 'lucide-react'
 
 export default function TermsPage() {
-    const { locale } = useSite()
+    const { locale, t } = useSite()
 
     return (
         <>
             <SeoHead
                 title={locale === 'ar' ? 'الشروط والأحكام' : 'Terms of Use'}
                 description={locale === 'ar'
-                    ? 'الشروط والأحكام لاستخدام موقع المعهد الحديث العالي للعلوم والتكنولوجيا'
-                    : 'Terms of use for the MHCST website'}
+                    ? `الشروط والأحكام لاستخدام موقع ${t.brandFull}`
+                    : `Terms of use for the ${t.brandFull} website`}
             />
             <div className="flex min-h-screen flex-col">
                 <SiteHeader />
@@ -38,7 +38,7 @@ export default function TermsPage() {
                             {locale === 'ar' ? (
                                 <>
                                     <h2>قبول الشروط</h2>
-                                    <p>باستخدامك لموقع المعايير الحديثة للتعليم والتدريب، فإنك توافق على الالتزام بهذه الشروط والأحكام.</p>
+                                    <p>باستخدامك لموقع {t.brandFull}، فإنك توافق على الالتزام بهذه الشروط والأحكام.</p>
                                     <h2>خدماتنا</h2>
                                     <p>نقدم برامج تدريبية وتعليمية معتمدة. يحق لنا تعديل أو إلغاء أي برنامج في أي وقت مع إشعار مناسب.</p>
                                     <h2>التسجيل والدفع</h2>
@@ -46,9 +46,9 @@ export default function TermsPage() {
                                     <h2>سياسة الاسترداد</h2>
                                     <p>يمكن استرداد الرسوم كاملاً في حال الإلغاء قبل 7 أيام من بدء البرنامج. لا يحق الاسترداد بعد بدء الدورة.</p>
                                     <h2>الملكية الفكرية</h2>
-                                    <p>جميع المحتويات والمواد التدريبية هي ملك حصري للمعايير الحديثة ولا يجوز نسخها أو توزيعها دون إذن مسبق.</p>
+                                    <p>جميع المحتويات والمواد التدريبية هي ملك حصري لـ{t.brandShort} ولا يجوز نسخها أو توزيعها دون إذن مسبق.</p>
                                     <h2>حدود المسؤولية</h2>
-                                    <p>لا تتحمل المعايير الحديثة مسؤولية أي أضرار غير مباشرة ناجمة عن استخدام خدماتنا.</p>
+                                    <p>لا تتحمل {t.brandShort} مسؤولية أي أضرار غير مباشرة ناجمة عن استخدام خدماتنا.</p>
                                     <h2>التعديلات</h2>
                                     <p>نحتفظ بالحق في تعديل هذه الشروط في أي وقت. سيتم إعلامكم بأي تغييرات جوهرية.</p>
                                     <h2>القانون المطبّق</h2>
@@ -57,7 +57,7 @@ export default function TermsPage() {
                             ) : (
                                 <>
                                     <h2>Acceptance of Terms</h2>
-                                    <p>By using the Modern Standards for Education & Training website, you agree to be bound by these Terms of Use.</p>
+                                    <p>By using the {t.brandFull} website, you agree to be bound by these Terms of Use.</p>
                                     <h2>Our Services</h2>
                                     <p>We provide accredited training and educational programs. We reserve the right to modify or cancel any program with appropriate notice.</p>
                                     <h2>Registration & Payment</h2>
@@ -65,9 +65,9 @@ export default function TermsPage() {
                                     <h2>Refund Policy</h2>
                                     <p>Full refunds are available if cancellation is made at least 7 days before the program starts. No refunds after a course has begun.</p>
                                     <h2>Intellectual Property</h2>
-                                    <p>All content and training materials are the exclusive property of Modern Standards and may not be copied or distributed without prior permission.</p>
+                                    <p>All content and training materials are the exclusive property of {t.brandShort} and may not be copied or distributed without prior permission.</p>
                                     <h2>Limitation of Liability</h2>
-                                    <p>Modern Standards is not liable for any indirect damages resulting from the use of our services.</p>
+                                    <p>{t.brandShort} is not liable for any indirect damages resulting from the use of our services.</p>
                                     <h2>Modifications</h2>
                                     <p>We reserve the right to modify these terms at any time. You will be notified of any material changes.</p>
                                     <h2>Governing Law</h2>

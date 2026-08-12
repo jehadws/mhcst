@@ -3,7 +3,6 @@
 use App\Models\CmsDepartment;
 use App\Models\CmsLevel;
 use App\Models\CmsStudent;
-use App\Models\User;
 use App\Services\IdCardBarcodeService;
 
 function createCmsStudentForCard(): CmsStudent
@@ -33,7 +32,7 @@ function createCmsStudentForCard(): CmsStudent
 }
 
 test('authenticated user can view the student id card print page', function () {
-    $user = User::factory()->create();
+    $user = createAdminUser();
     $student = createCmsStudentForCard();
 
     $response = $this->actingAs($user)->get("/cms/students/{$student->id}/id-card");
@@ -47,7 +46,7 @@ test('authenticated user can view the student id card print page', function () {
 });
 
 test('id card page renders the svg barcode area', function () {
-    $user = User::factory()->create();
+    $user = createAdminUser();
     $student = createCmsStudentForCard();
 
     $response = $this->actingAs($user)->get("/cms/students/{$student->id}/id-card");
@@ -56,14 +55,14 @@ test('id card page renders the svg barcode area', function () {
     $response->assertSee('barcode-area');
 });
 
-test('id card falls back to logo.png when no logo setting exists', function () {
-    $user = User::factory()->create();
+test('id card falls back to the default branding logo when no logo setting exists', function () {
+    $user = createAdminUser();
     $student = createCmsStudentForCard();
 
     $response = $this->actingAs($user)->get("/cms/students/{$student->id}/id-card");
 
     $response->assertOk();
-    $response->assertSee('logo.png');
+    $response->assertSee('images/branding/logo-header-128.png');
 });
 
 test('barcode service produces a valid svg for the student number', function () {
@@ -78,4 +77,22 @@ test('id card requires authentication', function () {
     $student = createCmsStudentForCard();
 
     $this->get("/cms/students/{$student->id}/id-card")->assertRedirect('/login');
+});
+
+test('authenticated user can view the student transcript print page', function () {
+    $user = createAdminUser();
+    $student = createCmsStudentForCard();
+
+    $response = $this->actingAs($user)->get("/cms/students/{$student->id}/transcript");
+
+    $response->assertOk();
+    $response->assertViewIs('cms.transcript');
+    $response->assertSee('كشف درجات رسمي');
+    $response->assertSee($student->student_no);
+});
+
+test('transcript requires authentication', function () {
+    $student = createCmsStudentForCard();
+
+    $this->get("/cms/students/{$student->id}/transcript")->assertRedirect('/login');
 });

@@ -9,7 +9,7 @@ code comment or commit message — never silently guess.
 
 ## 1. Project Summary
 
-Rebuild of an educational course-management platform (originally mset.ly), consisting of:
+Rebuild of the MHCST (Modern Higher College of Science & Technology) platform, consisting of:
 
 - **Public website**: `/`, `/courses`, `/courses/{course}`, `/contact-us`, `/how-we-are`
 - **Dashboard**: course management, student registration management, user management,

@@ -1,28 +1,54 @@
-import { SectionHeader } from '@/components/site/section-header';
 import { useSite } from '@/context/site-context';
+import { Link } from '@inertiajs/react';
+import { ArrowLeft, ArrowRight, ClipboardCheck, FileText, Send } from 'lucide-react';
+
+const STEP_ICONS = [ClipboardCheck, FileText, Send];
 
 export function ApplicationSteps() {
-  const { t } = useSite();
+  const { t, isRTL } = useSite();
+  const Arrow = isRTL ? ArrowLeft : ArrowRight;
 
   return (
-    <section className="py-20 sm:py-28">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <SectionHeader label={t.applicationSteps.label} title={t.applicationSteps.title} description={t.applicationSteps.description} />
+    <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl text-center">
+        <h2 className="text-primary text-3xl font-extrabold sm:text-4xl">
+          {t.applicationSteps.title} <span className="text-accent">{t.applicationSteps.titleAccent}</span>
+        </h2>
+        <p className="text-muted-foreground mt-4">{t.applicationSteps.description}</p>
+      </div>
 
-        <ol className="mt-14 grid gap-6 lg:grid-cols-3">
-          {t.applicationSteps.steps.map((step, idx) => (
-            <li key={idx} className="border-border bg-card relative border p-8 pt-10">
-              <span className="bg-hero text-hero-foreground absolute -top-4 start-8 inline-flex size-8 items-center justify-center rounded-full text-xs font-bold">
-                {idx + 1}
-              </span>
-              <p className="text-primary text-xs font-bold tracking-[0.15em] uppercase">
-                {t.applicationSteps.label} {String(idx + 1).padStart(2, '0')}
-              </p>
-              <h3 className="text-foreground mt-3 font-serif text-xl font-bold">{step.title}</h3>
-              <p className="text-muted-foreground mt-3 text-sm leading-7">{step.description}</p>
-            </li>
-          ))}
-        </ol>
+      <div className="mt-14 grid gap-6 md:grid-cols-3">
+        {t.applicationSteps.steps.map((s, idx) => {
+          const Icon = STEP_ICONS[idx] ?? ClipboardCheck;
+
+          return (
+            <div
+              key={s.title}
+              className="border-border bg-card shadow-primary/5 relative rounded-2xl border p-8 text-start shadow-sm transition-shadow hover:shadow-lg"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-secondary text-5xl font-extrabold">{idx + 1}</span>
+                <span className="bg-primary text-primary-foreground flex size-12 items-center justify-center rounded-xl">
+                  <Icon className="size-6" aria-hidden="true" />
+                </span>
+              </div>
+              <h3 className="text-primary mt-6 text-lg font-bold">
+                {idx + 1}. {s.title}
+              </h3>
+              <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{s.description}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-10 flex justify-center">
+        <Link
+          href="/contact"
+          className="bg-accent text-accent-foreground inline-flex items-center gap-2 rounded-md px-7 py-3.5 text-sm font-bold transition-transform hover:-translate-y-0.5"
+        >
+          {t.applicationSteps.cta}
+          <Arrow className="size-4" aria-hidden="true" />
+        </Link>
       </div>
     </section>
   );

@@ -44,8 +44,8 @@ export default function PublicDepartmentsPage({ departments = [] }: Props) {
         title={locale === 'ar' ? 'الأقسام الأكاديمية' : 'Academic Departments'}
         description={
           locale === 'ar'
-            ? 'استكشف التخصصات والأقسام الأكاديمية المتنوعة في المعهد الحديث العالي للعلوم والتكنولوجيا'
-            : 'Explore our academic departments and specialized study programs at MHCST'
+            ? `استكشف التخصصات والأقسام الأكاديمية المتنوعة في ${t.brandFull}`
+            : `Explore our academic departments and specialized study programs at ${t.brandFull}`
         }
       />
       <div className="flex min-h-screen flex-col">

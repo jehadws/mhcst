@@ -1,15 +1,15 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Jobs\SendNewsletterCampaign;
 use App\Mail\NewsletterCampaignMail;
 use App\Models\NewsletterCampaign;
 use App\Models\NewsletterSubscriber;
-use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 
 test('authenticated users can view the campaigns list', function () {
-    $user = User::factory()->create();
+    $user = createUserWithRoles([UserRole::Support->value]);
 
     $this->actingAs($user)
         ->get('/dashboard/newsletter/campaigns/list')
@@ -21,7 +21,7 @@ test('guests are redirected from the campaigns dashboard', function () {
 });
 
 test('authenticated users can create a campaign draft', function () {
-    $user = User::factory()->create();
+    $user = createUserWithRoles([UserRole::Support->value]);
 
     $this->actingAs($user)
         ->post('/dashboard/newsletter/campaigns', [
@@ -39,7 +39,7 @@ test('authenticated users can create a campaign draft', function () {
 });
 
 test('campaign requires a subject and content', function () {
-    $user = User::factory()->create();
+    $user = createUserWithRoles([UserRole::Support->value]);
 
     $this->actingAs($user)
         ->post('/dashboard/newsletter/campaigns', [])
@@ -49,7 +49,7 @@ test('campaign requires a subject and content', function () {
 test('sending a campaign dispatches the job to active subscribers', function () {
     Queue::fake();
 
-    $user = User::factory()->create();
+    $user = createUserWithRoles([UserRole::Support->value]);
     NewsletterSubscriber::factory()->count(3)->create();
     NewsletterSubscriber::factory()->inactive()->create();
 
@@ -68,7 +68,7 @@ test('sending a campaign dispatches the job to active subscribers', function () 
 test('an already sent campaign cannot be sent again', function () {
     Queue::fake();
 
-    $user = User::factory()->create();
+    $user = createUserWithRoles([UserRole::Support->value]);
     $campaign = NewsletterCampaign::factory()->sent()->create(['sent_by' => $user->id]);
 
     $this->actingAs($user)

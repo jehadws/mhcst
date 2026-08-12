@@ -12,7 +12,7 @@ class SiteSettingController extends Controller
     private const GROUPS = [
         'general' => [
             'label' => 'General',
-            'fields' => ['site_name', 'site_name_ar', 'site_tagline', 'site_logo', 'meta_description'],
+            'fields' => ['site_name', 'site_name_ar', 'site_tagline', 'site_tagline_ar', 'site_logo', 'meta_description'],
         ],
         'contact' => [
             'label' => 'Contact',

@@ -50,7 +50,7 @@ export default function CertificateForm({ enrollments }: Props) {
 
           <div>
             <Label htmlFor="certificate_number">{d.form.labels.certificateNumber} *</Label>
-            <Input id="certificate_number" value={data.certificate_number} onChange={e => setData('certificate_number', e.target.value)} dir="ltr" placeholder="MSET-XXXXXX" />
+            <Input id="certificate_number" value={data.certificate_number} onChange={e => setData('certificate_number', e.target.value)} dir="ltr" placeholder="MHCST-XXXXXX" />
             {errors.certificate_number && <p className="text-sm text-red-500 mt-1">{errors.certificate_number}</p>}
           </div>
 

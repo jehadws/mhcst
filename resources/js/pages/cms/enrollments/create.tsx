@@ -1,17 +1,20 @@
 import AppLayout from '@/layouts/app-layout';
+import { useCms } from '@/hooks/use-cms';
+import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem } from '@/types';
 import { CmsLevel, CmsStudent, CmsSubject } from '@/types/cms';
-import { Head, useForm, Link, router } from '@inertiajs/react';
+import { Head, useForm, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useState } from 'react';
 
 export default function EnrollmentCreate({ students, subjects, levels }: { students: CmsStudent[]; subjects: CmsSubject[]; levels: CmsLevel[] }) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'التسجيلات الأكاديمية', href: '/cms/enrollments' },
-        { title: 'تسجيل جديد', href: '/cms/enrollments/create' },
-    ];
+    const { c } = useCms();
+
+    const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [
+        { label: c.nav.enrollments, href: '/cms/enrollments' },
+        { label: c.enrollments.addTitle, href: '/cms/enrollments/create' },
+    ]);
 
     const singleForm = useForm({
         student_id: students[0]?.id ? String(students[0].id) : '',
@@ -38,22 +41,25 @@ export default function EnrollmentCreate({ students, subjects, levels }: { stude
         bulkForm.post('/cms/enrollments/bulk');
     };
 
+    const levelOptionLabel = (lvl: CmsLevel) =>
+        `${lvl.department?.name} - ${c.levels.yearLabel.replace('{year}', String(lvl.year))} (${c.levels.sectionLabel.replace('{section}', lvl.section)})`;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="تسجيل دراسي جديد" />
+            <Head title={c.enrollments.addTitle} />
             <div className="max-w-2xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-6">تسجيل مادة دراسية</h1>
+                <h1 className="text-2xl font-bold mb-6">{c.enrollments.addHeading}</h1>
 
                 <Tabs defaultValue="single">
                     <TabsList className="grid w-full grid-cols-2 mb-6">
-                        <TabsTrigger value="single">تسجيل طالب فردي</TabsTrigger>
-                        <TabsTrigger value="bulk">تسجيل جماعي (دفعة كاملة)</TabsTrigger>
+                        <TabsTrigger value="single">{c.enrollments.tabSingle}</TabsTrigger>
+                        <TabsTrigger value="bulk">{c.enrollments.tabBulk}</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="single">
                         <form onSubmit={submitSingle} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border">
                             <div>
-                                <Label htmlFor="student_id">اختر الطالب</Label>
+                                <Label htmlFor="student_id">{c.enrollments.selectStudent}</Label>
                                 <select
                                     id="student_id"
                                     className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
@@ -67,7 +73,7 @@ export default function EnrollmentCreate({ students, subjects, levels }: { stude
                             </div>
 
                             <div>
-                                <Label htmlFor="subject_id">اختر المادة الدراسية</Label>
+                                <Label htmlFor="subject_id">{c.enrollments.selectSubject}</Label>
                                 <select
                                     id="subject_id"
                                     className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
@@ -82,7 +88,7 @@ export default function EnrollmentCreate({ students, subjects, levels }: { stude
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="academic_year">العام الدراسي</Label>
+                                    <Label htmlFor="academic_year">{c.enrollments.academicYear}</Label>
                                     <input
                                         id="academic_year"
                                         className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
@@ -91,23 +97,23 @@ export default function EnrollmentCreate({ students, subjects, levels }: { stude
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="semester">الفصل الدراسي</Label>
+                                    <Label htmlFor="semester">{c.enrollments.semester}</Label>
                                     <select
                                         id="semester"
                                         className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
                                         value={singleForm.data.semester}
-                                        onChange={(e) => singleForm.setData('semester', e.target.value as any)}
+                                        onChange={(e) => singleForm.setData('semester', e.target.value as typeof singleForm.data.semester)}
                                     >
-                                        <option value="first">الفصل الأول</option>
-                                        <option value="second">الفصل الثاني</option>
-                                        <option value="summer">الفصل الصيفي</option>
+                                        <option value="first">{c.labels.semesters.first}</option>
+                                        <option value="second">{c.labels.semesters.second}</option>
+                                        <option value="summer">{c.labels.semesters.summer}</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-3 pt-4">
-                                <Button type="submit" disabled={singleForm.processing}>حفظ التسجيل</Button>
-                                <Button variant="outline" asChild><Link href="/cms/enrollments">إلغاء</Link></Button>
+                                <Button type="submit" disabled={singleForm.processing}>{c.enrollments.saveEnrollment}</Button>
+                                <Button variant="outline" asChild><Link href="/cms/enrollments">{c.common.cancel}</Link></Button>
                             </div>
                         </form>
                     </TabsContent>
@@ -115,7 +121,7 @@ export default function EnrollmentCreate({ students, subjects, levels }: { stude
                     <TabsContent value="bulk">
                         <form onSubmit={submitBulk} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border">
                             <div>
-                                <Label htmlFor="level_id">اختر الشعبة / الدفعة كاملة</Label>
+                                <Label htmlFor="level_id">{c.enrollments.selectLevel}</Label>
                                 <select
                                     id="level_id"
                                     className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
@@ -124,14 +130,14 @@ export default function EnrollmentCreate({ students, subjects, levels }: { stude
                                 >
                                     {levels.map((lvl) => (
                                         <option key={lvl.id} value={lvl.id}>
-                                            {lvl.department?.name} - السنة {lvl.year} (شعبة {lvl.section})
+                                            {levelOptionLabel(lvl)}
                                         </option>
                                     ))}
                                 </select>
                             </div>
 
                             <div>
-                                <Label htmlFor="bulk_subject_id">المادة الدراسية المراد تسجيلها للجميع</Label>
+                                <Label htmlFor="bulk_subject_id">{c.enrollments.bulkSubject}</Label>
                                 <select
                                     id="bulk_subject_id"
                                     className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
@@ -146,7 +152,7 @@ export default function EnrollmentCreate({ students, subjects, levels }: { stude
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="bulk_academic_year">العام الدراسي</Label>
+                                    <Label htmlFor="bulk_academic_year">{c.enrollments.academicYear}</Label>
                                     <input
                                         id="bulk_academic_year"
                                         className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
@@ -155,23 +161,23 @@ export default function EnrollmentCreate({ students, subjects, levels }: { stude
                                     />
                                 </div>
                                 <div>
-                                    <Label htmlFor="bulk_semester">الفصل الدراسي</Label>
+                                    <Label htmlFor="bulk_semester">{c.enrollments.semester}</Label>
                                     <select
                                         id="bulk_semester"
                                         className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
                                         value={bulkForm.data.semester}
-                                        onChange={(e) => bulkForm.setData('semester', e.target.value as any)}
+                                        onChange={(e) => bulkForm.setData('semester', e.target.value as typeof bulkForm.data.semester)}
                                     >
-                                        <option value="first">الفصل الأول</option>
-                                        <option value="second">الفصل الثاني</option>
-                                        <option value="summer">الفصل الصيفي</option>
+                                        <option value="first">{c.labels.semesters.first}</option>
+                                        <option value="second">{c.labels.semesters.second}</option>
+                                        <option value="summer">{c.labels.semesters.summer}</option>
                                     </select>
                                 </div>
                             </div>
 
                             <div className="flex items-center gap-3 pt-4">
-                                <Button type="submit" disabled={bulkForm.processing}>تسجيل كافة طلاب الشعبة</Button>
-                                <Button variant="outline" asChild><Link href="/cms/enrollments">إلغاء</Link></Button>
+                                <Button type="submit" disabled={bulkForm.processing}>{c.enrollments.enrollAll}</Button>
+                                <Button variant="outline" asChild><Link href="/cms/enrollments">{c.common.cancel}</Link></Button>
                             </div>
                         </form>
                     </TabsContent>

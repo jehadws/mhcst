@@ -32,7 +32,7 @@ export default function PublicFaqPage({ faqs }: Props) {
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="flex-1">
-          <PageHero label={t.nav.faq} title={t.faq.title} description={t.faq.subtitle} />
+          <PageHero title={t.faq.title} description={t.faq.subtitle} crumbs={[{ label: t.nav.faq, href: '/faq' }]} />
           <Faq items={faqs} />
           <CtaBanner />
         </main>

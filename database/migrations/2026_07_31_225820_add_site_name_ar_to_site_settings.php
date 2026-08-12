@@ -12,7 +12,7 @@ return new class extends Migration
     {
         DB::table('site_settings')->insertOrIgnore([
             'key' => 'site_name_ar',
-            'value' => 'المعهد الحديث العالي للعلوم والتكنولوجيا',
+            'value' => 'كلية المعايير الحديثة للعلوم والتقنية',
             'type' => 'text',
             'created_at' => now(),
             'updated_at' => now(),

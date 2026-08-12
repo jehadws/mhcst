@@ -1,4 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
+import { useCms } from '@/hooks/use-cms';
+import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem } from '@/types';
 import { CmsDepartment, CmsLevel } from '@/types/cms';
 import { Head, useForm, Link } from '@inertiajs/react';
@@ -7,10 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export default function LevelEdit({ level, departments }: { level: CmsLevel; departments: CmsDepartment[] }) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'الصفوف والشُعب', href: '/cms/levels' },
-        { title: 'تعديل شعبة', href: `/cms/levels/${level.id}/edit` },
-    ];
+    const { c } = useCms();
+
+    const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [
+        { label: c.nav.levels, href: '/cms/levels' },
+        { label: c.levels.editTitle, href: `/cms/levels/${level.id}/edit` },
+    ]);
 
     const { data, setData, put, processing, errors } = useForm({
         department_id: String(level.department_id),
@@ -26,12 +30,12 @@ export default function LevelEdit({ level, departments }: { level: CmsLevel; dep
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="تعديل شعبة دراسية" />
+            <Head title={c.levels.editTitle} />
             <div className="max-w-2xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-6">تعديل الشعبة الدراسية</h1>
+                <h1 className="text-2xl font-bold mb-6">{c.levels.editHeading}</h1>
                 <form onSubmit={submit} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border">
                     <div>
-                        <Label htmlFor="department_id">القسم الأكاديمي</Label>
+                        <Label htmlFor="department_id">{c.levels.department}</Label>
                         <select
                             id="department_id"
                             className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
@@ -46,7 +50,7 @@ export default function LevelEdit({ level, departments }: { level: CmsLevel; dep
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <Label htmlFor="year">السنة الدراسية</Label>
+                            <Label htmlFor="year">{c.levels.academicYear}</Label>
                             <Input
                                 id="year"
                                 type="number"
@@ -56,7 +60,7 @@ export default function LevelEdit({ level, departments }: { level: CmsLevel; dep
                         </div>
 
                         <div>
-                            <Label htmlFor="section">اسم الشعبة</Label>
+                            <Label htmlFor="section">{c.levels.section}</Label>
                             <Input
                                 id="section"
                                 value={data.section}
@@ -66,7 +70,7 @@ export default function LevelEdit({ level, departments }: { level: CmsLevel; dep
                     </div>
 
                     <div>
-                        <Label htmlFor="capacity">السعة الإستيعابية للطلاب</Label>
+                        <Label htmlFor="capacity">{c.levels.capacity}</Label>
                         <Input
                             id="capacity"
                             type="number"
@@ -76,8 +80,8 @@ export default function LevelEdit({ level, departments }: { level: CmsLevel; dep
                     </div>
 
                     <div className="flex items-center gap-3 pt-4">
-                        <Button type="submit" disabled={processing}>حفظ التغييرات</Button>
-                        <Button variant="outline" asChild><Link href="/cms/levels">إلغاء</Link></Button>
+                        <Button type="submit" disabled={processing}>{c.common.saveChanges}</Button>
+                        <Button variant="outline" asChild><Link href="/cms/levels">{c.common.cancel}</Link></Button>
                     </div>
                 </form>
             </div>

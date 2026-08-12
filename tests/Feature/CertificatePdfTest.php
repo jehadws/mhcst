@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Models\Certificate;
 use App\Models\Course;
 use App\Models\Enrollment;
@@ -7,7 +8,7 @@ use App\Models\Student;
 use App\Models\User;
 
 test('authenticated user can download certificate pdf view', function () {
-    $user = User::factory()->create();
+    $user = createUserWithRoles([UserRole::ContentEditor->value]);
     $student = Student::factory()->create();
     $course = Course::factory()->create(['status' => 'published']);
     $enrollment = Enrollment::factory()->create([

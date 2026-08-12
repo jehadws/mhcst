@@ -123,7 +123,7 @@
 
     <div class="page">
         <div class="report-header">
-            <div class="inst">المعهد الحديث العالي للعلوم والتكنولوجيا</div>
+            <div class="inst">كلية المعايير الحديثة للعلوم والتقنية</div>
             <div class="title">{{ $title }}</div>
             <div class="meta">تاريخ الإصدار: {{ $exportedAt->format('d/m/Y H:i') }} | عدد القيود: {{ $enrollments->count() }}</div>
         </div>
@@ -164,8 +164,8 @@
         </table>
 
         <div class="footer">
-            <span>{{ $enrollments->count() === 0 ? 'لا توجد بيانات للتصدير.' : 'نظام إدارة الكلية — MHCST CMS' }}</span>
-            <span>إدارة المعهد</span>
+            <span>{{ $enrollments->count() === 0 ? 'لا توجد بيانات للتصدير.' : 'نظام إدارة الكلية — CMS' }}</span>
+            <span>إدارة الكلية</span>
         </div>
     </div>
 </body>

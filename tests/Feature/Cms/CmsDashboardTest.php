@@ -3,7 +3,6 @@
 use App\Models\CmsDepartment;
 use App\Models\CmsLevel;
 use App\Models\CmsStudent;
-use App\Models\User;
 
 test('cms department has students through levels', function () {
     $department = CmsDepartment::create([
@@ -32,13 +31,13 @@ test('cms department has students through levels', function () {
 });
 
 test('cms dashboard redirects to the merged college dashboard', function () {
-    $user = User::factory()->create();
+    $user = createAdminUser();
 
     $this->actingAs($user)->get('/cms/dashboard')->assertRedirect('/dashboard');
 });
 
 test('authenticated user can view the merged dashboard with academic stats', function () {
-    $user = User::factory()->create();
+    $user = createAdminUser();
 
     $department = CmsDepartment::create([
         'name' => 'Engineering',

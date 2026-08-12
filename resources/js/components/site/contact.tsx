@@ -18,7 +18,7 @@ export function Contact() {
         message: '',
     })
 
-    const contactEmail = settings.contact_email || 'info@mset.ly'
+    const contactEmail = settings.contact_email || 'info@mhcst.ly'
     const contactPhone = settings.contact_phone || '+218 91 234 5678'
     const address = settings.address || t.location.addressLine
 

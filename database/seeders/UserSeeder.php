@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
     {
         $admin = User::create([
             'name' => 'System Admin',
-            'email' => 'admin@mset.ly',
+            'email' => 'admin@mhcst.ly',
             'password' => Hash::make('password'),
             'is_active' => true,
         ]);
@@ -20,16 +20,23 @@ class UserSeeder extends Seeder
 
         User::create([
             'name' => 'Manager User',
-            'email' => 'manager@mset.ly',
+            'email' => 'manager@mhcst.ly',
             'password' => Hash::make('password'),
             'is_active' => true,
         ])->assignRole('Manager');
 
         User::create([
             'name' => 'Editor User',
-            'email' => 'editor@mset.ly',
+            'email' => 'editor@mhcst.ly',
             'password' => Hash::make('password'),
             'is_active' => true,
         ])->assignRole('Content Editor');
+
+        User::create([
+            'name' => 'Support User',
+            'email' => 'support@mhcst.ly',
+            'password' => Hash::make('password'),
+            'is_active' => true,
+        ])->assignRole('Support');
     }
 }

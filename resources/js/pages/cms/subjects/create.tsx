@@ -1,4 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
+import { useCms } from '@/hooks/use-cms';
+import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem } from '@/types';
 import { CmsDepartment } from '@/types/cms';
 import { Head, useForm, Link } from '@inertiajs/react';
@@ -9,10 +11,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 
 export default function SubjectCreate({ departments }: { departments: CmsDepartment[] }) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'المواد الدراسية', href: '/cms/subjects' },
-        { title: 'إضافة مادة جديدة', href: '/cms/subjects/create' },
-    ];
+    const { c } = useCms();
+
+    const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [
+        { label: c.nav.subjects, href: '/cms/subjects' },
+        { label: c.subjects.addTitle, href: '/cms/subjects/create' },
+    ]);
 
     const { data, setData, post, processing, errors } = useForm({
         department_id: departments[0]?.id ? String(departments[0].id) : '',
@@ -31,12 +35,12 @@ export default function SubjectCreate({ departments }: { departments: CmsDepartm
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="إضافة مادة دراسية" />
+            <Head title={c.subjects.addTitle} />
             <div className="max-w-2xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-6">إضافة مادة دراسية جديدة</h1>
+                <h1 className="text-2xl font-bold mb-6">{c.subjects.addHeading}</h1>
                 <form onSubmit={submit} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border">
                     <div>
-                        <Label htmlFor="department_id">القسم الأكاديمي</Label>
+                        <Label htmlFor="department_id">{c.levels.department}</Label>
                         <select
                             id="department_id"
                             className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
@@ -51,7 +55,7 @@ export default function SubjectCreate({ departments }: { departments: CmsDepartm
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <Label htmlFor="code">رمز المادة (e.g. CS101) *</Label>
+                            <Label htmlFor="code">{c.subjects.codeHint}</Label>
                             <Input
                                 id="code"
                                 value={data.code}
@@ -62,12 +66,12 @@ export default function SubjectCreate({ departments }: { departments: CmsDepartm
                         </div>
 
                         <div>
-                            <Label htmlFor="name">اسم المادة *</Label>
+                            <Label htmlFor="name">{c.subjects.name}</Label>
                             <Input
                                 id="name"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                placeholder="مقدمة في علوم البرمجة"
+                                placeholder={c.subjects.namePlaceholder}
                             />
                             {errors.name && <p className="text-xs text-rose-500 mt-1">{errors.name}</p>}
                         </div>
@@ -75,7 +79,7 @@ export default function SubjectCreate({ departments }: { departments: CmsDepartm
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <Label htmlFor="credits">عدد الساعات المعتمدة</Label>
+                            <Label htmlFor="credits">{c.subjects.credits}</Label>
                             <Input
                                 id="credits"
                                 type="number"
@@ -87,16 +91,16 @@ export default function SubjectCreate({ departments }: { departments: CmsDepartm
                         </div>
 
                         <div>
-                            <Label htmlFor="semester">الفصل الدراسي المعتاد</Label>
+                            <Label htmlFor="semester">{c.subjects.usualSemester}</Label>
                             <select
                                 id="semester"
                                 className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
                                 value={data.semester}
-                                onChange={(e) => setData('semester', e.target.value as any)}
+                                onChange={(e) => setData('semester', e.target.value as typeof data.semester)}
                             >
-                                <option value="first">الفصل الأول</option>
-                                <option value="second">الفصل الثاني</option>
-                                <option value="summer">الفصل الصيفي</option>
+                                <option value="first">{c.labels.semesters.first}</option>
+                                <option value="second">{c.labels.semesters.second}</option>
+                                <option value="summer">{c.labels.semesters.summer}</option>
                             </select>
                         </div>
                     </div>
@@ -108,12 +112,12 @@ export default function SubjectCreate({ departments }: { departments: CmsDepartm
                             onCheckedChange={(checked) => setData('has_lab', !!checked)}
                         />
                         <Label htmlFor="has_lab" className="cursor-pointer font-medium">
-                            تحتوي المادة على جزء عملي / معمل (Lab)
+                            {c.subjects.hasLab}
                         </Label>
                     </div>
 
                     <div>
-                        <Label htmlFor="description">وصف وتفاصيل المادة</Label>
+                        <Label htmlFor="description">{c.subjects.description}</Label>
                         <Textarea
                             id="description"
                             value={data.description}
@@ -123,8 +127,8 @@ export default function SubjectCreate({ departments }: { departments: CmsDepartm
                     </div>
 
                     <div className="flex items-center gap-3 pt-4">
-                        <Button type="submit" disabled={processing}>حفظ المادة</Button>
-                        <Button variant="outline" asChild><Link href="/cms/subjects">إلغاء</Link></Button>
+                        <Button type="submit" disabled={processing}>{c.subjects.saveSubject}</Button>
+                        <Button variant="outline" asChild><Link href="/cms/subjects">{c.common.cancel}</Link></Button>
                     </div>
                 </form>
             </div>

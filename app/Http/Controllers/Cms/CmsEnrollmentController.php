@@ -8,15 +8,19 @@ use App\Models\CmsEnrollment;
 use App\Models\CmsLevel;
 use App\Models\CmsStudent;
 use App\Models\CmsSubject;
+use App\Services\CmsAuthorizationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CmsEnrollmentController extends Controller
 {
+    public function __construct(private CmsAuthorizationService $cmsAuth) {}
+
     public function index(Request $request): Response
     {
         $query = CmsEnrollment::with(['student', 'subject.department']);
+        $this->cmsAuth->scopeEnrollmentsForUser($query, auth()->user());
 
         if ($request->filled('subject_id')) {
             $query->where('subject_id', $request->subject_id);
@@ -32,7 +36,9 @@ class CmsEnrollmentController extends Controller
 
         return Inertia::render('cms/enrollments/index', [
             'enrollments' => $query->latest()->paginate(15)->withQueryString(),
-            'subjects' => CmsSubject::get(['id', 'code', 'name']),
+            'subjects' => $this->cmsAuth->isTeacher(auth()->user())
+                ? $this->cmsAuth->teacherSubjects(auth()->user())
+                : CmsSubject::get(['id', 'code', 'name']),
             'filters' => $request->only('subject_id', 'academic_year', 'semester'),
         ]);
     }
@@ -51,6 +57,33 @@ class CmsEnrollmentController extends Controller
         CmsEnrollment::create($request->validated());
 
         return redirect()->route('cms.enrollments.index')->with('success', 'Enrollment created successfully.');
+    }
+
+    public function show(CmsEnrollment $enrollment): Response
+    {
+        $this->cmsAuth->ensureTeacherCanViewEnrollment(auth()->user(), $enrollment);
+
+        $enrollment->load(['student.level.department', 'subject.department', 'grade', 'attendance']);
+
+        return Inertia::render('cms/enrollments/show', [
+            'enrollment' => $enrollment,
+        ]);
+    }
+
+    public function edit(CmsEnrollment $enrollment): Response
+    {
+        return Inertia::render('cms/enrollments/edit', [
+            'enrollment' => $enrollment,
+            'students' => CmsStudent::get(['id', 'name', 'student_no']),
+            'subjects' => CmsSubject::get(['id', 'code', 'name']),
+        ]);
+    }
+
+    public function update(StoreEnrollmentRequest $request, CmsEnrollment $enrollment)
+    {
+        $enrollment->update($request->validated());
+
+        return redirect()->route('cms.enrollments.index')->with('success', 'Enrollment updated successfully.');
     }
 
     public function bulkEnroll(Request $request)

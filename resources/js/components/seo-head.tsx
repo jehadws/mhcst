@@ -15,11 +15,11 @@ export function SeoHead({ title, description, keywords, image, url, type = 'webs
 
     const siteTitle = title ? `${title} | ${t.brandShort}` : `${t.brandFull}`;
     const defaultDesc = locale === 'ar'
-        ? 'المعهد الحديث العالي للعلوم والتكنولوجيا - دورات تدريبية واحترافية وتدريب تقني وتطوير مهارات في ليبيا.'
-        : 'Modern Higher Institute for Science & Technology - Professional courses and technical training in Libya.';
+        ? `${t.brandFull} - دورات تدريبية واحترافية وتدريب تقني وتطوير مهارات في ليبيا.`
+        : `${t.brandFull} - Professional courses and technical training in Libya.`;
     const metaDescription = description || defaultDesc;
     const siteUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
-    const ogImage = image || '/images/og-default.png';
+    const ogImage = image || '/images/og-logo.png';
 
     return (
         <Head title={title ? siteTitle : undefined}>

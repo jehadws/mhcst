@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cms;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreTeacherRequest;
 use App\Models\CmsTeacher;
@@ -52,7 +53,7 @@ class CmsTeacherController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
-            $user->assignRole('teacher');
+            $user->assignRole(UserRole::Teacher->value);
             $data['user_id'] = $user->id;
         }
 

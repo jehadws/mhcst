@@ -18,7 +18,11 @@ class NotificationTemplateFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->words(3, true),
+            'channel' => fake()->randomElement(['email', 'whatsapp']),
+            'trigger_event' => 'enrollment.created',
+            'subject' => fake()->sentence(),
+            'body' => fake()->paragraph(),
         ];
     }
 }

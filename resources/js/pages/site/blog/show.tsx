@@ -1,98 +1,69 @@
 import { SeoHead } from '@/components/seo-head';
+import { CtaBanner } from '@/components/site/cta-banner';
+import { NewsCard } from '@/components/site/news-card';
+import { PageHero } from '@/components/site/page-hero';
 import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import { useSite } from '@/context/site-context';
+import { formatNewsDate, newsExcerpt, newsImage, newsTagKey, newsTitle, type NewsPost } from '@/lib/news';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Calendar, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
-
-interface BlogPost {
-  id: number;
-  slug: string;
-  title: string;
-  title_ar?: string;
-  title_en?: string;
-  content?: string;
-  content_ar?: string;
-  content_en?: string;
-  excerpt?: string;
-  excerpt_ar?: string;
-  excerpt_en?: string;
-  cover_image?: string;
-  published_at?: string;
-  reading_time?: number;
-}
+import { ArrowLeft, ArrowRight, CalendarDays } from 'lucide-react';
 
 interface Props {
-  post: BlogPost;
-  related: BlogPost[];
+  post: NewsPost & {
+    content?: string;
+    content_ar?: string;
+    content_en?: string;
+    reading_time?: number;
+  };
+  related: NewsPost[];
 }
 
 export default function BlogShow({ post, related = [] }: Props) {
-  const { locale } = useSite();
-  const ArrowBack = locale === 'ar' ? ChevronRight : ChevronLeft;
+  const { t, locale, isRTL } = useSite();
+  const Arrow = isRTL ? ArrowLeft : ArrowRight;
 
-  const title = (p: BlogPost) => p.title || p.title_ar || p.title_en || '';
   const content = post.content || (locale === 'ar' ? post.content_ar : post.content_en) || post.content_ar || '';
-  const excerpt = (p: BlogPost) => p.excerpt || p.excerpt_ar || p.excerpt_en || '';
-
-  const formatDate = (d?: string) => {
-    if (!d) return '';
-    return new Date(d).toLocaleDateString(locale === 'ar' ? 'ar-LY' : 'en-GB', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const coverImage = post.cover_image ? (post.cover_image.startsWith('http') ? post.cover_image : `/storage/${post.cover_image}`) : undefined;
+  const excerpt = newsExcerpt(post);
+  const coverImage = post.cover_image ? newsImage(post) : undefined;
+  const tag = t.news.tags[newsTagKey(post)];
 
   return (
     <>
-      <SeoHead title={title(post)} description={excerpt(post)} image={coverImage} type="article" />
+      <SeoHead title={newsTitle(post)} description={excerpt} image={coverImage} type="article" />
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="flex-1">
-          {/* Cover Image */}
-          {post.cover_image && (
-            <div className="bg-muted relative h-72 w-full overflow-hidden sm:h-96 lg:h-[480px]">
-              <img
-                src={post.cover_image.startsWith('http') ? post.cover_image : `/storage/${post.cover_image}`}
-                alt={title(post)}
-                className="h-full w-full object-cover"
-              />
-              <div className="from-background/80 via-background/20 absolute inset-0 bg-gradient-to-t to-transparent" />
-            </div>
-          )}
+          <PageHero
+            title={newsTitle(post)}
+            description={excerpt || undefined}
+            crumbs={[
+              { label: t.news.viewAll, href: '/blog-posts' },
+              { label: newsTitle(post), href: `/blog-posts/${post.slug}` },
+            ]}
+          />
 
-          <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-            {/* Back Link */}
-            <Link
-              href="/blog-posts"
-              className="border-border/80 bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground mb-8 inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium shadow-xs transition-all"
-            >
-              <ArrowBack className="size-3.5" />
-              <span>{locale === 'ar' ? 'العودة إلى المدونة' : 'Back to Blog'}</span>
-            </Link>
-
-            {/* Article Header */}
-            <div className="mb-8">
-              <div className="text-muted-foreground mb-4 flex flex-wrap items-center gap-4 text-xs">
-                <span className="flex items-center gap-1">
-                  <Calendar className="size-3.5" />
-                  {formatDate(post.published_at)}
+          <article className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+            {post.cover_image && (
+              <div className="border-border relative mb-10 overflow-hidden rounded-3xl border shadow-lg">
+                <img src={newsImage(post)} alt={newsTitle(post)} className="aspect-[16/9] w-full object-cover" />
+                <span className="bg-accent text-accent-foreground absolute end-4 top-4 rounded-full px-3 py-1 text-xs font-bold">
+                  {post.category || tag}
                 </span>
-                {post.reading_time && (
-                  <span className="flex items-center gap-1">
-                    <Clock className="size-3.5" />
-                    {post.reading_time} {locale === 'ar' ? 'دقائق للقراءة' : 'min read'}
-                  </span>
-                )}
               </div>
-              <h1 className="text-foreground font-serif text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">{title(post)}</h1>
+            )}
+
+            <div className="text-muted-foreground mb-8 flex flex-wrap items-center gap-4 text-xs">
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarDays className="size-4" aria-hidden="true" />
+                {formatNewsDate(post.published_at, locale)}
+              </span>
+              {!post.cover_image && (
+                <span className="bg-accent/15 text-accent rounded-full px-3 py-1 text-xs font-bold">{tag}</span>
+              )}
             </div>
 
-            {/* Article Content */}
-            <div className="prose prose-lg dark:prose-invert prose-headings:font-serif prose-headings:font-bold prose-p:leading-relaxed prose-p:text-muted-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline max-w-none">
+            <div className="prose prose-lg dark:prose-invert prose-headings:font-bold prose-p:leading-relaxed prose-p:text-muted-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline max-w-none text-start">
               {content ? (
                 <div dangerouslySetInnerHTML={{ __html: content }} />
               ) : (
@@ -102,42 +73,29 @@ export default function BlogShow({ post, related = [] }: Props) {
               )}
             </div>
 
-            {/* Related Articles */}
+            <div className="mt-10 flex justify-start">
+              <Link
+                href="/blog-posts"
+                className="text-accent hover:text-primary inline-flex items-center gap-1.5 text-sm font-bold"
+              >
+                {t.news.backToNews}
+                <Arrow className="size-4" aria-hidden="true" />
+              </Link>
+            </div>
+
             {related.length > 0 && (
-              <div className="border-border/60 mt-16 border-t pt-10">
-                <h2 className="text-foreground mb-6 font-serif text-2xl font-bold">{locale === 'ar' ? 'مقالات ذات صلة' : 'Related Articles'}</h2>
-                <div className="grid gap-6 sm:grid-cols-3">
-                  {related.map((p) => (
-                    <Link
-                      key={p.id}
-                      href={`/blog-posts/${p.slug}`}
-                      className="group border-border/80 bg-card hover:border-primary/40 flex flex-col overflow-hidden rounded-2xl border shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-                    >
-                      <div className="bg-muted relative aspect-video overflow-hidden">
-                        {p.cover_image ? (
-                          <img
-                            src={p.cover_image.startsWith('http') ? p.cover_image : `/storage/${p.cover_image}`}
-                            alt={title(p)}
-                            className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                          />
-                        ) : (
-                          <div className="bg-primary/10 flex h-full items-center justify-center">
-                            <BookOpen className="text-primary/30 size-8" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-4">
-                        <p className="text-muted-foreground mb-2 text-xs">{formatDate(p.published_at)}</p>
-                        <h3 className="text-foreground group-hover:text-primary line-clamp-2 font-serif text-sm font-bold transition-colors">
-                          {title(p)}
-                        </h3>
-                      </div>
-                    </Link>
+              <div className="border-border mt-16 border-t pt-12">
+                <h2 className="text-primary mb-8 text-2xl font-extrabold">{t.news.relatedTitle}</h2>
+                <div className="grid gap-6 md:grid-cols-3">
+                  {related.map((p, idx) => (
+                    <NewsCard key={p.id} post={p} index={idx} />
                   ))}
                 </div>
               </div>
             )}
-          </div>
+          </article>
+
+          <CtaBanner />
         </main>
         <SiteFooter />
       </div>

@@ -1,4 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
+import { useCms } from '@/hooks/use-cms';
+import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem } from '@/types';
 import { CmsEnrollment, CmsSubject } from '@/types/cms';
 import { Head, router } from '@inertiajs/react';
@@ -11,15 +13,20 @@ export default function GradesIndex({
     subjects,
     selectedSubjectId,
     enrollments,
+    gradesLocked = false,
+    canEditGrades = true,
 }: {
     subjects: CmsSubject[];
     selectedSubjectId: number;
     enrollments: CmsEnrollment[];
+    gradesLocked?: boolean;
+    canEditGrades?: boolean;
 }) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'النظام الأكاديمي', href: '/cms/dashboard' },
-        { title: 'رصد الدرجات الأكاديمية', href: '/cms/grades' },
-    ];
+    const { c, canManage } = useCms();
+
+    const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [
+        { label: c.nav.grades, href: '/cms/grades' },
+    ]);
 
     const [gradeState, setGradeState] = useState<Record<number, any>>({});
     const [saving, setSaving] = useState(false);
@@ -77,7 +84,10 @@ export default function GradesIndex({
         return 'F';
     };
 
+    const inputsDisabled = gradesLocked && !canEditGrades;
+
     const saveAllGrades = () => {
+        if (inputsDisabled) return;
         setSaving(true);
         const payload = Object.entries(gradeState).map(([enrId, vals]) => ({
             enrollment_id: parseInt(enrId),
@@ -98,28 +108,34 @@ export default function GradesIndex({
     };
 
     const selectedSubject = subjects.find((s) => s.id === selectedSubjectId);
-    const gradesExport = `/cms/grades/export?format=xlsx&subject_id=${selectedSubjectId}&title=${encodeURIComponent(`كشف درجات - ${selectedSubject?.name ?? ''}`)}`;
-    const gradesExportPdf = `/cms/grades/export?format=pdf&subject_id=${selectedSubjectId}&title=${encodeURIComponent(`كشف درجات - ${selectedSubject?.name ?? ''}`)}`;
+    const exportTitle = c.gradesPage.exportTitle.replace('{subject}', selectedSubject?.name ?? '');
+    const gradesExport = `/cms/grades/export?format=xlsx&subject_id=${selectedSubjectId}&title=${encodeURIComponent(exportTitle)}`;
+    const gradesExportPdf = `/cms/grades/export?format=pdf&subject_id=${selectedSubjectId}&title=${encodeURIComponent(exportTitle)}`;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="رصد الدرجات" />
+            <Head title={c.nav.grades} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold">كشف ورصد الدرجات الأكاديمية</h1>
-                        <p className="text-sm text-slate-500">حساب تلقائي للمجموع والتقديرات حسب الأوزان المعتمدة</p>
+                        <h1 className="text-2xl font-bold">{c.gradesPage.title}</h1>
+                        <p className="text-sm text-slate-500">{c.gradesPage.subtitle}</p>
                     </div>
                     {enrollments.length > 0 && (
-                        <Button onClick={saveAllGrades} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700">
-                            {saving ? 'جاري الحفظ...' : 'حفظ كشف الدرجات بالكامل'}
+                        <Button onClick={saveAllGrades} disabled={saving || inputsDisabled} className="bg-emerald-600 hover:bg-emerald-700">
+                            {saving ? c.common.saving : c.gradesPage.saveAll}
                         </Button>
                     )}
                 </div>
 
-                {/* Subject Selector */}
+                {gradesLocked && (
+                    <div className={`p-4 rounded-xl border text-sm font-medium ${canEditGrades ? 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-200' : 'bg-rose-50 border-rose-200 text-rose-800 dark:bg-rose-950/30 dark:border-rose-800 dark:text-rose-200'}`}>
+                        {canEditGrades ? c.grades.lockedForTeachers : c.grades.lockedContactAdmin}
+                    </div>
+                )}
+
                 <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border flex items-center gap-4">
-                    <label className="text-sm font-semibold whitespace-nowrap">اختر المادة الدراسية:</label>
+                    <label className="text-sm font-semibold whitespace-nowrap">{c.gradesPage.selectSubject}</label>
                     <select
                         className="w-full max-w-md p-2.5 rounded-lg border bg-background text-sm"
                         value={selectedSubjectId}
@@ -133,37 +149,37 @@ export default function GradesIndex({
                     </select>
                 </div>
 
-                {/* Import / Export toolbar */}
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm">
-                    <div className="text-sm font-semibold mb-1">استيراد وتصدير كشوف الدرجات</div>
-                    <CmsImportExport
-                        importEndpoint="/cms/grades/import"
-                        templateUrl="/cms/grades/import/template"
-                        exportUrl={gradesExport}
-                        exportPdfUrl={gradesExportPdf}
-                    />
-                </div>
+                {canManage && (
+                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm">
+                        <div className="text-sm font-semibold mb-1">{c.gradesPage.importExport}</div>
+                        <CmsImportExport
+                            importEndpoint="/cms/grades/import"
+                            templateUrl="/cms/grades/import/template"
+                            exportUrl={gradesExport}
+                            exportPdfUrl={gradesExportPdf}
+                        />
+                    </div>
+                )}
 
-                {/* Grade Entry Table */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
                     <table className="w-full text-sm text-right">
                         <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-b text-xs">
                             <tr>
-                                <th className="p-3">اسم الطالب</th>
-                                <th className="p-3">رقم القيد</th>
-                                <th className="p-3 text-center">النصفي (30%)</th>
-                                <th className="p-3 text-center">النهائي (40%)</th>
-                                <th className="p-3 text-center">الواجبات (15%)</th>
-                                <th className="p-3 text-center">المشاريع (10%)</th>
-                                <th className="p-3 text-center">المشاركة (5%)</th>
-                                <th className="p-3 text-center">المجموع (100)</th>
-                                <th className="p-3 text-center">التقدير</th>
+                                <th className="p-3">{c.gradesPage.studentName}</th>
+                                <th className="p-3">{c.gradesPage.studentNo}</th>
+                                <th className="p-3 text-center">{c.gradesPage.midterm}</th>
+                                <th className="p-3 text-center">{c.gradesPage.final}</th>
+                                <th className="p-3 text-center">{c.gradesPage.assignments}</th>
+                                <th className="p-3 text-center">{c.gradesPage.projects}</th>
+                                <th className="p-3 text-center">{c.gradesPage.participation}</th>
+                                <th className="p-3 text-center">{c.gradesPage.total}</th>
+                                <th className="p-3 text-center">{c.gradesPage.letterGrade}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {enrollments.length === 0 ? (
                                 <tr>
-                                    <td colSpan={9} className="p-6 text-center text-slate-500">لا يوجد طلاب مسجلون في هذه المادة</td>
+                                    <td colSpan={9} className="p-6 text-center text-slate-500">{c.gradesPage.empty}</td>
                                 </tr>
                             ) : (
                                 enrollments.map((enr) => {
@@ -180,6 +196,7 @@ export default function GradesIndex({
                                                     type="number"
                                                     min="0"
                                                     max="100"
+                                                    disabled={inputsDisabled}
                                                     className="w-20 mx-auto text-center h-8"
                                                     value={g.midterm ?? ''}
                                                     onChange={(e) => handleInputChange(enr.id, 'midterm', e.target.value)}
@@ -190,6 +207,7 @@ export default function GradesIndex({
                                                     type="number"
                                                     min="0"
                                                     max="100"
+                                                    disabled={inputsDisabled}
                                                     className="w-20 mx-auto text-center h-8"
                                                     value={g.final ?? ''}
                                                     onChange={(e) => handleInputChange(enr.id, 'final', e.target.value)}
@@ -200,6 +218,7 @@ export default function GradesIndex({
                                                     type="number"
                                                     min="0"
                                                     max="100"
+                                                    disabled={inputsDisabled}
                                                     className="w-20 mx-auto text-center h-8"
                                                     value={g.assignments ?? ''}
                                                     onChange={(e) => handleInputChange(enr.id, 'assignments', e.target.value)}
@@ -210,6 +229,7 @@ export default function GradesIndex({
                                                     type="number"
                                                     min="0"
                                                     max="100"
+                                                    disabled={inputsDisabled}
                                                     className="w-20 mx-auto text-center h-8"
                                                     value={g.projects ?? ''}
                                                     onChange={(e) => handleInputChange(enr.id, 'projects', e.target.value)}
@@ -220,6 +240,7 @@ export default function GradesIndex({
                                                     type="number"
                                                     min="0"
                                                     max="100"
+                                                    disabled={inputsDisabled}
                                                     className="w-20 mx-auto text-center h-8"
                                                     value={g.participation ?? ''}
                                                     onChange={(e) => handleInputChange(enr.id, 'participation', e.target.value)}

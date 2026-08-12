@@ -42,7 +42,7 @@ class TestimonialSeeder extends Seeder
                 'role_title' => 'طالبة جامعية',
                 'company' => 'جامعة طرابلس',
                 'photo' => 'https://i.pravatar.cc/150?u=nour',
-                'quote' => 'اللغة الإنجليزية للأعمال ساعدتني في مقابلات العمل. شكرًا فريق مستلي!',
+                'quote' => 'اللغة الإنجليزية للأعمال ساعدتني في مقابلات العمل. شكرًا فريق المعايير الحديثة!',
                 'is_published' => true,
                 'sort_order' => 4,
             ],

@@ -1,103 +1,100 @@
+import { SiteLogo } from '@/components/site/site-logo';
+import { useBrandText } from '@/hooks/use-site-settings';
 import { useSite } from '@/context/site-context';
-import { useSiteSettings } from '@/hooks/use-site-settings';
 import { cn } from '@/lib/utils';
 import { Link, usePage } from '@inertiajs/react';
-import { Globe, Menu, Moon, Sun, X } from 'lucide-react';
+import { ArrowUpLeft, ArrowUpRight, Menu, Moon, Sun, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Button } from '../ui/button';
 
 export function SiteHeader() {
-  const { t, theme, toggleTheme, toggleLocale, locale } = useSite();
-  const settings = useSiteSettings();
+  const { t, theme, toggleTheme, toggleLocale, locale, isRTL } = useSite();
+  const { brandName, brandSub } = useBrandText();
   const { url } = usePage();
-  const logoUrl = settings?.site_logo ? `/storage/${settings.site_logo}` : '/logo.png';
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
+    const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const links = [
-    { href: '/departments', label: locale === 'ar' ? 'الأقسام الأكاديمية' : 'Departments' },
-    { href: '/blog-posts', label: locale === 'ar' ? 'الأخبار والإعلانات' : 'News' },
     { href: '/about', label: t.nav.about },
+    { href: '/contact', label: locale === 'ar' ? 'القبول والتسجيل' : 'Admissions' },
+    { href: '/departments', label: locale === 'ar' ? 'الأقسام والبرامج' : 'Departments' },
+    { href: '/blog-posts', label: locale === 'ar' ? 'الأخبار' : 'News' },
     { href: '/faq', label: t.nav.faq },
-    { href: '/contact', label: t.nav.contact },
   ];
 
   const isActive = (href: string) => url === href || url.startsWith(`${href}/`);
+  const EnrollArrow = isRTL ? ArrowUpLeft : ArrowUpRight;
 
   return (
     <header
       className={cn(
-        'fixed inset-x-0 top-0 z-50 w-full border-b transition-all duration-300',
+        'fixed inset-x-0 top-0 z-50 transition-colors duration-300',
         scrolled
-          ? 'border-hero-foreground/10 bg-hero/75 shadow-lg backdrop-blur-xl'
-          : 'border-transparent bg-transparent',
+          ? 'bg-hero/95 shadow-lg shadow-black/20 backdrop-blur supports-[backdrop-filter]:bg-hero/80'
+          : 'bg-transparent',
       )}
     >
-      <div className="mx-auto flex h-[4.25rem] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2.5 focus:outline-none">
-          <img src={logoUrl} alt={settings?.site_name || t.brandShort} className="size-9 rounded-lg object-cover" />
-          <span className="text-hero-foreground flex flex-col leading-none">
-            <span className="font-serif text-base font-semibold tracking-tight">{settings.site_name || t.brandShort}</span>
-            <span className="text-hero-muted text-[11px]">{locale === 'en' ? 'Education & Training' : 'للعلوم والتقنية'}</span>
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="text-hero-foreground flex items-center gap-3" aria-label={brandName}>
+          <span className="border-accent/60 flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full border bg-white p-0.5">
+            <SiteLogo variant="header" className="size-10" />
+          </span>
+          <span className="hidden leading-tight sm:block">
+            <span className="block text-base font-extrabold">{brandName}</span>
+            <span className="text-hero-foreground/70 block text-[11px] font-medium">{brandSub}</span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-0.5 md:flex">
-          {links.map((l) => (
+        <nav className="hidden items-center gap-6 xl:flex" aria-label={locale === 'ar' ? 'التنقل الرئيسي' : 'Main navigation'}>
+          {links.map((item) => (
             <Link
-              key={l.href}
-              href={l.href}
+              key={item.href}
+              href={item.href}
               className={cn(
-                'rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                isActive(l.href)
-                  ? 'bg-hero-foreground/10 text-hero-accent'
-                  : 'text-hero-foreground/75 hover:bg-hero-foreground/10 hover:text-hero-foreground',
+                'whitespace-nowrap text-sm font-medium transition-colors',
+                isActive(item.href) ? 'text-accent' : 'text-hero-foreground/85 hover:text-accent',
               )}
             >
-              {l.label}
+              {item.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-1">
-          <Button
+        <div className="flex items-center gap-2">
+          <button
             type="button"
-            size="default"
-            variant="ghost"
             onClick={toggleLocale}
+            className="border-hero-foreground/20 text-hero-foreground/85 hover:border-accent hover:text-accent hidden size-9 items-center justify-center rounded-md border text-xs font-bold transition-colors sm:flex"
             aria-label="Toggle language"
-            className="text-hero-foreground/75 hover:bg-hero-foreground/10 hover:text-hero-foreground"
           >
-            <Globe className="size-4" />
-            <span className="text-xs font-semibold">{locale === 'en' ? 'AR' : 'EN'}</span>
-          </Button>
+            {locale === 'ar' ? 'EN' : 'AR'}
+          </button>
           <button
             type="button"
             onClick={toggleTheme}
+            className="border-hero-foreground/20 text-hero-foreground/85 hover:border-accent hover:text-accent hidden size-9 items-center justify-center rounded-md border transition-colors sm:flex"
             aria-label={theme === 'dark' ? t.theme.light : t.theme.dark}
-            className="text-hero-foreground/75 hover:bg-hero-foreground/10 hover:text-hero-foreground inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
           >
-            {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" aria-hidden="true" />}
           </button>
           <Link
             href="/contact"
-            className="bg-hero-accent text-hero-accent-foreground hover:bg-hero-accent/85 ms-1 hidden rounded-full px-5 py-2.5 text-sm font-bold transition-colors sm:inline-flex"
+            className="bg-accent text-accent-foreground inline-flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-bold transition-transform hover:-translate-y-0.5"
           >
             {t.nav.enroll}
+            <EnrollArrow className="size-4" aria-hidden="true" />
           </Link>
           <button
             type="button"
-            className="text-hero-foreground/75 hover:bg-hero-foreground/10 hover:text-hero-foreground inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors md:hidden"
             onClick={() => setOpen((v) => !v)}
-            aria-label="Toggle menu"
-            aria-expanded={open}
+            className="border-hero-foreground/20 text-hero-foreground flex size-9 items-center justify-center rounded-md border xl:hidden"
+            aria-label={open ? (locale === 'ar' ? 'إغلاق القائمة' : 'Close menu') : locale === 'ar' ? 'فتح القائمة' : 'Open menu'}
           >
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
@@ -105,35 +102,29 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <div
-          className={cn(
-            'border-hero-foreground/10 border-t md:hidden',
-            scrolled ? 'bg-hero/75 backdrop-blur-xl' : 'bg-hero/40 backdrop-blur-md',
-          )}
+        <nav
+          className="border-hero-foreground/10 bg-hero border-t px-4 py-4 xl:hidden"
+          aria-label={locale === 'ar' ? 'قائمة الجوال' : 'Mobile menu'}
         >
-          <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-3 sm:px-6">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className={cn(
-                  'rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                  isActive(l.href) ? 'bg-hero-foreground/10 text-hero-accent' : 'text-hero-foreground/80 hover:bg-hero-foreground/10',
-                )}
-              >
-                {l.label}
-              </Link>
+          <ul className="grid gap-1">
+            {links.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    'block rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
+                    isActive(item.href)
+                      ? 'text-accent bg-white/5'
+                      : 'text-hero-foreground/85 hover:bg-white/5 hover:text-accent',
+                  )}
+                >
+                  {item.label}
+                </Link>
+              </li>
             ))}
-            <Link
-              href="/contact"
-              onClick={() => setOpen(false)}
-              className="bg-hero-accent text-hero-accent-foreground mt-2 rounded-full px-4 py-2.5 text-center text-sm font-bold"
-            >
-              {t.nav.enroll}
-            </Link>
-          </nav>
-        </div>
+          </ul>
+        </nav>
       )}
     </header>
   );

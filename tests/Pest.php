@@ -1,6 +1,9 @@
 <?php
 
+use App\Enums\UserRole;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 /*
@@ -44,7 +47,19 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function createUserWithRoles(array $roles): User
 {
-    // ..
+    foreach ($roles as $role) {
+        Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
+    }
+
+    $user = User::factory()->create();
+    $user->assignRole($roles);
+
+    return $user;
+}
+
+function createAdminUser(): User
+{
+    return createUserWithRoles([UserRole::Admin->value]);
 }

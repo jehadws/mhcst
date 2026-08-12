@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers\Cms;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreStudentRequest;
 use App\Models\CmsLevel;
 use App\Models\CmsStudent;
 use App\Models\SiteSetting;
 use App\Models\User;
+use App\Services\CmsAuthorizationService;
 use App\Services\CmsSpreadsheetService;
 use App\Services\CmsStudentImportService;
+use App\Services\CmsTranscriptService;
+use App\Support\SiteLogo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
@@ -17,9 +21,12 @@ use Inertia\Response;
 
 class CmsStudentController extends Controller
 {
+    public function __construct(private CmsAuthorizationService $cmsAuth) {}
+
     public function index(Request $request): Response
     {
         $query = CmsStudent::with(['level.department', 'user'])->withCount('enrollments');
+        $this->cmsAuth->scopeStudentsForUser($query, auth()->user());
 
         if ($request->filled('level_id')) {
             $query->where('level_id', $request->level_id);
@@ -64,7 +71,7 @@ class CmsStudentController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
-            $user->assignRole('student');
+            $user->assignRole(UserRole::Student->value);
             $data['user_id'] = $user->id;
         }
 
@@ -75,6 +82,8 @@ class CmsStudentController extends Controller
 
     public function show(CmsStudent $student): Response
     {
+        $this->cmsAuth->ensureTeacherCanViewStudent(auth()->user(), $student);
+
         return Inertia::render('cms/students/show', [
             'student' => $student->load([
                 'level.department',
@@ -115,21 +124,19 @@ class CmsStudentController extends Controller
     {
         $student->load('level.department');
 
-        $logo = SiteSetting::get('site_logo');
-        $logoUrl = null;
-
-        if ($logo) {
-            $logoUrl = asset('storage/'.$logo);
-        } elseif (file_exists(public_path('logo.png'))) {
-            $logoUrl = asset('/logo.png');
-        }
+        $logoUrl = SiteLogo::url(SiteSetting::get('site_logo'));
 
         return view('cms.id-card', [
             'student' => $student,
             'logoUrl' => $logoUrl,
-            'instituteNameAr' => SiteSetting::get('site_name_ar', 'المعهد الحديث العالي للعلوم والتكنولوجيا'),
-            'instituteNameEn' => SiteSetting::get('site_name', 'Modern Higher Institute for Science & Technology (MHCST)'),
+            'instituteNameAr' => SiteSetting::get('site_name_ar', 'كلية المعايير الحديثة للعلوم والتقنية'),
+            'instituteNameEn' => SiteSetting::get('site_name', 'Almaayir Alhaditha College for Science and Technology'),
         ]);
+    }
+
+    public function transcript(CmsStudent $student, CmsTranscriptService $transcriptService)
+    {
+        return $transcriptService->render($student);
     }
 
     public function import(Request $request)

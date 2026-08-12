@@ -3,7 +3,7 @@ import { useSite } from '@/context/site-context';
 import { Award, BookOpenCheck, Clock, Headphones, ShieldCheck, Users } from 'lucide-react';
 
 export function FeaturesGrid() {
-  const { locale } = useSite();
+  const { locale, t } = useSite();
 
   const features = [
     {
@@ -60,13 +60,13 @@ export function FeaturesGrid() {
     <section className="bg-secondary py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
-          label={locale === 'ar' ? 'لماذا المعايير الحديثة؟' : 'Why Modern Standards'}
+          label={locale === 'ar' ? `لماذا ${t.brandShort}؟` : `Why ${t.brandShort}?`}
           title={locale === 'ar' ? 'كل ما تحتاجه للنجاح المهني' : 'Everything you need for career success'}
         />
 
         <div className="border-border bg-border mt-14 grid gap-px overflow-hidden border sm:grid-cols-2 lg:grid-cols-3">
           {features.map((item, idx) => (
-            <div key={idx} className="group bg-card hover:bg-primary p-7 transition-colors sm:p-8">
+            <div key={idx} className="group bg-card hover:bg-hero p-7 transition-colors sm:p-8">
               <div className="bg-primary/10 text-primary group-hover:bg-hero-accent group-hover:text-hero-accent-foreground flex size-11 items-center justify-center rounded-full transition-colors">
                 <item.icon className="size-5" />
               </div>

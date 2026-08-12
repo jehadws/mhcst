@@ -4,7 +4,8 @@ import { Head } from "@inertiajs/react";
 import UserForm from "@/components/forms/user-form";
 
 interface Props {
-  user: User;
+  user: User & { roles: string[] };
+  availableRoles: string[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -13,12 +14,12 @@ const breadcrumbs: BreadcrumbItem[] = [
   { title: 'تعديل', href: '#' },
 ];
 
-export default function EditUser({ user }: Props) {
+export default function EditUser({ user, availableRoles }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="تعديل مستخدم" />
       <div className="flex h-full flex-1 flex-col gap-4 p-4">
-        <UserForm user={user} />
+        <UserForm user={user} availableRoles={availableRoles} />
       </div>
     </AppLayout>
   );

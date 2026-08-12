@@ -65,14 +65,14 @@ export default function PublicContactPage({ faqs = [] }: Props) {
 
   return (
     <>
-      <SeoHead title={t.nav.contact} description={isRtl ? 'تواصل مع المعايير الحديثة للتعليم والتدريب' : 'Contact Modern Standards for Education & Training'} />
+      <SeoHead title={t.nav.contact} description={isRtl ? `تواصل مع ${t.brandFull}` : `Contact ${t.brandFull}`} />
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="flex-1">
           <PageHero
-            label={t.nav.contact}
             title={isRtl ? 'نسعد بالتواصل معك' : "We'd love to hear from you"}
             description={isRtl ? 'احصل على استشارة مجانية حول برامجنا الأكاديمية والتدريبية.' : 'Get a free consultation about our academic and training programs.'}
+            crumbs={[{ label: isRtl ? 'القبول والتسجيل' : 'Admissions', href: '/contact' }]}
           />
 
           <section className="py-16 sm:py-20">

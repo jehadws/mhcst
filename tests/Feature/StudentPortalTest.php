@@ -27,6 +27,6 @@ test('student can lookup enrollments by email or phone via API', function () {
     $response = $this->getJson(route('student.portal.search', ['query' => 'student.portal.test@mhcst.edu.ly']));
 
     $response->assertSuccessful()
-        ->assertJsonCount(1, 'enrollments')
-        ->assertJsonPath('enrollments.0.email', 'student.portal.test@mhcst.edu.ly');
+        ->assertJsonCount(1, 'training_enrollments')
+        ->assertJsonPath('training_enrollments.0.email', 'student.portal.test@mhcst.edu.ly');
 });

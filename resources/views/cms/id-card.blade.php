@@ -219,7 +219,7 @@
                 @if($logoUrl)
                     <img src="{{ $logoUrl }}" alt="logo">
                 @else
-                    <div class="logo-fallback">MHCST</div>
+                    <div class="logo-fallback">المعايير</div>
                 @endif
             </div>
             <div class="titles">

@@ -10,14 +10,20 @@ import { DataTable } from "@/components/ui/data-table/data-table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { roleLabel } from "@/lib/dashboard-access";
 import { toast } from "sonner";
 
+interface UserRow extends User {
+    roles?: string[];
+}
+
 interface Props {
-    users: User[];
+    users: UserRow[];
 }
 
 export default function UsersListPage({ users = [] }: Props) {
-    const { t } = useSite();
+    const { t, locale } = useSite();
     const d = t.dashboard;
     const breadcrumbs: BreadcrumbItem[] = [
         { title: d.sidebar.items.dashboard, href: '/dashboard' },
@@ -43,7 +49,7 @@ export default function UsersListPage({ users = [] }: Props) {
         });
     };
 
-    const columns: ColumnDef<User>[] = [
+    const columns: ColumnDef<UserRow>[] = [
         {
             id: 'select',
             header: ({ table }) => (
@@ -68,6 +74,19 @@ export default function UsersListPage({ users = [] }: Props) {
         {
             accessorKey: 'email',
             header: d.columns.email,
+        },
+        {
+            id: 'roles',
+            header: d.columns.roles,
+            cell: ({ row }) => (
+                <div className="flex flex-wrap gap-1">
+                    {(row.original.roles ?? []).map((role) => (
+                        <Badge key={role} variant="secondary" className="text-xs">
+                            {roleLabel(role, locale === 'ar' ? 'ar' : 'en')}
+                        </Badge>
+                    ))}
+                </div>
+            ),
         },
         {
             id: 'actions',
@@ -103,7 +122,7 @@ export default function UsersListPage({ users = [] }: Props) {
     const bulkActions = [
         {
             label: `${d.actions.delete} ${d.entities.user.plural}`,
-            action: (selectedRows: User[]) => {
+            action: (selectedRows: UserRow[]) => {
                 router.post(route('dashboard.users.bulk-actions'), {
                     action: 'delete_selected',
                     entries: selectedRows.map(r => r.id),

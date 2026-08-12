@@ -1,18 +1,21 @@
 import { User } from "@/types";
 import { useSite } from "@/context/site-context";
+import { roleLabel } from "@/lib/dashboard-access";
 import { router, useForm } from "@inertiajs/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 
 interface Props {
-  user?: User;
+  user?: User & { roles?: string[] };
+  availableRoles?: string[];
 }
 
-export default function UserForm({ user }: Props) {
-  const { t } = useSite();
+export default function UserForm({ user, availableRoles = [] }: Props) {
+  const { t, locale } = useSite();
   const d = t.dashboard;
   const isEditing = !!user;
 
@@ -20,7 +23,14 @@ export default function UserForm({ user }: Props) {
     name: user?.name || '',
     email: user?.email || '',
     password: '',
+    roles: user?.roles ?? [],
   });
+
+  const toggleRole = (role: string, checked: boolean) => {
+    setData('roles', checked
+      ? [...data.roles, role]
+      : data.roles.filter((r) => r !== role));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +70,22 @@ export default function UserForm({ user }: Props) {
             <Label htmlFor="password">{d.form.labels.password} {isEditing ? `(${d.form.placeholders.leaveEmpty})` : '*'}</Label>
             <Input id="password" type="password" value={data.password} onChange={(e) => setData('password', e.target.value)} />
             {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
+          </div>
+
+          <div>
+            <Label>{d.form.labels.roles} *</Label>
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              {availableRoles.map((role) => (
+                <label key={role} className="flex items-center gap-2 rounded-md border p-3 cursor-pointer hover:bg-muted/50">
+                  <Checkbox
+                    checked={data.roles.includes(role)}
+                    onCheckedChange={(checked) => toggleRole(role, checked === true)}
+                  />
+                  <span className="text-sm">{roleLabel(role, locale === 'ar' ? 'ar' : 'en')}</span>
+                </label>
+              ))}
+            </div>
+            {errors.roles && <p className="mt-1 text-sm text-red-500">{errors.roles}</p>}
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

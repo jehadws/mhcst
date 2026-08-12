@@ -1,4 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
+import { useCms } from '@/hooks/use-cms';
+import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem } from '@/types';
 import { CmsEnrollment, CmsStudent, CmsSubject } from '@/types/cms';
 import { Head, router } from '@inertiajs/react';
@@ -14,10 +16,12 @@ export default function GradeReport({
     subjects: CmsSubject[];
     filters: any;
 }) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'التقارير الأكاديمية', href: '/cms/reports' },
-        { title: 'تقرير الدرجات', href: '/cms/reports/grades' },
-    ];
+    const { c } = useCms();
+
+    const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [
+        { label: c.nav.reports, href: '/cms/reports' },
+        { label: c.reports.grades.pageTitle, href: '/cms/reports/grades' },
+    ]);
 
     const filterChange = (key: string, val: string) => {
         router.get('/cms/reports/grades', { ...filters, [key]: val }, { preserveState: true });
@@ -25,25 +29,24 @@ export default function GradeReport({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="تقرير الدرجات" />
+            <Head title={c.reports.grades.pageTitle} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold">تقرير كشف الدرجات التفصيلي</h1>
-                        <p className="text-sm text-slate-500">عرض نتائج الطلاب وتوزيع التقديرات</p>
+                        <h1 className="text-2xl font-bold">{c.reports.grades.pageTitle}</h1>
+                        <p className="text-sm text-slate-500">{c.reports.grades.pageSubtitle}</p>
                     </div>
                 </div>
 
-                {/* Filters */}
                 <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border flex flex-wrap gap-4">
                     <div>
-                        <label className="text-xs font-semibold text-slate-500 block mb-1">فلترة بالمادة:</label>
+                        <label className="text-xs font-semibold text-slate-500 block mb-1">{c.reports.grades.filterBySubject}</label>
                         <select
                             className="p-2.5 rounded-lg border bg-background text-sm min-w-[200px]"
                             value={filters.subject_id || ''}
                             onChange={(e) => filterChange('subject_id', e.target.value)}
                         >
-                            <option value="">جميع المواد</option>
+                            <option value="">{c.common.allSubjects}</option>
                             {subjects.map((s) => (
                                 <option key={s.id} value={s.id}>{s.name} ({s.code})</option>
                             ))}
@@ -51,13 +54,13 @@ export default function GradeReport({
                     </div>
 
                     <div>
-                        <label className="text-xs font-semibold text-slate-500 block mb-1">فلترة بالطالب:</label>
+                        <label className="text-xs font-semibold text-slate-500 block mb-1">{c.reports.grades.filterByStudent}</label>
                         <select
                             className="p-2.5 rounded-lg border bg-background text-sm min-w-[200px]"
                             value={filters.student_id || ''}
                             onChange={(e) => filterChange('student_id', e.target.value)}
                         >
-                            <option value="">جميع الطلاب</option>
+                            <option value="">{c.common.allStudents}</option>
                             {students.map((s) => (
                                 <option key={s.id} value={s.id}>{s.name} ({s.student_no})</option>
                             ))}
@@ -69,19 +72,19 @@ export default function GradeReport({
                     <table className="w-full text-sm text-right">
                         <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-b">
                             <tr>
-                                <th className="p-4 font-semibold">اسم الطالب</th>
-                                <th className="p-4 font-semibold">رقم القيد</th>
-                                <th className="p-4 font-semibold">المادة الدراسية</th>
-                                <th className="p-4 font-semibold text-center">النصفي</th>
-                                <th className="p-4 font-semibold text-center">النهائي</th>
-                                <th className="p-4 font-semibold text-center">المجموع النهائي</th>
-                                <th className="p-4 font-semibold text-center">التقدير</th>
+                                <th className="p-4 font-semibold">{c.gradesPage.studentName}</th>
+                                <th className="p-4 font-semibold">{c.gradesPage.studentNo}</th>
+                                <th className="p-4 font-semibold">{c.enrollments.subject}</th>
+                                <th className="p-4 font-semibold text-center">{c.reports.grades.midterm}</th>
+                                <th className="p-4 font-semibold text-center">{c.reports.grades.final}</th>
+                                <th className="p-4 font-semibold text-center">{c.reports.grades.total}</th>
+                                <th className="p-4 font-semibold text-center">{c.reports.grades.letterGrade}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {enrollments.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="p-6 text-center text-slate-500">لا توجد نتائج مطابقة للفلاتر المختارة</td>
+                                    <td colSpan={7} className="p-6 text-center text-slate-500">{c.reports.grades.empty}</td>
                                 </tr>
                             ) : (
                                 enrollments.map((enr) => (

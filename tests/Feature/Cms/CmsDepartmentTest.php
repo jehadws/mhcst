@@ -2,10 +2,9 @@
 
 use App\Models\CmsDepartment;
 use App\Models\CmsTeacher;
-use App\Models\User;
 
 test('authenticated user can view cms departments index', function () {
-    $user = User::factory()->create();
+    $user = createAdminUser();
 
     $teacher = CmsTeacher::create([
         'name' => 'Dr. Ahmed',

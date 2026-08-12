@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { useSite } from '@/context/site-context';
 import AppLayout from '@/layouts/app-layout';
+import { ContentDashboardView, StudentDashboardView, TeacherDashboardView } from '@/components/dashboard/role-dashboards';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowUpRight, BookOpen, Building2, Calendar, CalendarCheck, ClipboardList, GraduationCap, Users, UserCheck } from 'lucide-react';
@@ -66,23 +67,33 @@ interface CmsSchedule {
 }
 
 export default function Dashboard() {
-  const { stats, studentsByDepartment, recentStudents, recentGrades, todaySchedules, attendanceByMonth } = usePage<{
-    stats: {
-      students_count: number;
-      students_delta?: number;
-      teachers_count: number;
-      departments_count: number;
-      subjects_count: number;
-      enrollments_count: number;
-      active_students: number;
-      attendance_today_count: number;
-    };
-    studentsByDepartment: Array<{ name: string; count: number }>;
-    recentStudents: CmsStudent[];
-    recentGrades: CmsGrade[];
-    todaySchedules: CmsSchedule[];
-    attendanceByMonth: Array<{ month: string; value: number }>;
+  const pageProps = usePage<{
+    dashboardRole?: 'admin' | 'teacher' | 'student' | 'content';
+    stats?: Record<string, number | null>;
+    studentsByDepartment?: Array<{ name: string; count: number }>;
+    recentStudents?: CmsStudent[];
+    recentGrades?: CmsGrade[] | Array<{ subject?: string; code?: string; total?: number; grade_letter?: string }>;
+    todaySchedules?: CmsSchedule[];
+    attendanceByMonth?: Array<{ month: string; value: number }>;
+    teacherProfile?: { name: string; specialization?: string | null };
+    teacherClasses?: Array<{ id: number; code: string; name: string; student_count: number; pending_grades: number }>;
+    studentProfile?: { id: number; name: string; student_no: string; department?: string | null } | null;
+    transcriptUrl?: string | null;
   }>().props;
+
+  const {
+    dashboardRole = 'admin',
+    stats = {},
+    studentsByDepartment = [],
+    recentStudents = [],
+    recentGrades = [],
+    todaySchedules = [],
+    attendanceByMonth = [],
+    teacherProfile,
+    teacherClasses = [],
+    studentProfile,
+    transcriptUrl,
+  } = pageProps;
 
   const { t, locale } = useSite();
   const d = t.dashboard;
@@ -100,52 +111,109 @@ export default function Dashboard() {
   const statCards = [
     {
       label: locale === 'ar' ? 'الطلاب الأكاديميون' : 'Academic Students',
-      value: numberFmt.format(stats.students_count),
+      value: numberFmt.format((stats.students_count as number) ?? 0),
       icon: GraduationCap,
       color: COLORS.primary,
-      delta: stats.students_delta,
+      delta: stats.students_delta as number | null | undefined,
     },
     {
       label: locale === 'ar' ? 'أعضاء هيئة التدريس' : 'Teaching Staff',
-      value: numberFmt.format(stats.teachers_count),
+      value: numberFmt.format((stats.teachers_count as number) ?? 0),
       icon: UserCheck,
       color: COLORS.emerald,
       delta: null,
     },
     {
       label: locale === 'ar' ? 'الأقسام الأكاديمية' : 'Departments',
-      value: numberFmt.format(stats.departments_count),
+      value: numberFmt.format((stats.departments_count as number) ?? 0),
       icon: Building2,
       color: COLORS.amber,
       delta: null,
     },
     {
       label: locale === 'ar' ? 'المواد الدراسية' : 'Subjects',
-      value: numberFmt.format(stats.subjects_count),
+      value: numberFmt.format((stats.subjects_count as number) ?? 0),
       icon: BookOpen,
       color: COLORS.sky,
       delta: null,
     },
     {
       label: locale === 'ar' ? 'التسجيلات الفعالة' : 'Active Enrollments',
-      value: numberFmt.format(stats.enrollments_count),
+      value: numberFmt.format((stats.enrollments_count as number) ?? 0),
       icon: ClipboardList,
       color: COLORS.violet,
       delta: null,
     },
     {
       label: locale === 'ar' ? 'حضور اليوم' : "Today's Attendance",
-      value: numberFmt.format(stats.attendance_today_count),
+      value: numberFmt.format((stats.attendance_today_count as number) ?? 0),
       icon: CalendarCheck,
       color: COLORS.amber,
       delta: null,
     },
   ];
 
+  const renderRoleView = () => {
+    if (dashboardRole === 'teacher' && teacherProfile) {
+      return (
+        <TeacherDashboardView
+          locale={locale}
+          teacherProfile={teacherProfile}
+          stats={{
+            classes_count: (stats.classes_count as number) ?? 0,
+            students_count: (stats.students_count as number) ?? 0,
+            pending_grades_count: (stats.pending_grades_count as number) ?? 0,
+            today_classes_count: (stats.today_classes_count as number) ?? 0,
+          }}
+          todaySchedules={todaySchedules}
+          teacherClasses={teacherClasses}
+        />
+      );
+    }
+
+    if (dashboardRole === 'student') {
+      return (
+        <StudentDashboardView
+          locale={locale}
+          studentProfile={studentProfile ?? null}
+          stats={{
+            enrolled_subjects: (stats.enrolled_subjects as number) ?? 0,
+            gpa: stats.gpa as number | null,
+            attendance_rate: stats.attendance_rate as number | null,
+            today_classes_count: (stats.today_classes_count as number) ?? 0,
+          }}
+          todaySchedules={todaySchedules}
+          recentGrades={recentGrades as Array<{ subject?: string; code?: string; total?: number; grade_letter?: string }>}
+          transcriptUrl={transcriptUrl}
+        />
+      );
+    }
+
+    if (dashboardRole === 'content') {
+      return (
+        <ContentDashboardView
+          locale={locale}
+          stats={{
+            blog_posts_count: (stats.blog_posts_count as number) ?? 0,
+            published_posts_count: (stats.published_posts_count as number) ?? 0,
+            faqs_count: (stats.faqs_count as number) ?? 0,
+            testimonials_count: (stats.testimonials_count as number) ?? 0,
+          }}
+        />
+      );
+    }
+
+    return null;
+  };
+
+  const adminView = renderRoleView() === null;
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={locale === 'ar' ? 'لوحة التحكم الكلية' : 'College Dashboard'} />
       <div className="flex h-full flex-1 flex-col gap-4 p-4">
+        {adminView ? (
+          <>
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold tracking-tight">
             {locale === 'ar' ? 'مرحباً بك في النظام الأكاديمي' : 'Welcome to Academic Dashboard'}
@@ -400,6 +468,10 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
+          </>
+        ) : (
+          renderRoleView()
+        )}
       </div>
     </AppLayout>
   );

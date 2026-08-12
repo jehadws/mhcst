@@ -8,7 +8,7 @@ import { Testimonials } from '@/components/site/testimonials';
 import { useSite } from '@/context/site-context';
 import { Award, Eye, GraduationCap, Lightbulb, ShieldCheck, Target, Users } from 'lucide-react';
 
-const CAMPUS_IMAGE = 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1000&auto=format&fit=crop';
+const CAMPUS_IMAGE = '/images/campus-aerial.png';
 
 interface Props {
   testimonials?: Array<Record<string, unknown>>;
@@ -82,13 +82,13 @@ export default function PublicAboutPage({ testimonials }: Props) {
         <SiteHeader />
         <main className="flex-1">
           <PageHero
-            label={t.nav.about}
             title={locale === 'ar' ? 'قصتنا ورحلتنا' : 'Our story & journey'}
             description={
               locale === 'ar'
                 ? 'أكثر من عقد من الخبرة في بناء مهارات المهنيين عبر برامج تدريبية معتمدة.'
                 : 'Over a decade of experience building professional skills through accredited training.'
             }
+            crumbs={[{ label: t.nav.about, href: '/about' }]}
           />
 
           <section className="py-20 sm:py-28">
