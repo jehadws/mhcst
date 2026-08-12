@@ -1,98 +1,45 @@
-import { Award, BookOpen, CheckCircle, GraduationCap, ShieldCheck, Sparkles, Users } from 'lucide-react'
-import { useSite } from '@/context/site-context'
+import { useSite } from '@/context/site-context';
+import { Check } from 'lucide-react';
+
+const CAMPUS_IMAGE = 'https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1000&auto=format&fit=crop';
 
 export function About() {
-    const { t, locale } = useSite()
+  const { t } = useSite();
 
-    const features = [
-        {
-            icon: ShieldCheck,
-            title: t.about.point1Title,
-            body: t.about.point1Body,
-            color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-        },
-        {
-            icon: Users,
-            title: t.about.point2Title,
-            body: t.about.point2Body,
-            color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
-        },
-        {
-            icon: GraduationCap,
-            title: t.about.point3Title,
-            body: t.about.point3Body,
-            color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-        },
-    ]
+  return (
+    <section id="about" className="bg-secondary scroll-mt-20 py-20 sm:py-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">{t.campus.label}</p>
+            <h2 className="text-foreground mt-3 font-serif text-3xl font-bold tracking-tight sm:text-4xl">{t.campus.title}</h2>
+            <p className="text-muted-foreground mt-4 leading-relaxed">{t.campus.description}</p>
 
-    return (
-        <section id="about" className="relative scroll-mt-20 py-16 sm:py-24">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
-                    {/* Visual collage */}
-                    <div className="relative lg:col-span-6">
-                        <div className="relative mx-auto max-w-lg lg:max-w-none">
-                            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl border border-border/80 bg-card p-2 shadow-2xl">
-                                <img
-                                    src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1000&auto=format&fit=crop"
-                                    alt={t.about.title}
-                                    className="h-full w-full rounded-2xl object-cover"
-                                />
-                            </div>
+            <ul className="mt-8 space-y-4">
+              {t.campus.bullets.map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-foreground">
+                  <span className="bg-primary/10 text-primary mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full">
+                    <Check className="size-3.5" />
+                  </span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-                            {/* Decorative Experience Badge */}
-                            <div className="absolute -bottom-6 -end-6 rounded-2xl border border-border/80 bg-card p-5 shadow-xl backdrop-blur-xl">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground font-serif text-xl font-bold">
-                                        +10
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-foreground">
-                                            {locale === 'ar' ? 'سنوات من التميز' : 'Years of Excellence'}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            {locale === 'ar' ? 'في التعليم والتطوير المهني' : 'In professional training'}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Content text */}
-                    <div className="lg:col-span-6">
-                        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-semibold text-primary">
-                            <Sparkles className="size-3.5" />
-                            <span>{locale === 'ar' ? 'رؤيتنا ورسالتنا' : 'Our Mission'}</span>
-                        </div>
-
-                        <h2 className="mt-4 font-serif text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                            {t.about.title}
-                        </h2>
-
-                        <p className="mt-4 leading-relaxed text-muted-foreground">
-                            {t.about.body}
-                        </p>
-
-                        <div className="mt-8 space-y-4">
-                            {features.map((f, i) => (
-                                <div
-                                    key={i}
-                                    className="flex items-start gap-4 rounded-2xl border border-border/60 bg-card/60 p-4 transition-all duration-300 hover:border-primary/40 hover:bg-card hover:shadow-md"
-                                >
-                                    <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${f.color}`}>
-                                        <f.icon className="size-5" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-serif text-base font-bold text-foreground">{f.title}</h3>
-                                        <p className="mt-1 text-xs sm:text-sm text-muted-foreground">{f.body}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+          <div className="relative">
+            <div className="border-border bg-card overflow-hidden border shadow-lg">
+              <img src={CAMPUS_IMAGE} alt={t.campus.title} className="aspect-[4/3] w-full object-cover" />
             </div>
-        </section>
-    )
+
+            <div className="border-border bg-card absolute -bottom-6 -start-4 border px-6 py-5 shadow-xl sm:-start-6">
+              <p className="text-primary text-xs font-bold tracking-widest uppercase">Est.</p>
+              <p className="text-foreground font-serif text-3xl font-extrabold">{t.hero.foundedYear}</p>
+              <p className="text-muted-foreground mt-1 max-w-[180px] text-xs leading-relaxed">{t.campus.estLabel}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }

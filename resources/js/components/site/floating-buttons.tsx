@@ -25,11 +25,9 @@ export function FloatingButtons() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Chat on WhatsApp"
-                className="group flex size-13 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 transition-all duration-300 hover:scale-110 hover:shadow-xl hover:shadow-emerald-500/40"
+                className="group flex size-13 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 transition-all duration-300 hover:bg-emerald-600"
             >
                 <MessageCircle className="size-6" />
-                {/* Ping animation */}
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-30" />
             </a>
 
             {/* Scroll to Top */}
@@ -38,7 +36,7 @@ export function FloatingButtons() {
                 onClick={scrollToTop}
                 aria-label="Scroll to top"
                 className={cn(
-                    'flex size-11 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-md transition-all duration-300 hover:border-primary/40 hover:bg-primary hover:text-primary-foreground hover:scale-110',
+                    'flex size-11 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-md transition-all duration-300 hover:border-primary/40 hover:bg-primary hover:text-primary-foreground',
                     showTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
                 )}
             >

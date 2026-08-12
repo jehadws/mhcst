@@ -39,7 +39,7 @@ export function SiteFooter() {
   ];
 
   return (
-    <footer className="border-border bg-card border-t">
+    <footer className="border-hero-foreground/10 bg-hero text-hero-foreground border-t">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand */}
@@ -48,10 +48,10 @@ export function SiteFooter() {
               <img src={logoUrl} alt={brandName} className="size-10 rounded-xl object-cover shadow-md" />
               <span className="flex flex-col leading-none">
                 <span className="font-serif text-base font-bold">{brandName}</span>
-                <span className="text-muted-foreground text-[11px]">{locale === 'en' ? 'Education & Training' : 'للتعليم والتدريب'}</span>
+                <span className="text-hero-muted text-[11px]">{locale === 'en' ? 'Education & Training' : 'للتعليم والتدريب'}</span>
               </span>
             </Link>
-            <p className="text-muted-foreground mt-4 max-w-xs text-sm leading-relaxed">{t.footer.tagline}</p>
+            <p className="text-hero-muted mt-4 max-w-xs text-sm leading-relaxed">{t.footer.tagline}</p>
 
             {/* Social Icons */}
             <div className="mt-5 flex items-center gap-2">
@@ -62,7 +62,7 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="border-border/80 bg-background text-muted-foreground hover:border-primary/50 hover:bg-primary/10 hover:text-primary flex size-9 items-center justify-center rounded-lg border transition-all"
+                  className="border-hero-foreground/15 bg-hero-foreground/5 text-hero-muted hover:border-hero-accent hover:bg-hero-foreground/10 hover:text-hero-accent flex size-9 items-center justify-center rounded-full border transition-all"
                 >
                   <s.icon className="size-4" />
                 </a>
@@ -72,8 +72,8 @@ export function SiteFooter() {
 
           {/* Newsletter */}
           <div>
-            <h3 className="text-foreground font-serif text-sm font-bold">{t.newsletter.title}</h3>
-            <p className="text-muted-foreground mt-3 text-xs leading-relaxed">{t.newsletter.subtitle}</p>
+            <h3 className="font-serif text-sm font-bold">{t.newsletter.title}</h3>
+            <p className="text-hero-muted mt-3 text-xs leading-relaxed">{t.newsletter.subtitle}</p>
             <div className="mt-4">
               <NewsletterForm compact />
             </div>
@@ -81,11 +81,11 @@ export function SiteFooter() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-foreground font-serif text-sm font-bold">{t.footer.quickLinks}</h3>
+            <h3 className="font-serif text-sm font-bold">{t.footer.quickLinks}</h3>
             <ul className="mt-4 space-y-2.5">
               {navLinks.map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                  <Link href={l.href} className="text-hero-muted hover:text-hero-accent text-sm transition-colors">
                     {l.label}
                   </Link>
                 </li>
@@ -95,8 +95,8 @@ export function SiteFooter() {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-foreground font-serif text-sm font-bold">{t.footer.contact}</h3>
-            <ul className="text-muted-foreground mt-4 space-y-3 text-sm">
+            <h3 className="font-serif text-sm font-bold">{t.footer.contact}</h3>
+            <ul className="text-hero-muted mt-4 space-y-3 text-sm">
               <li>{address}</li>
               <li dir="ltr" className={locale === 'ar' ? 'text-end' : ''}>
                 {contactPhone}
@@ -121,11 +121,11 @@ export function SiteFooter() {
 
           {/* Legal */}
           <div>
-            <h3 className="text-foreground font-serif text-sm font-bold">{locale === 'ar' ? 'القانوني' : 'Legal'}</h3>
+            <h3 className="font-serif text-sm font-bold">{locale === 'ar' ? 'القانوني' : 'Legal'}</h3>
             <ul className="mt-4 space-y-2.5">
               {legalLinks.map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="text-muted-foreground hover:text-primary text-sm transition-colors">
+                  <Link href={l.href} className="text-hero-muted hover:text-hero-accent text-sm transition-colors">
                     {l.label}
                   </Link>
                 </li>
@@ -133,11 +133,9 @@ export function SiteFooter() {
             </ul>
 
             {/* Accreditation Badge */}
-            <div className="border-border/80 bg-background mt-6 rounded-xl border p-3">
-              <p className="text-foreground mb-1 text-[11px] font-semibold">
-                {locale === 'ar' ? 'جهة تدريب معتمدة' : 'Accredited Training Provider'}
-              </p>
-              <p className="text-muted-foreground text-[10px] leading-relaxed">
+            <div className="border-hero-foreground/15 bg-hero-foreground/5 mt-6 rounded-xl border p-3">
+              <p className="mb-1 text-[11px] font-semibold">{locale === 'ar' ? 'جهة تدريب معتمدة' : 'Accredited Training Provider'}</p>
+              <p className="text-hero-muted text-[10px] leading-relaxed">
                 {locale === 'ar' ? 'معتمدون من الجهات المهنية الإقليمية والدولية' : 'Recognized by regional & international professional bodies'}
               </p>
             </div>
@@ -146,8 +144,8 @@ export function SiteFooter() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-border border-t">
-        <div className="text-muted-foreground mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 text-xs sm:flex-row sm:px-6 lg:px-8">
+      <div className="border-hero-foreground/10 border-t">
+        <div className="text-hero-muted mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 text-xs sm:flex-row sm:px-6 lg:px-8">
           <p>
             {settings.footer_text || (
               <>
@@ -158,7 +156,7 @@ export function SiteFooter() {
           </p>
           <div className="flex items-center gap-4">
             {legalLinks.map((l) => (
-              <Link key={l.href} href={l.href} className="hover:text-foreground transition-colors">
+              <Link key={l.href} href={l.href} className="hover:text-hero-foreground transition-colors">
                 {l.label}
               </Link>
             ))}

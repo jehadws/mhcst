@@ -18,19 +18,93 @@ export const dictionary = {
             enroll: 'Enroll now',
         },
         hero: {
-            badge: 'Accredited training provider',
-            title: 'Build skills that move your career forward',
+            locationTag: 'Libya · Est. 2010',
+            titleLine1: 'Education that shapes',
+            titleLine2: 'your professional future',
             subtitle:
-                'Professional, accredited courses taught by industry experts. Learn online or in person and earn certificates that employers trust.',
-            ctaPrimary: 'Browse courses',
-            ctaSecondary: 'Talk to an advisor',
-            imageAlt: 'Adult learners collaborating in a modern training classroom',
+                'Modern Standards offers accredited academic programs and vocational training — designed to prepare qualified graduates for the demands of the job market.',
+            ctaPrimary: 'Explore programs',
+            ctaSecondary: 'Student life',
+            ctaContact: 'Talk to an advisor',
+            scrollHint: 'Scroll',
+            imageAlt: 'Students on campus at Modern Standards',
+            foundedYear: '2010',
+            foundedLabel: 'Year founded',
         },
         stats: {
             experts: 'Expert instructors',
             courses: 'Courses & programs',
-            learners: 'Learners trained',
-            satisfaction: 'Satisfaction rate',
+            learners: 'Graduates',
+            satisfaction: 'Departments',
+            partners: 'Training partners',
+        },
+        departmentsSection: {
+            label: 'Departments',
+            title: 'Academic departments',
+            description:
+                'Modern Standards offers distinguished academic and vocational programs through specialized departments with accredited curricula designed to prepare qualified professionals.',
+            viewPrograms: 'View programs',
+            emptyTitle: 'No departments listed yet',
+            emptyBody: 'Academic departments will be published soon.',
+        },
+        whyUs: {
+            label: 'Why Modern Standards?',
+            title: 'Four facts that make the difference.',
+            items: [
+                {
+                    title: 'Fully accredited programs',
+                    description: 'All programs meet national and international accreditation standards recognized by employers.',
+                },
+                {
+                    title: 'Expert instructors',
+                    description: 'Learn from practitioners with years of real-world experience in their fields.',
+                },
+                {
+                    title: 'Hands-on training',
+                    description: 'Practical labs, workshops, and projects that build job-ready skills from day one.',
+                },
+                {
+                    title: 'Career support',
+                    description: 'Advisors guide you from enrollment through graduation and into the workforce.',
+                },
+            ],
+        },
+        applicationSteps: {
+            label: 'Enrollment',
+            title: 'Your path to enrollment at a glance',
+            description: 'From inquiry to the classroom — in just a few clear steps.',
+            steps: [
+                {
+                    title: 'Check requirements',
+                    description: 'Review admission criteria and required documents before you begin.',
+                },
+                {
+                    title: 'Prepare your documents',
+                    description: 'Gather certificates, ID, and any prior qualifications needed for your program.',
+                },
+                {
+                    title: 'Apply online',
+                    description: 'Submit your application in minutes and track its status with our team.',
+                },
+            ],
+        },
+        campus: {
+            label: 'Campus',
+            title: 'A complete learning environment',
+            description:
+                'We designed an academic environment that meets all your needs — combining modern facilities with spaces for focus, collaboration, and student activities.',
+            bullets: [
+                'Modern classrooms and specialized training labs',
+                'Library and quiet study spaces',
+                'Student activities and professional development events',
+                'Dedicated advisory and support services',
+            ],
+            estLabel: 'Years of excellence in education',
+        },
+        ctaBanner: {
+            badge: 'Enrollment open',
+            title: 'Start your journey today.',
+            button: 'Apply now',
         },
         catalog: {
             title: 'Explore our courses',
@@ -1181,19 +1255,93 @@ export const dictionary = {
             enroll: 'سجّل الآن',
         },
         hero: {
-            badge: 'جهة تدريب معتمدة',
-            title: 'اكتسب مهارات تدفع مسيرتك المهنية إلى الأمام',
+            locationTag: 'ليبيا · تأسست ۲۰۱۰',
+            titleLine1: 'علم يصنع المستقبل',
+            titleLine2: 'ابدأ رحلتك نحو التميز المهني',
             subtitle:
-                'دورات احترافية معتمدة يقدّمها خبراء في مجالاتهم. تعلّم عبر الإنترنت أو حضورياً واحصل على شهادات يثق بها أصحاب العمل.',
-            ctaPrimary: 'تصفّح الدورات',
-            ctaSecondary: 'تحدّث مع مستشار',
-            imageAlt: 'متدربون بالغون يتعاونون في قاعة تدريب حديثة',
+                'تقدّم المعايير الحديثة تعليمًا أكاديميًا وتدريبًا مهنيًا متميزًا من خلال أقسام متخصصة وبرامج معتمدة، صُمِّمت لإعداد كوادر مؤهلة تلبي احتياجات سوق العمل.',
+            ctaPrimary: 'استكشف البرامج',
+            ctaSecondary: 'حياة الطالب',
+            ctaContact: 'تحدّث مع مستشار',
+            scrollHint: 'مرّر للأسفل',
+            imageAlt: 'طلاب في حرم المعايير الحديثة',
+            foundedYear: '۲۰۱۰',
+            foundedLabel: 'سنة التأسيس',
         },
         stats: {
             experts: 'مدرّب خبير',
             courses: 'دورة وبرنامج',
-            learners: 'متدرب',
-            satisfaction: 'نسبة الرضا',
+            learners: 'خريجاً',
+            satisfaction: 'تخصصات',
+            partners: 'شريك تدريب',
+        },
+        departmentsSection: {
+            label: 'الأقسام',
+            title: 'الأقسام الأكاديمية',
+            description:
+                'تقدّم المعايير الحديثة تعليمًا أكاديميًا متميزًا من خلال أقسام متخصصة تضم برامج أكاديمية معتمدة، صُمِّمت لإعداد كوادر مؤهلة تلبي احتياجات سوق العمل.',
+            viewPrograms: 'التخصصات',
+            emptyTitle: 'لا توجد أقسام مضافة حالياً',
+            emptyBody: 'سيتم إضافة الأقسام الأكاديمية قريباً.',
+        },
+        whyUs: {
+            label: 'لماذا المعايير الحديثة؟',
+            title: 'أربع حقائق تصنع الفرق.',
+            items: [
+                {
+                    title: 'برامج معتمدة بالكامل',
+                    description: 'جميع البرامج تلبي معايير الاعتماد الوطنية والدولية المعترف بها لدى أصحاب العمل.',
+                },
+                {
+                    title: 'مدربون من ذوي الخبرة',
+                    description: 'تعلّم مباشرة من ممارسين يمتلكون سنوات من الخبرة العملية في مجالاتهم.',
+                },
+                {
+                    title: 'تدريب عملي مكثّف',
+                    description: 'معامل وورش عمل ومشاريع تطبيقية تبني مهارات جاهزة لسوق العمل منذ البداية.',
+                },
+                {
+                    title: 'دعم مهني مستمر',
+                    description: 'مستشارون يرافقونك من التسجيل حتى التخرج والاندماج في سوق العمل.',
+                },
+            ],
+        },
+        applicationSteps: {
+            label: 'التقديم',
+            title: 'مسار التقديم في لمحة',
+            description: 'من الاستفسار إلى قاعة المحاضرات — بأقل عدد من الخطوات.',
+            steps: [
+                {
+                    title: 'تحقق من الشروط',
+                    description: 'راجع شروط القبول والوثائق المطلوبة قبل البدء.',
+                },
+                {
+                    title: 'جهّز مستنداتك',
+                    description: 'اجمع الشهادات والهوية وأي مؤهلات سابقة مطلوبة لبرنامجك.',
+                },
+                {
+                    title: 'قدّم إلكترونياً',
+                    description: 'أرسل طلبك خلال دقائق وتابع حالته مع فريقنا.',
+                },
+            ],
+        },
+        campus: {
+            label: 'الحرم',
+            title: 'بيئة تعليمية متكاملة',
+            description:
+                'صممنا لك بيئة أكاديمية تلبي كافة احتياجاتك؛ تجمع بين أحدث التجهيزات ومرافق الراحة والأنشطة، لتمنحك تجربة تعليمية استثنائية.',
+            bullets: [
+                'قاعات حديثة ومعامل تدريب متخصصة',
+                'مكتبة ومساحات هادئة للتركيز',
+                'أنشطة طلابية وفعاليات تطوير مهني',
+                'خدمات استشارية ودعم أكاديمي',
+            ],
+            estLabel: 'مسيرة من التميز في التعليم',
+        },
+        ctaBanner: {
+            badge: 'التقديم مفتوح',
+            title: 'ابدأ رحلتك اليوم.',
+            button: 'قدّم الآن',
         },
         catalog: {
             title: 'استكشف دوراتنا',

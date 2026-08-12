@@ -18,7 +18,7 @@ export default function TermsPage() {
             <div className="flex min-h-screen flex-col">
                 <SiteHeader />
                 <main className="flex-1">
-                    <div className="border-b border-border/60 bg-gradient-to-b from-primary/10 via-background to-background py-12">
+                    <div className="border-b border-border bg-secondary py-12">
                         <div className="mx-auto max-w-3xl px-4 text-center sm:px-6">
                             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1 text-xs font-semibold text-primary">
                                 <FileText className="size-3.5" />

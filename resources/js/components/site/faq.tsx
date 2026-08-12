@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { ChevronDown, HelpCircle } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { faqs as defaultFaqs } from '@/data/i18n'
+import { SectionHeader } from '@/components/site/section-header'
 import { useSite } from '@/context/site-context'
 import { cn } from '@/lib/utils'
 
@@ -11,19 +12,11 @@ export function Faq({ items }: { items?: any[] }) {
     const list = items && items.length > 0 ? items : defaultFaqs
 
     return (
-        <section id="faq" className="relative scroll-mt-20 py-16 sm:py-24">
-            <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-                <div className="text-center">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1 text-xs font-semibold text-primary">
-                        <HelpCircle className="size-3.5" />
-                        <span>{t.faq.title}</span>
-                    </span>
-                    <h2 className="mt-4 font-serif text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                        {t.faq.subtitle}
-                    </h2>
-                </div>
+        <section id="faq" className="bg-secondary scroll-mt-20 py-20 sm:py-28">
+            <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+                <SectionHeader label={t.faq.title} title={t.faq.subtitle} />
 
-                <div className="mt-10 space-y-3">
+                <div className="mt-10 space-y-2">
                     {list.map((item, idx) => {
                         const question = item.question || (item.q ? tr(item.q) : '')
                         const answer = item.answer || (item.a ? tr(item.a) : '')
@@ -33,26 +26,26 @@ export function Faq({ items }: { items?: any[] }) {
                             <div
                                 key={idx}
                                 className={cn(
-                                    'overflow-hidden rounded-2xl border transition-all duration-300',
-                                    isOpen ? 'border-primary/50 bg-card shadow-md' : 'border-border/80 bg-card/60 hover:border-primary/30',
+                                    'overflow-hidden rounded-xl border transition-colors',
+                                    isOpen ? 'border-primary/30 bg-card' : 'border-border/80 bg-card/60',
                                 )}
                             >
                                 <button
                                     type="button"
                                     onClick={() => setOpenIdx(isOpen ? null : idx)}
-                                    className="flex w-full items-center justify-between p-5 text-start font-serif font-bold text-foreground text-base sm:text-lg focus:outline-none"
+                                    className="flex w-full items-center justify-between gap-4 p-5 text-start text-base font-semibold text-foreground focus:outline-none sm:text-lg"
                                 >
                                     <span>{question}</span>
                                     <ChevronDown
                                         className={cn(
-                                            'size-5 shrink-0 text-muted-foreground transition-transform duration-300',
+                                            'size-5 shrink-0 text-muted-foreground transition-transform duration-200',
                                             isOpen && 'rotate-180 text-primary',
                                         )}
                                     />
                                 </button>
 
                                 {isOpen && (
-                                    <div className="border-t border-border/60 px-5 pb-5 pt-3 text-xs sm:text-sm leading-relaxed text-muted-foreground animate-fade-in">
+                                    <div className="border-t border-border/60 px-5 pb-5 pt-3 text-sm leading-relaxed text-muted-foreground">
                                         <p>{answer}</p>
                                     </div>
                                 )}
