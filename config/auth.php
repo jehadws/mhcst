@@ -114,4 +114,16 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Public Registration
+    |--------------------------------------------------------------------------
+    |
+    | When disabled, the registration routes return 404. Accounts should be
+    | created by administrators only.
+    |
+    */
+
+    'registration_enabled' => env('AUTH_REGISTRATION_ENABLED', false),
+
 ];

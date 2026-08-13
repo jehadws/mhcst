@@ -63,6 +63,7 @@ test('a valid certificate number returns the certificate', function () {
         ->assertInertia(fn ($page) => $page
             ->component('site/verify-certificate')
             ->where('certificate.certificate_number', 'MHCST-2026-00001')
+            ->has('certificate.download_url')
             ->where('notFound', false));
 });
 

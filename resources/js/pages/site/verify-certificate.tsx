@@ -7,11 +7,11 @@ import { Award, BadgeCheck, Calendar, CheckCircle2, FileBadge, Search, ShieldChe
 import { useState } from 'react';
 
 interface VerifiedCertificate {
-  id: number;
   certificate_number: string;
   issued_at?: string;
+  download_url?: string;
   course?: { title_ar: string; title_en?: string; slug?: string };
-  student?: { full_name: string; email?: string };
+  student?: { full_name: string };
   issuer?: { name: string };
 }
 
@@ -141,7 +141,7 @@ export default function VerifyCertificate({ number = '', certificate = null, not
                     </div>
                   </div>
                   <a
-                    href={`/verify-certificate/${certificate.certificate_number}/download`}
+                    href={certificate.download_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold shadow-md transition-colors"

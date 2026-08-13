@@ -4,6 +4,7 @@ use App\Http\Middleware\CmsAuditLogMiddleware;
 use App\Http\Middleware\EnsureCmsAccess;
 use App\Http\Middleware\EnsureCmsManage;
 use App\Http\Middleware\EnsureDashboardAccess;
+use App\Http\Middleware\EnsureHasDashboardRole;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'cms.manage' => EnsureCmsManage::class,
             'cms.audit' => CmsAuditLogMiddleware::class,
             'dashboard.access' => EnsureDashboardAccess::class,
+            'dashboard.role' => EnsureHasDashboardRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

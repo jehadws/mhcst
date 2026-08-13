@@ -20,7 +20,6 @@ class StoreNewsletterCampaignRequest extends FormRequest
         return [
             'subject' => 'required|string|max:255',
             'content' => 'required|string',
-            'status' => 'sometimes|in:draft,sending,sent,cancelled',
         ];
     }
 }

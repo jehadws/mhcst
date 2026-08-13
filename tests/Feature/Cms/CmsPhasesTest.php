@@ -42,7 +42,7 @@ test('student portal returns both training and academic search results', functio
 
     $response->assertOk()
         ->assertJsonStructure(['query', 'training_enrollments', 'academic_students'])
-        ->assertJsonPath('academic_students.0.email', 'portal-student@test.com');
+        ->assertJsonPath('academic_students.0.name', 'Portal Student');
 });
 
 test('admin can access new cms reports', function () {

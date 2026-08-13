@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\HtmlSanitizer;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
 
@@ -10,6 +11,17 @@ class StoreBlogPostRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'content' => HtmlSanitizer::clean($this->input('content')),
+            'seo_title' => HtmlSanitizer::plainText($this->input('seo_title')),
+            'seo_description' => HtmlSanitizer::plainText($this->input('seo_description')),
+            'title' => HtmlSanitizer::plainText($this->input('title')),
+            'excerpt' => HtmlSanitizer::plainText($this->input('excerpt')),
+        ]);
     }
 
     public function rules(): array

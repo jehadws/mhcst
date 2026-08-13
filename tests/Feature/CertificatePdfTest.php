@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Student;
 use App\Models\User;
+use Illuminate\Support\Facades\URL;
 
 test('authenticated user can download certificate pdf view', function () {
     $user = createUserWithRoles([UserRole::ContentEditor->value]);
@@ -33,7 +34,7 @@ test('authenticated user can download certificate pdf view', function () {
     $response->assertSee($student->full_name);
 });
 
-test('public user can download printable certificate by number', function () {
+test('public user can download printable certificate with signed url', function () {
     $user = User::factory()->create();
     $student = Student::factory()->create();
     $course = Course::factory()->create(['status' => 'published']);
@@ -42,7 +43,7 @@ test('public user can download printable certificate by number', function () {
         'course_id' => $course->id,
         'status' => 'completed',
     ]);
-    $certificate = Certificate::create([
+    Certificate::create([
         'enrollment_id' => $enrollment->id,
         'student_id' => $student->id,
         'course_id' => $course->id,
@@ -52,7 +53,13 @@ test('public user can download printable certificate by number', function () {
         'issued_by' => $user->id,
     ]);
 
-    $response = $this->get(route('certificates.public-download', 'MHCST-PUBLIC-999'));
+    $url = URL::temporarySignedRoute(
+        'certificates.public-download',
+        now()->addMinutes(30),
+        ['number' => 'MHCST-PUBLIC-999']
+    );
+
+    $response = $this->get($url);
 
     $response->assertSuccessful();
     $response->assertSee('MHCST-PUBLIC-999');

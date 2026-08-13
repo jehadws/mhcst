@@ -5,7 +5,7 @@ import { PageHero } from '@/components/site/page-hero';
 import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import { useSite } from '@/context/site-context';
-import { formatNewsDate, newsExcerpt, newsImage, newsTagKey, newsTitle, type NewsPost } from '@/lib/news';
+import { formatNewsDate, newsExcerpt, newsImage, newsSeoDescription, newsSeoTitle, newsTagKey, newsTitle, type NewsPost } from '@/lib/news';
 import { Link } from '@inertiajs/react';
 import { ArrowLeft, ArrowRight, CalendarDays } from 'lucide-react';
 
@@ -30,7 +30,15 @@ export default function BlogShow({ post, related = [] }: Props) {
 
   return (
     <>
-      <SeoHead title={newsTitle(post)} description={excerpt} image={coverImage} type="article" />
+      <SeoHead
+        title={newsSeoTitle(post)}
+        description={newsSeoDescription(post)}
+        image={coverImage}
+        type="article"
+        url={`/blog-posts/${post.slug}`}
+        publishedTime={post.published_at ?? undefined}
+        modifiedTime={post.updated_at ?? undefined}
+      />
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="flex-1">

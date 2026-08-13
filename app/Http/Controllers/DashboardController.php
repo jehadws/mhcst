@@ -101,7 +101,18 @@ class DashboardController extends Controller
         $teacher = CmsTeacher::where('user_id', $user->id)->first();
 
         if (! $teacher) {
-            return $this->adminDashboard();
+            return Inertia::render('dashboard/index', [
+                'dashboardRole' => 'teacher',
+                'teacherProfile' => null,
+                'todaySchedules' => [],
+                'teacherClasses' => [],
+                'stats' => [
+                    'classes_count' => 0,
+                    'students_count' => 0,
+                    'pending_grades_count' => 0,
+                    'today_classes_count' => 0,
+                ],
+            ]);
         }
 
         $subjectIds = CmsSchedule::where('teacher_id', $teacher->id)

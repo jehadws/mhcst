@@ -10,17 +10,18 @@ test('student portal page can be rendered', function () {
     $response->assertSuccessful();
 });
 
-test('student can lookup enrollments by email or phone via API', function () {
+test('student can lookup enrollments by exact email match', function () {
     $student = Student::factory()->create([
         'email' => 'student.portal.test@mhcst.edu.ly',
         'phone' => '+218919998877',
     ]);
     $course = Course::factory()->create(['status' => 'published']);
-    $enrollment = Enrollment::factory()->create([
+    Enrollment::factory()->create([
         'student_id' => $student->id,
         'course_id' => $course->id,
         'email' => 'student.portal.test@mhcst.edu.ly',
         'phone' => '+218919998877',
+        'full_name' => 'Portal Student',
         'status' => 'confirmed',
     ]);
 
@@ -28,5 +29,21 @@ test('student can lookup enrollments by email or phone via API', function () {
 
     $response->assertSuccessful()
         ->assertJsonCount(1, 'training_enrollments')
-        ->assertJsonPath('training_enrollments.0.email', 'student.portal.test@mhcst.edu.ly');
+        ->assertJsonPath('training_enrollments.0.full_name', 'Portal Student')
+        ->assertJsonMissingPath('training_enrollments.0.email');
+});
+
+test('student portal search rejects partial matches', function () {
+    Student::factory()->create([
+        'email' => 'student.portal.test@mhcst.edu.ly',
+    ]);
+
+    $this->getJson(route('student.portal.search', ['query' => 'portal.test']))
+        ->assertSuccessful()
+        ->assertJsonCount(0, 'training_enrollments');
+});
+
+test('student portal search requires minimum query length', function () {
+    $this->getJson(route('student.portal.search', ['query' => 'abc']))
+        ->assertUnprocessable();
 });

@@ -20,6 +20,7 @@ use App\Http\Controllers\FaqController;
 use App\Http\Controllers\MyTranscriptController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NotificationTemplateController;
+use App\Http\Controllers\SeoController;
 use App\Http\Controllers\SiteContentController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteSettingController;
@@ -30,6 +31,11 @@ use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/site.webmanifest', [SeoController::class, 'manifest'])->name('seo.manifest');
+Route::get('/robots.txt', [SeoController::class, 'robots'])->name('seo.robots');
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('seo.sitemap');
+Route::get('/browserconfig.xml', [SeoController::class, 'browserConfig'])->name('seo.browserconfig');
+
 Route::get('/', [SiteController::class, 'home'])->name('home');
 Route::get('/about', [SiteController::class, 'about'])->name('about');
 Route::get('/departments', [SiteController::class, 'departments'])->name('departments');
@@ -39,19 +45,31 @@ Route::get('/blog-posts', [BlogController::class, 'index'])->name('blog');
 Route::get('/blog-posts/{slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::redirect('/blog', '/blog-posts');
 Route::redirect('/blog/{slug}', '/blog-posts/{slug}');
-Route::get('/verify-certificate', [CertificateController::class, 'verify'])->name('verify-certificate');
-Route::get('/verify-certificate/{number}/download', [CertificateController::class, 'publicDownload'])->name('certificates.public-download');
+Route::get('/verify-certificate', [CertificateController::class, 'verify'])
+    ->middleware('throttle:30,1')
+    ->name('verify-certificate');
+Route::get('/verify-certificate/{number}/download', [CertificateController::class, 'publicDownload'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('certificates.public-download');
 Route::get('/student/portal', [StudentPortalController::class, 'index'])->name('student.portal');
-Route::get('/student/portal/search', [StudentPortalController::class, 'search'])->name('student.portal.search');
+Route::get('/student/portal/search', [StudentPortalController::class, 'search'])
+    ->middleware('throttle:20,1')
+    ->name('student.portal.search');
 Route::get('/terms-of-use', fn () => app(SiteContentController::class)->show('terms-of-use'))->name('terms-of-use');
 Route::get('/privacy-policy', fn () => app(SiteContentController::class)->show('privacy-policy'))->name('privacy-policy');
 
 // Public form submissions
-Route::post('/contact', [SiteController::class, 'contactStore'])->name('contact.store');
-Route::post('/newsletter', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
-Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+Route::post('/contact', [SiteController::class, 'contactStore'])
+    ->middleware('throttle:5,1')
+    ->name('contact.store');
+Route::post('/newsletter', [NewsletterController::class, 'subscribe'])
+    ->middleware('throttle:10,1')
+    ->name('newsletter.subscribe');
+Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])
+    ->middleware('throttle:10,1')
+    ->name('newsletter.unsubscribe');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'dashboard.role'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('dashboard/my-transcript', MyTranscriptController::class)
         ->middleware('dashboard.access:student')

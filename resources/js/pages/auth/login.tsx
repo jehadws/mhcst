@@ -19,9 +19,10 @@ interface LoginForm {
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
+    canRegister?: boolean;
 }
 
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Login({ status, canResetPassword, canRegister = false }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
         password: '',
@@ -91,10 +92,14 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 </div>
 
                 <div className="text-muted-foreground text-center text-sm">
-                    Don't have an account?{' '}
-                    <TextLink href={route('register')} tabIndex={5}>
-                        Sign up
-                    </TextLink>
+                    {canRegister && (
+                        <>
+                            Don't have an account?{' '}
+                            <TextLink href={route('register')} tabIndex={5}>
+                                Sign up
+                            </TextLink>
+                        </>
+                    )}
                 </div>
             </form>
 

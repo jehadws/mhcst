@@ -59,9 +59,9 @@ export function SiteFooter() {
     { href: '/departments', label: locale === 'ar' ? 'الأقسام والبرامج' : 'Departments' },
     { href: '/blog-posts', label: locale === 'ar' ? 'الأخبار' : 'News' },
     { href: '/faq', label: t.nav.faq },
-    { href: '/contact', label: t.nav.contact },
-    { href: '/contact', label: t.nav.enroll },
-    { href: '/', label: t.nav.home },
+    { href: '/student/portal', label: locale === 'ar' ? 'بوابة الطالب' : 'Student portal' },
+    { href: '/terms-of-use', label: t.footer.terms },
+    { href: '/privacy-policy', label: t.footer.privacy },
   ];
 
   const contactItems = [
@@ -143,10 +143,15 @@ export function SiteFooter() {
       </div>
 
       <div className="border-hero-foreground/10 border-t">
-        <div className="text-hero-foreground/60 mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-center text-xs sm:flex-row sm:px-6 lg:px-8">
-          <Link href="/privacy-policy" className="hover:text-accent">
-            {t.footer.privacy}
-          </Link>
+        <div className="text-hero-foreground/60 mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-center text-xs sm:flex-row sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+            <Link href="/privacy-policy" className="hover:text-accent">
+              {t.footer.privacy}
+            </Link>
+            <Link href="/terms-of-use" className="hover:text-accent">
+              {t.footer.terms}
+            </Link>
+          </div>
           <p>
             {t.footer.rights} {brandName} © {new Date().getFullYear()}
           </p>

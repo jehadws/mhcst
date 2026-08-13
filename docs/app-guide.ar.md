@@ -17,6 +17,8 @@
 6. [حسابات التجربة](#6-حسابات-التجربة)
 7. [الميزات الرئيسية](#7-الميزات-الرئيسية)
 8. [التطوير](#8-التطوير)
+9. [SEO ومحركات البحث](#9-seo-ومحركات-البحث)
+10. [الأمان](#10-الأمان)
 
 ---
 
@@ -30,7 +32,7 @@
 | **لوحة التحكم** | `/dashboard` | إدارة المحتوى، CRM، المستخدمين، الصفحة الرئيسية حسب الدور |
 | **نظام إدارة الكلية (CMS)** | `/cms` | العمليات الأكاديمية — الأقسام، الطلاب، الدرجات، الحضور، الجداول، التقارير |
 
-**المصادقة:** تسجيل دخول عبر جلسة Laravel.  
+**المصادقة:** تسجيل دخول عبر جلسة Laravel. **التسجيل العام معطّل افتراضياً** — تُنشأ الحسابات الجديدة بواسطة **Admin ← المستخدمون**.  
 **الصلاحيات:** Spatie Laravel Permission مع ستة أدوار معرّفة في `App\Enums\UserRole`.
 
 يتم فرض الصلاحيات على ثلاث مستويات:
@@ -69,8 +71,8 @@
 | الأسئلة الشائعة | `/faq` | الأسئلة المتكررة |
 | اتصل بنا | `/contact` | نموذج التواصل |
 | المدونة | `/blog-posts` | الأخبار والمقالات |
-| التحقق من الشهادة | `/verify-certificate` | البحث العام عن الشهادات |
-| بوابة الطالب | `/student/portal` | بحث عام عن الطلاب |
+| التحقق من الشهادة | `/verify-certificate` | بحث عام (بيانات محدودة؛ رابط تحميل موقّع) |
+| بوابة الطالب | `/student/portal` | بحث بالتطابق التام (رقم قيد، بريد، أو هاتف) |
 | شروط الاستخدام | `/terms-of-use` | صفحة قانونية |
 | سياسة الخصوصية | `/privacy-policy` | صفحة قانونية |
 | الاشتراك في النشرة | `POST /newsletter` | اشتراك بالبريد |
@@ -81,7 +83,7 @@
 
 ### 3.2 لوحة التحكم
 
-تتطلب تسجيل الدخول. تظهر أقسام الشريط الجانبي حسب الدور (انظر [القسم 4](#4-الأدوار-والصلاحيات)).
+تتطلب تسجيل الدخول **ودور Spatie**. المستخدمون بدون أي دور يحصلون على **403** في `/dashboard` وجميع مسارات لوحة التحكم/CMS (middleware `dashboard.role`).
 
 #### نظرة عامة
 
@@ -209,6 +211,7 @@
 
 | Middleware | الأدوار المسموحة |
 |------------|------------------|
+| `dashboard.role` | أي مستخدم لديه دور Spatie واحد على الأقل |
 | `cms.access` | Admin، Manager، Teacher |
 | `cms.manage` | Admin، Manager |
 | `dashboard.access:content` | Admin، Manager، Content Editor |
@@ -222,7 +225,7 @@
 
 مُنفَّذة في `App\Services\CmsAuthorizationService`:
 
-1. يجب وجود ملف أستاذ (`cms_teachers.user_id`) مرتبط بالمستخدم.
+1. يجب وجود ملف أستاذ (`cms_teachers.user_id`) مرتبط بالمستخدم. إن لم يوجد، يرى الأستاذ **لوحة أستاذ فارغة** (وليس إحصائيات المدير).
 2. **معرّفات المواد** تُستخرج من الجداول حيث `teacher_id` يطابق الأستاذ.
 3. **معرّفات الطلاب** هم الطلاب المسجّلون في تلك المواد.
 4. تحديث الدرجات/الحضور يتحقق من أن التسجيل ينتمي لمادة مسموحة.
@@ -251,20 +254,39 @@ GET  /about
 GET  /departments
 GET  /faq
 GET  /contact
-POST /contact
+POST /contact                         [حد: 5/دقيقة]
 GET  /blog-posts
-GET  /blog-posts/{slug}
-GET  /verify-certificate
+GET  /blog-posts/{slug}               [المقالات المنشورة فقط]
+GET  /verify-certificate              [حد: 30/دقيقة]
+GET  /verify-certificate/{number}/download   [رابط موقّع، حد: 10/دقيقة]
 GET  /student/portal
+GET  /student/portal/search           [تطابق تام، 4 أحرف كحد أدنى، حد: 20/دقيقة]
 GET  /terms-of-use
 GET  /privacy-policy
-POST /newsletter
+POST /newsletter                      [حد: 10/دقيقة]
+GET  /newsletter/unsubscribe/{token}  [حد: 10/دقيقة]
 POST /locale
+
+# SEO (ديناميكي من إعدادات الموقع)
+GET  /site.webmanifest
+GET  /robots.txt
+GET  /sitemap.xml
+GET  /browserconfig.xml
+```
+
+### مسارات المصادقة
+
+```
+GET  /login
+POST /login
+POST /logout
+GET  /register                        [404 ما لم يُفعَّل AUTH_REGISTRATION_ENABLED]
+POST /register                        [404 ما لم يُفعَّل AUTH_REGISTRATION_ENABLED]
 ```
 
 ### مسارات لوحة التحكم (تتطلب تسجيل دخول)
 
-```
+جميع المسارات أدناه تتطلب `auth` + `dashboard.role`.
 GET  /dashboard
 GET  /dashboard/my-transcript          [Student]
 
@@ -281,7 +303,8 @@ GET  /dashboard/my-transcript          [Student]
 /dashboard/newsletter/*                [CRM]
 /dashboard/notification-templates/*
 
-POST /uploads/image                    [أدوار الرفع]
+POST /uploads/image                    [أدوار الرفع؛ مجلدات مسموحة]
+DELETE /uploads/image                  [أدوار الرفع؛ مسارات مسموحة]
 ```
 
 ### مسارات CMS
@@ -389,6 +412,19 @@ PUT  /cms/settings
 - تخطيط RTL عند اختيار العربية
 - صفحات CMS تستخدم `useCms()` وملفات الترجمة
 
+### التحقق من الشهادات (عام)
+
+- البحث برقم الشهادة في `/verify-certificate`
+- تعرض الصفحة **حقولاً عامة فقط**: اسم المتدرب، الدورة، تاريخ الإصدار، المُصدر
+- تحميل PDF يتطلب **رابطاً موقّعاً مؤقتاً** (30 دقيقة) بعد نجاح البحث — التحميل المباشر بدون توقيع يُرجع 403
+
+### بوابة الطالب (عام)
+
+- البحث يتطلب **تطابقاً تاماً** على رقم القيد أو البريد أو الهاتف أو الاسم (4 أحرف كحد أدنى)
+- البحث الجزئي (مثل `@gmail.com`) لا يُرجع نتائج — يقلل التعداد غير المصرّح
+- الاستجابة لا تتضمن البريد أو الهاتف أو حقول الدفع
+- تحميل الشهادات من النتائج يستخدم روابط موقّعة أيضاً
+
 ---
 
 ## 8. التطوير
@@ -405,6 +441,8 @@ npm run dev
 # أو: composer run dev
 ```
 
+اضبط `APP_URL` على رابط التطوير أو الإنتاج. اترك `AUTH_REGISTRATION_ENABLED=false` ما لم تحتاج تسجيلاً مفتوحاً في بيئة التطوير.
+
 ### بيانات التجربة
 
 ```bash
@@ -418,6 +456,8 @@ php artisan db:seed --class=CmsDemoDataSeeder
 ```bash
 php artisan test --compact
 php artisan test --compact tests/Feature/Cms
+php artisan test --compact tests/Feature/SecurityHardeningTest.php
+php artisan test --compact tests/Feature/SeoTest.php
 php artisan test --compact tests/Feature/DashboardRouteAccessTest.php
 ```
 
@@ -432,8 +472,103 @@ php artisan test --compact tests/Feature/DashboardRouteAccessTest.php
 | صلاحيات الواجهة | `resources/js/lib/dashboard-access.ts` |
 | الشريط الجانبي | `resources/js/components/app-sidebar.tsx` |
 | قدرات CMS المشتركة | `app/Http/Middleware/HandleInertiaRequests.php` |
+| خدمة SEO | `app/Services/SiteSeoService.php` |
+| متحكم SEO | `app/Http/Controllers/SeoController.php` |
+| وسوم Meta (React) | `resources/js/components/seo-head.tsx` |
+| تنقية HTML | `app/Support/HtmlSanitizer.php` |
+| بوابة أدوار لوحة التحكم | `app/Http/Middleware/EnsureHasDashboardRole.php` |
 
 ### وثائق ذات صلة
 
 - [CMS Technical Specification](../CMS_Technical_Specification.md) — مخطط قاعدة البيانات والمواصفات التفصيلية
 - [English guide](./app-guide.en.md) — Same content in English
+
+---
+
+## 9. SEO ومحركات البحث
+
+تُولَّد أصول SEO ديناميكياً من **لوحة التحكم ← إعدادات الموقع** (اسم الموقع، الوصف، بيانات التواصل).
+
+| الأصل | المسار | الوصف |
+|-------|--------|-------|
+| Web manifest | `/site.webmanifest` | اسم PWA، الأيقونات، لون السمة (`#1B365D`) |
+| Robots | `/robots.txt` | يسمح بالصفحات العامة؛ يمنع `/dashboard` و`/cms` والبوابات الخاصة |
+| Sitemap | `/sitemap.xml` | الصفحات العامة + **مقالات المدونة المنشورة** فقط |
+| Browser config | `/browserconfig.xml` | لون وأيقونات بلاط Windows |
+
+### وسوم الصفحات
+
+الصفحات العامة تستخدم `SeoHead` (`resources/js/components/seo-head.tsx`):
+
+- العنوان، الوصف، الرابط الأساسي (canonical من `APP_URL`)
+- Open Graph و Twitter
+- JSON-LD (`EducationalOrganization`، `WebSite`، `Article` في المدونة)
+- المقالات تستخدم `seo_title` / `seo_description` عند تعيينهما في CMS
+
+خصائص Inertia المشتركة: `appUrl`، `seo.organization`.
+
+### متطلبات الإنتاج
+
+- اضبط **`APP_URL`** على النطاق الفعلي — الروابط الأساسية وخريطة الموقع ومعاينات الشبكات الاجتماعية تعتمد عليه
+- بعد تغيير اسم الموقع أو الوصف، تحقق من `/sitemap.xml` و`/site.webmanifest` في الإنتاج
+
+### الاختبارات
+
+```bash
+php artisan test --compact tests/Feature/SeoTest.php
+```
+
+---
+
+## 10. الأمان
+
+### المصادقة والحسابات
+
+| الضابط | السلوك |
+|--------|--------|
+| التسجيل العام | **معطّل** افتراضياً (`AUTH_REGISTRATION_ENABLED=false`) |
+| الوصول للوحة التحكم | يتطلب تسجيل دخول **ودور Spatie** (`dashboard.role`) |
+| الحسابات المعطّلة | `is_active = false` لا يمكنها تسجيل الدخول |
+| حد محاولات الدخول | 5 محاولات لكل بريد/IP |
+
+حسابات جديدة: **Admin ← المستخدمون ← إنشاء** (تعيين الأدوار هناك).
+
+### النقاط العامة
+
+| النقطة | الحماية |
+|--------|---------|
+| `POST /contact` | حد 5/دقيقة؛ التحقق من البريد في reply-to |
+| `POST /newsletter` | حد 10/دقيقة |
+| بحث بوابة الطالب | تطابق تام، 4 أحرف كحد أدنى، حد 20/دقيقة؛ استجابة JSON محدودة |
+| التحقق من الشهادة | حد 30/دقيقة؛ لا بريد/هاتف في props |
+| تحميل الشهادة | رابط موقّع مطلوب؛ حد 10/دقيقة |
+
+المناطق الخاصة (`/dashboard`، `/cms`، `/settings`، بوابة الطالب) تحصل أيضاً على `noindex, nofollow` في قالب Blade الجذر.
+
+### أمان المحتوى
+
+HTML الغني (المدونة، الصفحات الثابتة، حملات النشرة) يُنقّى عند الحفظ عبر `HtmlSanitizer`:
+
+- وسوم مسموحة: فقرات، عناوين، قوائم، روابط، صور
+- يزيل `onclick` و`style` وروابط `javascript:`
+- JSON-LD يهرب `<` لمنع كسر `<script>`
+
+### رفع الملفات
+
+رفع الصور (`POST /uploads/image`):
+
+- مجلدات مسموحة: `uploads`، `blog`، `testimonials`، `settings`
+- الحذف مقيّد بمسارات تلك المجلدات
+
+### إعدادات الموقع
+
+تُشارك فقط المفاتيح الآمنة للعامة (الاسم، الشعار، التواصل، الوصف). إعدادات CMS الداخلية غير مُضمّنة.
+
+### الاختبارات
+
+```bash
+php artisan test --compact tests/Feature/SecurityHardeningTest.php
+php artisan test --compact tests/Feature/Auth
+php artisan test --compact tests/Feature/StudentPortalTest.php
+php artisan test --compact tests/Feature/CertificateVerificationTest.php
+```

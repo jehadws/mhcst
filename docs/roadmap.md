@@ -11,6 +11,7 @@ Phased completion plan for CMS gaps and platform polish.
 | [Phase 5](#phase-5--academic-settings) | Done | Calendar + alert thresholds |
 | [Phase 6](#phase-6--enrollment-rules) | Done | Validation + tests |
 | [Phase 7](#phase-7--architecture-notes) | Done | Docs + amc-portal note |
+| [Phase 8](#phase-8--seo--security) | Done | Dynamic SEO assets + security hardening |
 
 ---
 
@@ -23,9 +24,11 @@ Phased completion plan for CMS gaps and platform polish.
 
 ## Phase 2 — Student portal
 
-- Public `/student/portal` now searches **both**:
+- Public `/student/portal` searches **both**:
   - **Training courses** (legacy enrollments + certificates)
   - **College academic records** (`cms_students` — department, level, enrolled subjects)
+- Search requires **exact match** (student ID, email, phone, or name); rate limited; no payment/PII fields in JSON
+- Certificate downloads use **signed URLs**
 - Full transcript still requires login at `/dashboard/my-transcript`
 
 ## Phase 3 — Notifications
@@ -79,6 +82,40 @@ Recommendation: treat as reference; primary app is Laravel at repo root.
 Tables `students`, `enrollments`, `courses` remain for training-center features (certificates, course portal). CMS uses `cms_*` tables. Both coexist intentionally until a full migration is planned.
 
 **Removed (cleanup):** Orphan dashboard UI for legacy training students (`/dashboard/students/*`), `StudentController`, and related form requests — no routes existed; academic students are managed at `/cms/students`.
+
+## Phase 8 — SEO & security
+
+### SEO (dynamic, from site settings)
+
+| Asset | Route |
+|-------|-------|
+| Web manifest | `/site.webmanifest` |
+| Robots | `/robots.txt` |
+| Sitemap | `/sitemap.xml` |
+| Windows tiles | `/browserconfig.xml` |
+
+- Public pages use `SeoHead` — canonical URLs, Open Graph, Twitter, JSON-LD
+- Blog posts support `seo_title` / `seo_description`
+- Sitemap includes published blog posts only
+- Requires `APP_URL` in production
+
+Tests: `tests/Feature/SeoTest.php`
+
+### Security hardening
+
+| Area | Change |
+|------|--------|
+| Registration | Disabled by default (`AUTH_REGISTRATION_ENABLED=false`) |
+| Dashboard | Requires Spatie role (`dashboard.role` middleware) |
+| Teacher dashboard | No admin fallback when CMS teacher profile missing |
+| Student portal | Exact-match search, rate limited, minimal JSON |
+| Certificates | Signed download URLs; verify page exposes public fields only |
+| Public forms | Throttle on contact, newsletter, verify |
+| Content | `HtmlSanitizer` on blog, static pages, newsletters |
+| Uploads | Folder allowlist; path validation on delete |
+| Login | Block `is_active = false` accounts |
+
+Tests: `tests/Feature/SecurityHardeningTest.php`, updated auth/portal/certificate tests (136 total passing).
 
 ---
 

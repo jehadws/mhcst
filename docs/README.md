@@ -9,6 +9,15 @@ Bilingual reference guides for **Almaayir Alhaditha College for Science and Tech
 | [roadmap.md](./roadmap.md) | EN | Phased implementation status and architecture notes |
 | [../amc-portal/README.md](../amc-portal/README.md) | EN | Archived Next.js prototype (not production) |
 
+## Quick links
+
+- **Roles & permissions** — Section 4 in either app guide
+- **Demo accounts** — Section 6
+- **CMS (College Management)** — Section 3.3
+- **SEO & search engines** — Section 9
+- **Security** — Section 10
+- **Technical spec (CMS schema)** — [../CMS_Technical_Specification.md](../CMS_Technical_Specification.md)
+
 ## Demo accounts (after `php artisan migrate:fresh --seed`)
 
 See [roadmap.md](./roadmap.md) or app guides §6.
@@ -45,8 +54,13 @@ Generated from the master logo in `public/`:
 
 **Optional later:** a 1200×630 banner (`og-banner.png`) for richer Facebook/WhatsApp link previews.
 
+## Production checklist
 
-- **Roles & permissions** — see Section 4 in either guide
-- **Demo accounts** — see Section 6
-- **CMS (College Management)** — see Section 3.3
-- **Technical spec (CMS schema)** — [../CMS_Technical_Specification.md](../CMS_Technical_Specification.md)
+Before going live, set in `.env`:
+
+| Variable | Recommended value |
+|----------|-------------------|
+| `APP_URL` | Your public domain (e.g. `https://mhcst.ly`) — required for canonical URLs, sitemap, and Open Graph |
+| `APP_ENV` | `production` |
+| `APP_DEBUG` | `false` |
+| `AUTH_REGISTRATION_ENABLED` | `false` — accounts are created by admins only |

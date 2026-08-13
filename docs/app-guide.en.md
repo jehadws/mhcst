@@ -17,6 +17,8 @@
 6. [Demo accounts](#6-demo-accounts)
 7. [Key features](#7-key-features)
 8. [Development](#8-development)
+9. [SEO & search engines](#9-seo--search-engines)
+10. [Security](#10-security)
 
 ---
 
@@ -30,7 +32,7 @@ Almaayir Alhaditha College for Science and Technology is a full-stack web platfo
 | **Admin dashboard** | `/dashboard` | Content management, CRM, user administration, role-specific home |
 | **College Management System (CMS)** | `/cms` | Academic operations — departments, students, grades, attendance, schedules, reports |
 
-Authentication uses **Laravel session login**. Authorization uses **Spatie Laravel Permission** with six named roles stored in `App\Enums\UserRole`.
+Authentication uses **Laravel session login**. **Public self-registration is disabled by default** — new accounts are created by an Admin via **Dashboard → Users**. Authorization uses **Spatie Laravel Permission** with six named roles stored in `App\Enums\UserRole`.
 
 Access is enforced at three layers:
 
@@ -68,8 +70,8 @@ Available without login.
 | FAQ | `/faq` | Frequently asked questions |
 | Contact | `/contact` | Contact form |
 | Blog | `/blog-posts` | News and articles |
-| Certificate verification | `/verify-certificate` | Public certificate lookup |
-| Student portal | `/student/portal` | Public student lookup (search) |
+| Certificate verification | `/verify-certificate` | Public certificate lookup (minimal data; signed download link) |
+| Student portal | `/student/portal` | Exact-match lookup by student ID, email, or phone (no partial search) |
 | Terms of use | `/terms-of-use` | Legal page |
 | Privacy policy | `/privacy-policy` | Legal page |
 | Newsletter subscribe | `POST /newsletter` | Email subscription |
@@ -80,7 +82,7 @@ Locale can be switched via `POST /locale` (Arabic / English).
 
 ### 3.2 Admin dashboard
 
-Requires login. Sidebar sections appear based on role (see [Section 4](#4-roles--permissions)).
+Requires login **and** a Spatie role. Users without any assigned role receive **403** on `/dashboard` and all dashboard/CMS routes (`dashboard.role` middleware).
 
 #### Overview
 
@@ -208,6 +210,7 @@ Roles are defined in `App\Enums\UserRole` and synced via Spatie.
 
 | Middleware | Allowed roles |
 |------------|---------------|
+| `dashboard.role` | Any user with at least one Spatie role |
 | `cms.access` | Admin, Manager, Teacher |
 | `cms.manage` | Admin, Manager |
 | `dashboard.access:content` | Admin, Manager, Content Editor |
@@ -221,7 +224,7 @@ Roles are defined in `App\Enums\UserRole` and synced via Spatie.
 
 Implemented in `App\Services\CmsAuthorizationService`:
 
-1. A teacher profile (`cms_teachers.user_id`) must exist for the logged-in user.
+1. A teacher profile (`cms_teachers.user_id`) must exist for the logged-in user. If missing, the teacher sees an **empty teacher dashboard** (not admin stats).
 2. **Subject IDs** are derived from schedules where `teacher_id` matches.
 3. **Student IDs** are students enrolled in those subjects.
 4. Grade/attendance updates verify enrollment belongs to an allowed subject.
@@ -239,20 +242,39 @@ GET  /about
 GET  /departments
 GET  /faq
 GET  /contact
-POST /contact
+POST /contact                         [throttle: 5/min]
 GET  /blog-posts
-GET  /blog-posts/{slug}
-GET  /verify-certificate
+GET  /blog-posts/{slug}               [published posts only]
+GET  /verify-certificate              [throttle: 30/min]
+GET  /verify-certificate/{number}/download   [signed URL, throttle: 10/min]
 GET  /student/portal
+GET  /student/portal/search           [exact match, min 4 chars, throttle: 20/min]
 GET  /terms-of-use
 GET  /privacy-policy
-POST /newsletter
+POST /newsletter                      [throttle: 10/min]
+GET  /newsletter/unsubscribe/{token}  [throttle: 10/min]
 POST /locale
+
+# SEO (dynamic, from site settings)
+GET  /site.webmanifest
+GET  /robots.txt
+GET  /sitemap.xml
+GET  /browserconfig.xml
+```
+
+### Auth routes
+
+```
+GET  /login
+POST /login
+POST /logout
+GET  /register                        [404 unless AUTH_REGISTRATION_ENABLED=true]
+POST /register                        [404 unless AUTH_REGISTRATION_ENABLED=true]
 ```
 
 ### Authenticated dashboard routes
 
-```
+All routes below require `auth` + `dashboard.role`.
 GET  /dashboard
 GET  /dashboard/my-transcript          [Student]
 
@@ -269,7 +291,8 @@ GET  /dashboard/my-transcript          [Student]
 /dashboard/newsletter/*                [CRM]
 /dashboard/notification-templates/*
 
-POST /uploads/image                    [Upload roles]
+POST /uploads/image                    [Upload roles; folder allowlist]
+DELETE /uploads/image                  [Upload roles; path allowlist]
 ```
 
 ### CMS routes
@@ -377,6 +400,19 @@ Available to Admin/Manager:
 - RTL layout when Arabic is active
 - CMS pages use shared `useCms()` hook and translation files
 
+### Certificate verification (public)
+
+- Search by certificate number at `/verify-certificate`
+- Page shows **public fields only**: student name, course, issue date, issuer
+- PDF download uses a **temporary signed URL** (30 minutes) generated after a successful lookup — direct `/download` without a signature returns 403
+
+### Student portal (public)
+
+- Search requires an **exact match** on student number, email, phone, or full name (minimum 4 characters)
+- Partial searches (e.g. `@gmail.com`) return no results — reduces enumeration
+- Response excludes emails, phones, and payment fields
+- Certificate downloads from portal results also use signed URLs
+
 ---
 
 ## 8. Development
@@ -393,6 +429,8 @@ npm run dev
 # or: composer run dev
 ```
 
+Set `APP_URL` to your local or production URL. Keep `AUTH_REGISTRATION_ENABLED=false` unless you explicitly need open sign-up in a dev environment.
+
 ### Seed data
 
 ```bash
@@ -406,6 +444,8 @@ php artisan db:seed --class=CmsDemoDataSeeder
 ```bash
 php artisan test --compact
 php artisan test --compact tests/Feature/Cms
+php artisan test --compact tests/Feature/SecurityHardeningTest.php
+php artisan test --compact tests/Feature/SeoTest.php
 php artisan test --compact tests/Feature/DashboardRouteAccessTest.php
 ```
 
@@ -420,8 +460,103 @@ php artisan test --compact tests/Feature/DashboardRouteAccessTest.php
 | Dashboard access (frontend) | `resources/js/lib/dashboard-access.ts` |
 | Sidebar navigation | `resources/js/components/app-sidebar.tsx` |
 | Shared CMS capabilities | `app/Http/Middleware/HandleInertiaRequests.php` |
+| SEO service | `app/Services/SiteSeoService.php` |
+| SEO controller | `app/Http/Controllers/SeoController.php` |
+| Public meta tags (React) | `resources/js/components/seo-head.tsx` |
+| HTML sanitization | `app/Support/HtmlSanitizer.php` |
+| Dashboard role gate | `app/Http/Middleware/EnsureHasDashboardRole.php` |
 
 ### Related documentation
 
 - [CMS Technical Specification](../CMS_Technical_Specification.md) — database schema, API details, UI wireframes
 - [Arabic guide](./app-guide.ar.md) — نفس المحتوى بالعربية
+
+---
+
+## 9. SEO & search engines
+
+Dynamic SEO assets are generated from **Dashboard → Site Settings** (site name, meta description, contact info).
+
+| Asset | Route | Description |
+|-------|-------|-------------|
+| Web manifest | `/site.webmanifest` | PWA name, icons, theme color (`#1B365D`), start URL |
+| Robots | `/robots.txt` | Allows public pages; disallows `/dashboard`, `/cms`, auth, student portal |
+| Sitemap | `/sitemap.xml` | Public pages + **published** blog posts only |
+| Browser config | `/browserconfig.xml` | Windows tile color and icons |
+
+### Page-level metadata
+
+Public Inertia pages use `SeoHead` (`resources/js/components/seo-head.tsx`):
+
+- Title, description, canonical URL (absolute, from `APP_URL`)
+- Open Graph and Twitter cards
+- JSON-LD structured data (`EducationalOrganization`, `WebSite`, `Article` on blog posts)
+- Blog posts use `seo_title` / `seo_description` when set in the CMS
+
+Shared Inertia props: `appUrl`, `seo.organization` (from site settings).
+
+### Production requirements
+
+- Set **`APP_URL`** to the live domain — canonical links, sitemap URLs, and social previews depend on it
+- After changing site name or description, verify `/sitemap.xml` and `/site.webmanifest` in production
+
+### Tests
+
+```bash
+php artisan test --compact tests/Feature/SeoTest.php
+```
+
+---
+
+## 10. Security
+
+### Authentication & accounts
+
+| Control | Behavior |
+|---------|----------|
+| Public registration | **Disabled** by default (`AUTH_REGISTRATION_ENABLED=false`). Enable only in `.env` for dev if needed. |
+| Dashboard access | Requires login **and** at least one Spatie role (`dashboard.role` middleware) |
+| Inactive users | `is_active = false` accounts cannot log in |
+| Login rate limit | 5 attempts per email/IP (via `LoginRequest`) |
+
+New staff/student accounts: **Admin → Users → Create** (assign roles there).
+
+### Public endpoints
+
+| Endpoint | Protection |
+|----------|------------|
+| `POST /contact` | Throttle 5/min; reply-to validated as email |
+| `POST /newsletter` | Throttle 10/min |
+| Student portal search | Exact match, min 4 chars, throttle 20/min; minimal JSON response |
+| Certificate verify | Throttle 30/min; no email/phone in page props |
+| Certificate download | Signed URL required; throttle 10/min |
+
+Private areas (`/dashboard`, `/cms`, `/settings`, student portal) also receive `noindex, nofollow` in the root Blade template.
+
+### Content safety
+
+Rich HTML (blog, static pages, newsletter campaigns) is sanitized on save via `HtmlSanitizer`:
+
+- Allowed tags: paragraphs, headings, lists, links, images, basic formatting
+- Strips `onclick`, `style`, `javascript:` URLs
+- JSON-LD output escapes `<` to prevent script breakout
+
+### File uploads
+
+Dashboard image uploads (`POST /uploads/image`):
+
+- Allowed folders: `uploads`, `blog`, `testimonials`, `settings` (server-enforced)
+- Delete restricted to paths matching those folders (no `..`, no arbitrary paths)
+
+### Site settings exposure
+
+Only public-safe keys are shared to every Inertia page (name, tagline, contact, social links, meta description). Internal CMS settings are not included.
+
+### Tests
+
+```bash
+php artisan test --compact tests/Feature/SecurityHardeningTest.php
+php artisan test --compact tests/Feature/Auth
+php artisan test --compact tests/Feature/StudentPortalTest.php
+php artisan test --compact tests/Feature/CertificateVerificationTest.php
+```

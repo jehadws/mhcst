@@ -79,6 +79,21 @@ test('teacher dashboard shows teacher-specific data', function () {
         );
 });
 
+test('teacher without cms profile gets empty teacher dashboard not admin data', function () {
+    Role::firstOrCreate(['name' => UserRole::Teacher->value, 'guard_name' => 'web']);
+
+    $user = User::factory()->create();
+    $user->assignRole(UserRole::Teacher->value);
+
+    $this->actingAs($user)->get('/dashboard')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('dashboardRole', 'teacher')
+            ->where('teacherProfile', null)
+            ->missing('recentStudents')
+        );
+});
+
 test('student role gets student dashboard', function () {
     Role::firstOrCreate(['name' => UserRole::Student->value, 'guard_name' => 'web']);
 

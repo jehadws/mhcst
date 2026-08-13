@@ -104,7 +104,7 @@ class SiteController extends Controller
                 function ($message) use ($adminEmail, $validated) {
                     $message->to($adminEmail)
                         ->subject('Contact Message: '.($validated['subject'] ?? 'Website Inquiry'))
-                        ->replyTo($validated['email'], $validated['name']);
+                        ->replyTo(filter_var($validated['email'], FILTER_VALIDATE_EMAIL) ?: $adminEmail, $validated['name']);
                 }
             );
         } catch (\Throwable $e) {

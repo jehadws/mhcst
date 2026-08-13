@@ -2,14 +2,17 @@ import { SiteLogo } from '@/components/site/site-logo';
 import { useBrandText } from '@/hooks/use-site-settings';
 import { useSite } from '@/context/site-context';
 import { cn } from '@/lib/utils';
+import type { SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ArrowUpLeft, ArrowUpRight, Menu, Moon, Sun, X } from 'lucide-react';
+import { ArrowUpLeft, ArrowUpRight, LayoutDashboard, LogIn, Menu, Moon, Sun, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function SiteHeader() {
   const { t, theme, toggleTheme, toggleLocale, locale, isRTL } = useSite();
   const { brandName, brandSub } = useBrandText();
-  const { url } = usePage();
+  const { url, props } = usePage<SharedData>();
+  const { auth } = props;
+  const canAccessDashboard = Boolean(auth.user && (auth.roles?.length ?? 0) > 0);
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -83,6 +86,23 @@ export function SiteHeader() {
           >
             {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" aria-hidden="true" />}
           </button>
+          {canAccessDashboard ? (
+            <Link
+              href="/dashboard"
+              className="border-hero-foreground/20 text-hero-foreground/85 hover:border-accent hover:text-accent hidden items-center gap-1.5 rounded-md border px-3 py-2 text-sm font-semibold transition-colors sm:inline-flex"
+            >
+              <LayoutDashboard className="size-4" aria-hidden="true" />
+              {t.nav.dashboard}
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="border-hero-foreground/20 text-hero-foreground/85 hover:border-accent hover:text-accent hidden items-center gap-1.5 rounded-md border px-3 py-2 text-sm font-semibold transition-colors sm:inline-flex"
+            >
+              <LogIn className="size-4" aria-hidden="true" />
+              {t.nav.login}
+            </Link>
+          )}
           <Link
             href="/contact"
             className="bg-accent text-accent-foreground inline-flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-bold transition-transform hover:-translate-y-0.5"
@@ -123,6 +143,27 @@ export function SiteHeader() {
                 </Link>
               </li>
             ))}
+            <li className="border-hero-foreground/10 mt-2 border-t pt-2">
+              {canAccessDashboard ? (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setOpen(false)}
+                  className="text-hero-foreground/85 hover:text-accent flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-semibold transition-colors hover:bg-white/5"
+                >
+                  <LayoutDashboard className="size-4" aria-hidden="true" />
+                  {t.nav.dashboard}
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setOpen(false)}
+                  className="text-hero-foreground/85 hover:text-accent flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-semibold transition-colors hover:bg-white/5"
+                >
+                  <LogIn className="size-4" aria-hidden="true" />
+                  {t.nav.login}
+                </Link>
+              )}
+            </li>
           </ul>
         </nav>
       )}

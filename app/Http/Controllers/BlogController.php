@@ -22,7 +22,7 @@ class BlogController extends Controller
     public function show(string $slug): Response
     {
         $post = BlogPost::where('slug', $slug)
-            ->orWhere('id', $slug)
+            ->where('status', 'published')
             ->firstOrFail();
 
         $related = BlogPost::where('status', 'published')

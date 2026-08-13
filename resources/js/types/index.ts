@@ -24,6 +24,11 @@ export interface NavItem {
 
 export interface SharedData {
     name: string;
+    appUrl: string;
+    seo?: {
+        themeColor: string;
+        organization: Record<string, unknown>;
+    };
     quote: { message: string; author: string };
     auth: Auth;
     cmsCapabilities?: { canManage: boolean; isTeacher: boolean };

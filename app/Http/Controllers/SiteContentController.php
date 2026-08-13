@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SiteContent;
+use App\Support\HtmlSanitizer;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -39,7 +40,10 @@ class SiteContentController extends Controller
             'content' => ['required', 'string'],
         ]);
 
-        $content->update($data);
+        $content->update([
+            'title' => HtmlSanitizer::plainText($data['title']),
+            'content' => HtmlSanitizer::clean($data['content']),
+        ]);
 
         return back();
     }

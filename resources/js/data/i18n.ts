@@ -18,6 +18,8 @@ export const dictionary = {
             faq: 'FAQ',
             contact: 'Contact',
             enroll: 'Enroll now',
+            login: 'Log in',
+            dashboard: 'Dashboard',
         },
         hero: {
             locationTag: 'Libya · Est. 2010',
@@ -312,6 +314,7 @@ export const dictionary = {
             paymentMethods: 'Payment methods',
             bankTransfer: 'Bank transfer',
             privacy: 'Privacy policy',
+            terms: 'Terms of use',
         },
         newsletter: {
             title: 'Subscribe to our newsletter',
@@ -1380,6 +1383,8 @@ export const dictionary = {
             faq: 'الأسئلة الشائعة',
             contact: 'تواصل معنا',
             enroll: 'سجّل الآن',
+            login: 'تسجيل الدخول',
+            dashboard: 'لوحة التحكم',
         },
         hero: {
             locationTag: 'ليبيا · تأسست ۲۰۱۰',
@@ -1674,6 +1679,7 @@ export const dictionary = {
             paymentMethods: 'طرق الدفع المتوفرة',
             bankTransfer: 'التحويل البنكي',
             privacy: 'سياسة الخصوصية',
+            terms: 'شروط الاستخدام',
         },
         newsletter: {
             title: 'اشترك في نشرتنا البريدية',

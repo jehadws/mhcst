@@ -8,8 +8,6 @@ import { useState } from 'react';
 interface TrainingEnrollment {
   id: number;
   full_name: string;
-  email: string;
-  phone: string;
   status: string;
   created_at: string;
   course?: {
@@ -17,13 +15,9 @@ interface TrainingEnrollment {
     title_en?: string;
     slug: string;
   };
-  student?: {
-    full_name: string;
-    email?: string;
-  };
   certificate?: {
-    id: number;
     certificate_number: string;
+    download_url?: string;
   };
 }
 
@@ -31,7 +25,6 @@ interface AcademicStudent {
   id: number;
   student_no: string;
   name: string;
-  email: string;
   status: string;
   department?: string;
   level?: string;
@@ -181,7 +174,7 @@ export default function StudentPortal() {
                               <div>
                                 <div className="mb-2">{statusBadge(student.status)}</div>
                                 <h4 className="text-lg font-bold">{student.name}</h4>
-                                <p className="text-muted-foreground text-sm">{student.student_no} · {student.email}</p>
+                                <p className="text-muted-foreground text-sm">{student.student_no}</p>
                                 {student.department && (
                                   <p className="text-sm mt-2">{student.department}{student.level ? ` · ${student.level}` : ''}</p>
                                 )}
@@ -210,8 +203,7 @@ export default function StudentPortal() {
                         </h3>
                         {trainingEnrollments.map((enr) => {
                           const courseName = courseTitle(enr.course, locale);
-                          const learnerName = enr.student?.full_name || enr.full_name;
-                          const learnerEmail = enr.student?.email || enr.email;
+                          const learnerName = enr.full_name;
 
                           return (
                             <div key={`training-${enr.id}`} className="border-border bg-card overflow-hidden rounded-2xl border p-6 shadow-sm">
@@ -223,12 +215,12 @@ export default function StudentPortal() {
                                   </div>
                                   <h4 className="text-foreground font-serif text-lg font-bold">{courseName}</h4>
                                   <p className="text-muted-foreground text-xs">
-                                    {locale === 'ar' ? 'المتدرب:' : 'Learner:'} {learnerName} ({learnerEmail})
+                                    {locale === 'ar' ? 'المتدرب:' : 'Learner:'} {learnerName}
                                   </p>
                                 </div>
-                                {enr.certificate && (
+                                {enr.certificate?.download_url && (
                                   <a
-                                    href={`/verify-certificate/${enr.certificate.certificate_number}/download`}
+                                    href={enr.certificate.download_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white shadow transition-colors hover:bg-emerald-700"

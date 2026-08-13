@@ -18,6 +18,9 @@ export interface NewsPost {
   excerpt_en?: string;
   cover_image?: string;
   published_at?: string;
+  updated_at?: string;
+  seo_title?: string;
+  seo_description?: string;
   category?: string;
 }
 
@@ -27,6 +30,14 @@ export function newsTitle(post: NewsPost): string {
 
 export function newsExcerpt(post: NewsPost): string {
   return post.excerpt || post.excerpt_ar || post.excerpt_en || '';
+}
+
+export function newsSeoTitle(post: NewsPost): string {
+  return post.seo_title || newsTitle(post);
+}
+
+export function newsSeoDescription(post: NewsPost): string {
+  return post.seo_description || newsExcerpt(post);
 }
 
 export function newsImage(post: NewsPost, index = 0): string {

@@ -7,6 +7,7 @@ use App\Http\Requests\StoreNewsletterSubscriberRequest;
 use App\Jobs\SendNewsletterCampaign;
 use App\Models\NewsletterCampaign;
 use App\Models\NewsletterSubscriber;
+use App\Support\HtmlSanitizer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -100,8 +101,12 @@ class NewsletterController extends Controller
 
     public function campaignsStore(StoreNewsletterCampaignRequest $request): RedirectResponse
     {
+        $validated = $request->validated();
+
         $campaign = NewsletterCampaign::create([
-            ...$request->validated(),
+            'subject' => $validated['subject'],
+            'content' => HtmlSanitizer::clean($validated['content']),
+            'status' => 'draft',
             'sent_by' => Auth::id(),
         ]);
 
@@ -135,7 +140,10 @@ class NewsletterController extends Controller
             return back()->with('error', 'Only draft campaigns can be edited.');
         }
 
-        $campaign->update($request->validated());
+        $campaign->update([
+            'subject' => $request->validated('subject'),
+            'content' => HtmlSanitizer::clean($request->validated('content')),
+        ]);
 
         return to_route('dashboard.newsletter.campaigns.show', $campaign)
             ->with('success', 'Campaign updated successfully.');
@@ -168,11 +176,14 @@ class NewsletterController extends Controller
 
     public function bulkActions(Request $request): RedirectResponse
     {
-        $action = $request->input('action');
-        $entries = $request->input('entries', []);
+        $validated = $request->validate([
+            'action' => ['required', 'string', 'in:delete_selected'],
+            'entries' => ['required', 'array'],
+            'entries.*' => ['integer', 'exists:newsletter_subscribers,id'],
+        ]);
 
-        if ($action === 'delete_selected') {
-            NewsletterSubscriber::whereIn('id', $entries)->delete();
+        if ($validated['action'] === 'delete_selected') {
+            NewsletterSubscriber::whereIn('id', $validated['entries'])->delete();
         }
 
         return to_route('dashboard.newsletter.list');
