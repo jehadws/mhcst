@@ -160,26 +160,25 @@ In cPanel → Cron Jobs, add one job running every minute:
 * * * * * php /home/<cpanel-user>/artisan schedule:run >> /dev/null 2>&1
 ```
 
-In `app/Console/Kernel.php`, register the queue worker to run via the scheduler (since a
-persistent `queue:work` daemon isn't available on shared hosting):
+The queue worker is already registered in `bootstrap/app.php` via `->withSchedule()`:
 
 ```php
-$schedule->command('queue:work --stop-when-empty --max-time=50')
-         ->everyMinute()
-         ->withoutOverlapping();
+->withSchedule(function (Schedule $schedule): void {
+    $schedule->command('queue:work --stop-when-empty --max-time=50')
+        ->everyMinute()
+        ->withoutOverlapping();
+})
 ```
 
-This processes queued notification emails (new registration, new contact message, etc.)
-roughly every minute — acceptable latency for admin/instructor email alerts.
+This processes queued jobs (newsletter campaigns, etc.) roughly every minute — acceptable
+latency on shared hosting where a persistent `queue:work` daemon is not available.
 
 ---
 
 ## 8. Post-deploy checklist
 
 - [ ] Visit the site — confirm no 500 errors, `APP_DEBUG=false` confirmed (no stack traces)
-- [ ] Submit a test contact-us message → confirm it lands in DB and triggers admin email
-      within ~1 minute (cron cadence)
-- [ ] Register a test student on a test course → confirm instructor + admin notification fires
+- [ ] Submit a test contact-us message → confirm it appears under **Dashboard → CRM → Leads** and admin email arrives (if SMTP configured)
 - [ ] Confirm `storage:link` worked — an uploaded course image loads correctly
 - [ ] Confirm SSL is active (padlock, no mixed-content warnings)
 - [ ] Confirm `.env` and `vendor/` are NOT web-accessible (try hitting

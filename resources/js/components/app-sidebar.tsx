@@ -13,6 +13,7 @@ import {
     FileText,
     GraduationCap,
     HelpCircle,
+    Inbox,
     LayoutGrid,
     MailPlus,
     Presentation,
@@ -80,6 +81,7 @@ export function AppSidebar() {
                     label={sidebar.overview}
                     items={[
                         { title: sidebar.items.dashboard, url: '/dashboard', icon: LayoutGrid },
+                        { title: sidebar.items.systemGuide, url: '/dashboard/guide', icon: BookOpen },
                     ]}
                 />
 
@@ -94,9 +96,11 @@ export function AppSidebar() {
                     <NavMain
                         label={sidebar.crm}
                         items={[
-                            { title: sidebar.items.newsletter, url: '/dashboard/newsletter/list', icon: MailPlus },
+                            { title: sidebar.items.leads, url: '/dashboard/leads/list', icon: Inbox },
+                            { title: sidebar.items.newsletter, url: '/dashboard/newsletter/list', icon: Send },
                             { title: sidebar.items.newsletterCampaigns, url: '/dashboard/newsletter/campaigns/list', icon: Send },
                             { title: c.nav.notificationTemplates, url: '/dashboard/notification-templates/list', icon: Bell },
+                            { title: sidebar.items.notificationLogs, url: '/dashboard/notification-logs/list', icon: ScrollText },
                         ]}
                     />
                 )}

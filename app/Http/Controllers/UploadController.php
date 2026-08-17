@@ -10,7 +10,15 @@ use Illuminate\Validation\Rule;
 class UploadController extends Controller
 {
     /** @var list<string> */
-    private const ALLOWED_FOLDERS = ['uploads', 'blog', 'testimonials', 'settings'];
+    private const ALLOWED_FOLDERS = [
+        'uploads',
+        'blog',
+        'testimonials',
+        'settings',
+        'banners',
+        'courses',
+        'instructors',
+    ];
 
     public function store(Request $request)
     {

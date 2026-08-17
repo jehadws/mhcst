@@ -16,9 +16,12 @@ use App\Http\Controllers\Cms\CmsStudentController;
 use App\Http\Controllers\Cms\CmsSubjectController;
 use App\Http\Controllers\Cms\CmsTeacherController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardGuideController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\LeadController;
 use App\Http\Controllers\MyTranscriptController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\NotificationLogController;
 use App\Http\Controllers\NotificationTemplateController;
 use App\Http\Controllers\SeoController;
 use App\Http\Controllers\SiteContentController;
@@ -71,6 +74,7 @@ Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'uns
 
 Route::middleware(['auth', 'dashboard.role'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard/guide', [DashboardGuideController::class, 'index'])->name('dashboard.guide');
     Route::get('dashboard/my-transcript', MyTranscriptController::class)
         ->middleware('dashboard.access:student')
         ->name('dashboard.my-transcript');
@@ -136,6 +140,13 @@ Route::middleware(['auth', 'dashboard.role'])->group(function () {
     });
 
     Route::middleware(['dashboard.access:crm'])->group(function () {
+        Route::get('dashboard/leads/list', [LeadController::class, 'index'])->name('dashboard.leads.list');
+        Route::get('dashboard/leads/{lead}', [LeadController::class, 'show'])->name('dashboard.leads.show');
+        Route::put('dashboard/leads/{lead}', [LeadController::class, 'update'])->name('dashboard.leads.update');
+        Route::delete('dashboard/leads/{lead}', [LeadController::class, 'destroy'])->name('dashboard.leads.destroy');
+
+        Route::get('dashboard/notification-logs/list', [NotificationLogController::class, 'index'])->name('dashboard.notification-logs.list');
+
         Route::get('dashboard/notification-templates/list', [NotificationTemplateController::class, 'index'])->name('dashboard.notification-templates.list');
         Route::get('dashboard/notification-templates/create', [NotificationTemplateController::class, 'create'])->name('dashboard.notification-templates.create');
         Route::get('dashboard/notification-templates/{notificationTemplate}/edit', [NotificationTemplateController::class, 'edit'])->name('dashboard.notification-templates.edit');

@@ -7,6 +7,7 @@ use App\Models\CmsDepartment;
 use App\Models\CmsStudent;
 use App\Models\CmsTeacher;
 use App\Models\Faq;
+use App\Models\Lead;
 use App\Models\SiteSetting;
 use App\Models\Testimonial;
 use Illuminate\Http\RedirectResponse;
@@ -93,6 +94,12 @@ class SiteController extends Controller
             'message' => 'required|string|max:2000',
         ]);
 
+        Lead::create([
+            ...$validated,
+            'type' => 'contact',
+            'status' => 'new',
+        ]);
+
         $adminEmail = SiteSetting::where('key', 'contact_email')->value('value') ?: 'info@mhcst.ly';
 
         try {
@@ -112,15 +119,5 @@ class SiteController extends Controller
         }
 
         return back()->with('success', 'تم ارسال رسالتك بنجاح! سنقوم بالتواصل معك في أقرب وقت.');
-    }
-
-    public function privacy(): Response
-    {
-        return Inertia::render('site/privacy');
-    }
-
-    public function terms(): Response
-    {
-        return Inertia::render('site/terms');
     }
 }

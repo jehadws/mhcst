@@ -2,7 +2,7 @@ import { SeoHead } from '@/components/seo-head';
 import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import { useSite } from '@/context/site-context';
-import { Link, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { Award, BadgeCheck, Calendar, CheckCircle2, FileBadge, Search, ShieldCheck, User, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
@@ -184,13 +184,7 @@ export default function VerifyCertificate({ number = '', certificate = null, not
                         <Award className="size-3.5" />
                         <span>{locale === 'ar' ? 'اسم الدورة' : 'Course Name'}</span>
                       </div>
-                      {certificate.course?.slug ? (
-                        <Link href={`/courses/${certificate.course.slug}`} className="text-primary mt-1.5 block font-semibold hover:underline">
-                          {courseTitle}
-                        </Link>
-                      ) : (
-                        <p className="text-foreground mt-1.5 font-semibold">{courseTitle}</p>
-                      )}
+                      <p className="text-foreground mt-1.5 font-semibold">{courseTitle}</p>
                     </div>
                     <div className="border-border/80 bg-background rounded-2xl border p-5">
                       <div className="text-muted-foreground flex items-center gap-2 text-xs">
