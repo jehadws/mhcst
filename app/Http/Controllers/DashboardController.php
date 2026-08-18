@@ -250,8 +250,8 @@ class DashboardController extends Controller
     private function monthlyTotals($query, CarbonImmutable $now): array
     {
         $select = [
-            DB::raw("strftime('%Y', created_at) as year"),
-            DB::raw("strftime('%m', created_at) as month"),
+            DB::raw('YEAR(created_at) as year'),
+            DB::raw('MONTH(created_at) as month'),
             DB::raw('COUNT(*) as value'),
         ];
 
