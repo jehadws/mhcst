@@ -18,11 +18,11 @@ class LeadFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->safeEmail(),
-            'phone' => fake()->optional()->numerify('09########'),
-            'subject' => fake()->optional()->sentence(4),
-            'message' => fake()->paragraph(),
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->optional()->numerify('09########'),
+            'subject' => $this->faker->optional()->sentence(4),
+            'message' => $this->faker->paragraph(),
             'type' => 'contact',
             'status' => 'new',
         ];

@@ -18,12 +18,12 @@ class NewsletterSubscriberFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
             'is_active' => true,
             'subscribed_at' => now(),
             'unsubscribed_at' => null,
-            'unsubscribe_token' => fake()->unique()->regexify('[A-Za-z0-9]{32}'),
+            'unsubscribe_token' => $this->faker->unique()->regexify('[A-Za-z0-9]{32}'),
         ];
     }
 

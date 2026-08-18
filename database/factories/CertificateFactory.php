@@ -23,19 +23,19 @@ class CertificateFactory extends Factory
     public function definition(): array
     {
         $student = Student::create([
-            'full_name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'phone' => fake()->numerify('09########'),
+            'full_name' => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
+            'phone' => $this->faker->numerify('09########'),
         ]);
 
         $course = Course::create([
             'created_by' => User::factory()->create()->id,
             'category_id' => Category::factory()->create()->id,
-            'title_ar' => fake()->word(),
-            'title_en' => fake()->word(),
-            'slug' => fake()->unique()->slug(),
-            'level' => fake()->randomElement(['beginner', 'intermediate', 'advanced']),
-            'price' => fake()->randomFloat(2, 100, 1000),
+            'title_ar' => $this->faker->word(),
+            'title_en' => $this->faker->word(),
+            'slug' => $this->faker->unique()->slug(),
+            'level' => $this->faker->randomElement(['beginner', 'intermediate', 'advanced']),
+            'price' => $this->faker->randomFloat(2, 100, 1000),
             'status' => 'published',
         ]);
 
@@ -56,8 +56,8 @@ class CertificateFactory extends Factory
             'enrollment_id' => $enrollment->id,
             'student_id' => $student->id,
             'course_id' => $course->id,
-            'certificate_number' => 'MHCST-'.fake()->year().'-'.str_pad((string) fake()->unique()->numberBetween(1, 99999), 5, '0', STR_PAD_LEFT),
-            'file_path' => 'certificates/'.fake()->slug().'.pdf',
+            'certificate_number' => 'MHCST-'.$this->faker->year().'-'.str_pad((string) $this->faker->unique()->numberBetween(1, 99999), 5, '0', STR_PAD_LEFT),
+            'file_path' => 'certificates/'.$this->faker->slug().'.pdf',
             'issued_at' => now(),
             'issued_by' => User::factory(),
         ];

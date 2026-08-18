@@ -19,8 +19,8 @@ class NewsletterCampaignFactory extends Factory
     public function definition(): array
     {
         return [
-            'subject' => fake()->sentence(6),
-            'content' => '<h1>'.fake()->sentence().'</h1><p>'.fake()->paragraph().'</p>',
+            'subject' => $this->faker->sentence(6),
+            'content' => '<h1>'.$this->faker->sentence().'</h1><p>'.$this->faker->paragraph().'</p>',
             'status' => 'draft',
             'sent_by' => User::factory(),
             'sent_at' => null,
