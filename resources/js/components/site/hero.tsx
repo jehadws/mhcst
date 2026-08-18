@@ -8,7 +8,7 @@ export function Hero() {
 
   return (
     <section className="relative flex min-h-screen items-end overflow-hidden">
-      <img src="/images/campus-aerial.png" alt={t.hero.imageAlt} className="absolute inset-0 size-full object-cover" />
+      <img src="/banner.jpg" alt={t.hero.imageAlt} className="absolute inset-0 size-full object-cover" />
       <div className="from-hero via-hero/70 to-hero/40 absolute inset-0 bg-gradient-to-t" />
       <div className="bg-hero/30 absolute inset-0" />
 

@@ -8,7 +8,7 @@ import { Testimonials } from '@/components/site/testimonials';
 import { useSite } from '@/context/site-context';
 import { Award, Eye, GraduationCap, Lightbulb, ShieldCheck, Target, Users } from 'lucide-react';
 
-const CAMPUS_IMAGE = '/images/campus-aerial.png';
+const CAMPUS_IMAGE = '/banner.jpg';
 
 interface Props {
   testimonials?: Array<Record<string, unknown>>;

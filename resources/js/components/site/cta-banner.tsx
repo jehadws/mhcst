@@ -10,7 +10,7 @@ export function CtaBanner() {
     <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
       <div className="bg-hero shadow-lg shadow-black/20 relative overflow-hidden rounded-3xl px-6 py-16 text-center sm:px-12">
         <img
-          src="/images/campus-aerial.png"
+          src="/banner.jpg"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 size-full object-cover opacity-15"
