@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('status', ['active', 'dropped', 'completed'])->default('active');
             $table->timestamps();
 
-            $table->unique(['student_id', 'subject_id', 'academic_year', 'semester']);
+            $table->unique(['student_id', 'subject_id', 'academic_year', 'semester'], 'cms_enrollments_unique');
         });
     }
 
