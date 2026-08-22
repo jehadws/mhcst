@@ -20,7 +20,7 @@ export function PageHero({ title, description, crumbs = [] }: PageHeroProps) {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-[0.15]"
         style={{
-          backgroundImage: 'url(/banner.jpg)',
+          backgroundImage: 'url(/banner.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

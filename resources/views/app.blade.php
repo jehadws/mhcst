@@ -50,8 +50,8 @@
             body { margin: 0; font-family: 'Tajawal', 'Cairo', system-ui, sans-serif; }
         </style>
 
-        {{-- LCP image: the hero banner behind the headline (hero.tsx <img src="/banner.jpg">) --}}
-        <link rel="preload" as="image" href="/banner.jpg" fetchpriority="high">
+        {{-- LCP image: the hero banner behind the headline (hero.tsx <img src="/banner.webp">) --}}
+        <link rel="preload" as="image" href="/banner.webp" fetchpriority="high">
 
         {{-- Hero-critical web fonts (Tajawal 800 renders the h1); remaining faces load via CSS on demand --}}
         <link rel="preload" as="font" type="font/woff2" href="/fonts/tajawal-v1-arabic-800.woff2" crossorigin>

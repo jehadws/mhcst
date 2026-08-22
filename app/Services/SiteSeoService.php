@@ -126,7 +126,7 @@ class SiteSeoService
     public function organizationSchema(): array
     {
         $name = (string) SiteSetting::get('site_name', config('app.name'));
-        $logo = SiteLogo::url(SiteSetting::get('site_logo'), '/images/og-logo.png');
+        $logo = SiteLogo::url(SiteSetting::get('site_logo'), '/images/og-logo.webp');
         $socialLinks = SiteSetting::get('social_links', []);
         $sameAs = is_array($socialLinks)
             ? array_values(array_filter($socialLinks, fn ($url) => is_string($url) && $url !== ''))

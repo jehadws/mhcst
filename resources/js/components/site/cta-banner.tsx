@@ -10,7 +10,7 @@ export function CtaBanner() {
     <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
       <div className="bg-hero shadow-lg shadow-black/20 relative overflow-hidden rounded-3xl px-6 py-16 text-center sm:px-12">
         <img
-          src="/banner.jpg"
+          src="/banner.webp"
           alt=""
           aria-hidden="true"
           loading="lazy"

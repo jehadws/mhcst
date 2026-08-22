@@ -1,8 +1,8 @@
 export const NEWS_FALLBACK_IMAGES = [
-  '/images/news-forum.png',
-  '/images/news-partnership.png',
-  '/images/news-volunteer.png',
-  '/images/college-health.png',
+  '/images/news-forum.webp',
+  '/images/news-partnership.webp',
+  '/images/news-volunteer.webp',
+  '/images/college-health.webp',
 ];
 
 export type NewsTagKey = 'events' | 'partnerships' | 'academic' | 'community';

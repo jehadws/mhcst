@@ -44,7 +44,7 @@ export function About({ stats }: AboutProps) {
         <div className="order-1 lg:order-2">
           <div className="border-border bg-hero shadow-lg shadow-black/15 relative overflow-hidden rounded-3xl border p-8">
             <img
-              src="/banner.jpg"
+              src="/banner.webp"
               alt={t.campus.title}
               loading="lazy"
               decoding="async"

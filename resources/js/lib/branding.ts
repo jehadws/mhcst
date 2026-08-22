@@ -11,7 +11,7 @@ export const brandingAssets = {
     /** Black canvas — social previews; prefer `main` on the live site */
     rounded: '/images/branding/logo-rounded.png',
     /** Open Graph / social square preview */
-    og: '/images/og-logo.png',
+    og: '/images/og-logo.webp',
 } as const;
 
 /** Recommended display heights in the UI (CSS), not file dimensions */

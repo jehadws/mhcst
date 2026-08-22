@@ -43,7 +43,7 @@ Generated from the master logo in `public/`:
 | `android-chrome-192x192.png` | 192×192 | Android / PWA |
 | `android-chrome-512x512.png` | 512×512 | Android splash / PWA |
 | `logo.png` | 256×256 | Generic fallback (ID cards, legacy code) |
-| `images/og-logo.png` | 512×512 | Social preview default |
+| `images/og-logo.webp` | 512×512 | Social preview default |
 
 **Which of your two originals?**
 

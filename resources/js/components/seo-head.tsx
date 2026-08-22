@@ -64,7 +64,7 @@ export function SeoHead({
     const metaDescription = description || defaultDesc;
     const canonicalPath = url || page.url.split('?')[0] || '/';
     const canonicalUrl = absoluteUrl(canonicalPath, appUrl);
-    const ogImage = absoluteUrl(image || '/images/og-logo.png', appUrl);
+    const ogImage = absoluteUrl(image || '/images/og-logo.webp', appUrl);
 
     const structuredData: Record<string, unknown>[] = [];
 

@@ -20,7 +20,7 @@ const FALLBACK_DEPARTMENTS = [
       en: 'Bachelor programs in software engineering, networks, and information systems.',
       ar: 'برامج بكالوريوس في هندسة البرمجيات والشبكات ونظم المعلومات.',
     },
-    image: '/images/college-medicine.png',
+    image: '/images/college-medicine.webp',
     links: [{ en: 'Software Engineering', ar: 'هندسة البرمجيات' }],
   },
   {
@@ -30,7 +30,7 @@ const FALLBACK_DEPARTMENTS = [
       en: 'Programs in management, accounting, and entrepreneurship.',
       ar: 'برامج في الإدارة والمحاسبة وريادة الأعمال.',
     },
-    image: '/images/college-nursing.png',
+    image: '/images/college-nursing.webp',
     links: [{ en: 'Management', ar: 'الإدارة' }],
   },
   {
@@ -40,7 +40,7 @@ const FALLBACK_DEPARTMENTS = [
       en: 'Applied engineering programs with practical lab training.',
       ar: 'برامج هندسية تطبيقية مع تدريب عملي في المعامل.',
     },
-    image: '/images/college-health.png',
+    image: '/images/college-health.webp',
     links: [{ en: 'Civil Engineering', ar: 'الهندسة المدنية' }],
   },
 ];
