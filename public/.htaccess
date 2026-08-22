@@ -19,3 +19,96 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# ─────────────────────────────────────────────────────────────────────
+# Compression — Brotli when available, gzip fallback (cPanel-safe).
+# Text formats only; woff2/images are already compressed and excluded.
+# ─────────────────────────────────────────────────────────────────────
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/xml text/javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/javascript application/x-javascript application/ecmascript
+    AddOutputFilterByType BROTLI_COMPRESS application/json application/manifest+json
+    AddOutputFilterByType BROTLI_COMPRESS application/xml application/rss+xml application/vnd.ms-fontobject
+    AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/ecmascript
+    AddOutputFilterByType DEFLATE application/json application/manifest+json
+    AddOutputFilterByType DEFLATE application/xml application/rss+xml application/vnd.ms-fontobject
+    AddOutputFilterByType DEFLATE image/svg+xml
+
+    # Browser-specific compression quirks (legacy clients)
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+    BrowserMatch \bMSIE\s(7|8) !no-gzip !gzip-only-text/html
+</IfModule>
+
+# Prevent intermediaries from serving the wrong encoded variant
+<IfModule mod_headers.c>
+    Header append Vary Accept-Encoding
+</IfModule>
+
+# ─────────────────────────────────────────────────────────────────────
+# Caching strategy
+#   - /build/assets/* (Vite content-hashed) → 1 year, immutable
+#   - Self-hosted fonts (versioned filenames) → 1 year, immutable
+#   - Media (png/jpg/webp/svg/ico) → 7 days + stale-while-revalidate
+#   - site.webmanifest → 1 day
+#   - HTML / JSON / XML (all Laravel responses) → always revalidate
+# ─────────────────────────────────────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    ExpiresDefault                          "access plus 0 seconds"
+
+    # Never cache dynamic documents
+    ExpiresByType text/html                 "access plus 0 seconds"
+    ExpiresByType application/json          "access plus 0 seconds"
+    ExpiresByType application/xml           "access plus 0 seconds"
+    ExpiresByType text/xml                  "access plus 0 seconds"
+
+    # Hashed build assets + versioned fonts: effectively permanent
+    ExpiresByType text/css                  "access plus 1 year"
+    ExpiresByType application/javascript    "access plus 1 year"
+    ExpiresByType text/javascript           "access plus 1 year"
+    ExpiresByType font/woff2                "access plus 1 year"
+    ExpiresByType font/woff                 "access plus 1 year"
+
+    # Media
+    ExpiresByType image/png                 "access plus 1 week"
+    ExpiresByType image/jpeg                "access plus 1 week"
+    ExpiresByType image/webp                "access plus 1 week"
+    ExpiresByType image/gif                 "access plus 1 week"
+    ExpiresByType image/svg+xml             "access plus 1 week"
+    ExpiresByType image/x-icon              "access plus 1 week"
+    ExpiresByType image/vnd.microsoft.icon  "access plus 1 week"
+
+    # Web manifest
+    ExpiresByType application/manifest+json "access plus 1 day"
+</IfModule>
+
+<IfModule mod_headers.c>
+    # Immutable: Vite content-hashed bundles + versioned font files
+    <FilesMatch "\.(css|js|mjs|woff2?)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # Media: one week, serve stale briefly while revalidating in background
+    <FilesMatch "\.(png|jpe?g|gif|webp|avif|ico|svg)$">
+        Header set Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
+    </FilesMatch>
+
+    # Web manifest (static file or route fallback)
+    <FilesMatch "\.webmanifest$">
+        Header set Cache-Control "public, max-age=86400"
+    </FilesMatch>
+
+    # Documents rendered by the front controller: always revalidate.
+    # After Laravel's internal rewrite the served file is index.php, so this
+    # covers every clean-URL HTML/JSON/XML response without touching statics.
+    <FilesMatch "\.(html|php)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+</IfModule>

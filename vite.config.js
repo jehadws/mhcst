@@ -18,4 +18,17 @@ export default defineConfig({
     esbuild: {
         jsx: 'automatic',
     },
+    build: {
+        rollupOptions: {
+            output: {
+                // Merge per-icon micro-chunks (0.2-1KB each, ~20 requests over
+                // HTTP/1.1) into one tree-shaken chunk. Only used icons are kept.
+                manualChunks(id) {
+                    if (id.includes('node_modules/lucide-react')) {
+                        return 'icons';
+                    }
+                },
+            },
+        },
+    },
 });

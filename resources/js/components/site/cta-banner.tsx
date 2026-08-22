@@ -13,6 +13,8 @@ export function CtaBanner() {
           src="/banner.jpg"
           alt=""
           aria-hidden="true"
+          loading="lazy"
+          decoding="async"
           className="absolute inset-0 size-full object-cover opacity-15"
         />
         <div className="relative">

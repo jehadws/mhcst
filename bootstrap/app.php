@@ -23,6 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('queue:work --stop-when-empty --max-time=50')
             ->everyMinute()
             ->withoutOverlapping();
+
+        // Keep public/site.webmanifest, robots.txt and browserconfig.xml fresh
+        // so they are served as static files instead of hitting PHP.
+        $schedule->command('seo:generate-static')->daily();
     })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [

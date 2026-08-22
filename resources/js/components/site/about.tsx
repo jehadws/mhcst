@@ -46,6 +46,8 @@ export function About({ stats }: AboutProps) {
             <img
               src="/banner.jpg"
               alt={t.campus.title}
+              loading="lazy"
+              decoding="async"
               className="absolute inset-0 size-full object-cover opacity-25"
             />
             <div className="relative flex flex-col items-start gap-2 text-start">

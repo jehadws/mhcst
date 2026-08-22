@@ -249,9 +249,13 @@ class DashboardController extends Controller
 
     private function monthlyTotals($query, CarbonImmutable $now): array
     {
+        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+        $yearExpr = $isSqlite ? "CAST(strftime('%Y', created_at) AS INTEGER)" : 'YEAR(created_at)';
+        $monthExpr = $isSqlite ? "CAST(strftime('%m', created_at) AS INTEGER)" : 'MONTH(created_at)';
+
         $select = [
-            DB::raw('YEAR(created_at) as year'),
-            DB::raw('MONTH(created_at) as month'),
+            DB::raw("$yearExpr as year"),
+            DB::raw("$monthExpr as month"),
             DB::raw('COUNT(*) as value'),
         ];
 
