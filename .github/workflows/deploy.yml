@@ -29,7 +29,7 @@ jobs:
     steps:
       # ── 1. Checkout the exact commit being deployed ────────────────
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       # ── 2. Build stage: production dependencies + compiled assets ──
       - name: Set up PHP 8.2
@@ -42,7 +42,7 @@ jobs:
         run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
       - name: Set up Node 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
           cache: npm
