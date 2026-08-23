@@ -17,6 +17,7 @@ use App\Http\Controllers\Cms\CmsSubjectController;
 use App\Http\Controllers\Cms\CmsTeacherController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardGuideController;
+use App\Http\Controllers\DeployRunController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\MyTranscriptController;
@@ -38,6 +39,9 @@ Route::get('/site.webmanifest', [SeoController::class, 'manifest'])->name('seo.m
 Route::get('/robots.txt', [SeoController::class, 'robots'])->name('seo.robots');
 Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('seo.sitemap');
 Route::get('/browserconfig.xml', [SeoController::class, 'browserConfig'])->name('seo.browserconfig');
+
+// Post-deploy hook (FTP deploys cannot run artisan directly) — token-guarded.
+Route::get('/deploy/run', DeployRunController::class)->name('deploy.run');
 
 Route::get('/', [SiteController::class, 'home'])->name('home');
 Route::get('/about', [SiteController::class, 'about'])->name('about');

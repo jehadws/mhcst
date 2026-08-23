@@ -127,4 +127,15 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |----------------------------------------------------------------------
+    | Deploy hook token
+    |----------------------------------------------------------------------
+    | Shared-hosting deploys upload files via FTP, which cannot run artisan
+    | commands. The CI pipeline finishes by calling GET /deploy/run?token=...
+    | on the live site, which runs migrations/caches. This random token is
+    | what authorizes that call — keep it long and secret.
+    */
+    'deploy_token' => env('DEPLOY_TOKEN'),
+
 ];

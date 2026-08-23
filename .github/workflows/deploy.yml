@@ -1,13 +1,15 @@
 # ─────────────────────────────────────────────────────────────────────
-# Production deploy — Libyan Spider cPanel shared hosting (SSH + rsync)
+# Production deploy — Libyan Spider cPanel shared hosting via FTPS
 #
-# Flow: push to main → build (composer --no-dev + vite) → rsync code to
-# ~/app and built assets to ~/public_html → migrate/caches/queue restart.
+# The host's firewall blocks inbound SSH from GitHub runners, so this
+# workflow uploads files over FTPS instead. Because FTP cannot execute
+# commands, post-deploy tasks (migrate/caches) run through the token-
+# protected GET /deploy/run hook on the live site (DeployRunController).
 #
 # Server layout (matches deploy.md):
 #   /home/<user>/app           ← Laravel app root (this repo minus public/)
 #   /home/<user>/public_html   ← Laravel public/ (docroot)
-#   /home/<user>/.env          ← NEVER touched by deploys
+#   /home/<user>/.env          ← NEVER touched by deploys (not in git)
 # ─────────────────────────────────────────────────────────────────────
 name: Deploy production
 
@@ -23,9 +25,6 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      # Adjust if the host's CLI binary differs (e.g. /usr/local/bin/php82)
-      PHP_BIN: php
     steps:
       # ── 1. Checkout the exact commit being deployed ────────────────
       - name: Checkout
@@ -53,107 +52,69 @@ jobs:
       - name: Build Vite assets
         run: npm run build
 
-      # ── 3. SSH trust setup: private key + pinned host key ──────────
-      - name: Set up SSH key and known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          # Pin the server's host key so rsync/ssh never prompt interactively.
-          # StrictHostKeyChecking=yes means an unexpected key FAILS the deploy
-          # instead of silently trusting it (MITM protection).
-          if ! ssh-keyscan -T 15 -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts; then
-            echo "::error::ssh-keyscan could not reach ${{ secrets.SSH_HOST }}:${{ secrets.SSH_PORT }} — check SSH_HOST/SSH_PORT secrets and any firewall/IP-allowlist blocking GitHub runner IPs"
-            exit 1
-          fi
-          wc -l ~/.ssh/known_hosts
+      # ── 3. Upload application code over FTPS ───────────────────────
+      #    Excluded on purpose (server-only or runtime data):
+      #    - storage/  → logs, sessions, user uploads live here
+      #    - public/   → synced separately into the docroot below
+      #    - tests/docs/.git/.github/node_modules → dev-only
+      - name: FTP deploy application code
+        uses: SamKirkland/ftp-deploy-action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftps
+          local-dir: ./
+          server-dir: ${{ secrets.DEPLOY_PATH }}/
+          exclude: |
+            ^\.git/$
+            ^\.github/$
+            ^node_modules/$
+            ^tests/$
+            ^docs/$
+            ^storage/$
+            ^public/$
+            ^\.env*
+            ^tmp-
+          dangerous-clean-slate: false
 
-      # Reusable SSH command wrapper for all remote steps below.
-      - name: Configure SSH
-        run: |
-          cat > ~/.ssh/config <<EOF
-          Host mhcst
-            HostName ${{ secrets.SSH_HOST }}
-            Port ${{ secrets.SSH_PORT }}
-            User ${{ secrets.SSH_USER }}
-            IdentityFile ~/.ssh/deploy_key
-            IdentitiesOnly yes
-            StrictHostKeyChecking yes
-          EOF
-          chmod 600 ~/.ssh/config
+      #    Docroot upload: built assets + static files.
+      #    Excludes: storage (the storage:link symlink) and .well-known
+      #    (ACME/cPanel-managed SSL challenges).
+      - name: FTP deploy public directory
+        uses: SamKirkland/ftp-deploy-action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          protocol: ftps
+          local-dir: ./public/
+          server-dir: ${{ secrets.PUBLIC_PATH }}/
+          exclude: |
+            ^storage/$
+            ^\.well-known/
+          dangerous-clean-slate: false
 
-      # ── 4. Sync application code (with --delete so removed files go) ──
-      #    Excludes: .env (server-only), storage/ (runtime data: logs,
-      #    uploads, cache — deleting it would wipe user content).
-      - name: Rsync application code
-        run: >
-          rsync -az --delete
-          --exclude '.env'
-          --exclude '.git'
-          --exclude '.github'
-          --exclude 'node_modules'
-          --exclude 'tests'
-          --exclude 'storage'
-          --exclude 'public'
-          --exclude 'docs'
-          -e 'ssh'
-          ./app ./bootstrap ./config ./database ./resources ./routes
-          ./vendor ./artisan ./composer.json ./composer.lock
-          mhcst:${{ secrets.DEPLOY_PATH }}/
-
-      #    Docroot sync: built assets + static files. Excludes storage
-      #    (the storage:link symlink pointing back to ~/app/storage) and
-      #    .well-known (ACME/cPanel-managed SSL challenges).
-      - name: Rsync public directory
-        run: >
-          rsync -az --delete
-          --exclude 'storage'
-          --exclude '.well-known'
-          -e 'ssh'
-          public/
-          mhcst:${{ secrets.PUBLIC_PATH }}/
-
-      # ── 5. Remote post-deploy: migrations, caches, workers ─────────
-      #    Each command must succeed or the deploy is marked failed.
+      # ── 4. Post-deploy tasks via HTTP hook ─────────────────────────
+      #    Runs migrate --force, rebuilds config/route/view caches,
+      #    regenerates static SEO files and restarts queue workers.
+      #    Authorized by DEPLOY_TOKEN (also present in server .env).
       - name: Run post-deploy tasks
         run: |
-          ssh mhcst bash -s <<'REMOTE'
-          set -euo pipefail
-          cd ~/app
+          RESPONSE=$(curl -sf --max-time 300 \
+            "https://${{ secrets.SITE_URL }}/deploy/run?token=${{ secrets.DEPLOY_TOKEN }}")
+          echo "Hook response: $RESPONSE"
+          echo "$RESPONSE" | grep -q '"status":"ok"'
 
-          # Runtime directories Laravel needs (first deploy / after changes)
-          mkdir -p storage/framework/{cache/data,sessions,views} storage/logs bootstrap/cache
-          chmod -R u+rwX storage bootstrap/cache
-
-          # [ "$PHP_BIN" ] placeholder — override via env if host uses php82 etc.
-          php -v | head -n1
-
-          # Schema changes — never destructive prompts in prod
-          php artisan migrate --force
-
-          # Rebuild caches AFTER new code is in place (stale caches are the
-          # #1 cause of "works locally, breaks on server")
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
-
-          # Regenerate static webmanifest/robots/browserconfig (new OG logo URL)
-          php artisan seo:generate-static
-
-          # Restart any queued newsletter jobs on old code
-          php artisan queue:restart
-          REMOTE
-
-      # ── 6. Smoke test — fail loudly if the site didn't come up ─────
+      # ── 5. Smoke test — fail loudly if the site didn't come up ─────
       - name: Smoke test
         run: |
-          STATUS=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 https://${{ secrets.SSH_HOST }})
+          STATUS=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 https://${{ secrets.SITE_URL }})
           echo "HTTP status: $STATUS"
           test "$STATUS" != "5"
 
-      # ── 7. Rollback hint on failure (keeps previous vendor/build only
-      #       until overwritten — re-run previous green commit to restore) ──
       - name: Notify on failure
         if: failure()
-        run: echo "::error::Deploy failed. Re-deploy the last successful commit from the Actions tab."
+        run: echo "::error::Deploy failed. Re-run the last successful workflow, then hit /deploy/run?token=... manually."
