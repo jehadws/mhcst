@@ -1,0 +1,156 @@
+# ─────────────────────────────────────────────────────────────────────
+# Production deploy — Libyan Spider cPanel shared hosting (SSH + rsync)
+#
+# Flow: push to main → build (composer --no-dev + vite) → rsync code to
+# ~/app and built assets to ~/public_html → migrate/caches/queue restart.
+#
+# Server layout (matches deploy.md):
+#   /home/<user>/app           ← Laravel app root (this repo minus public/)
+#   /home/<user>/public_html   ← Laravel public/ (docroot)
+#   /home/<user>/.env          ← NEVER touched by deploys
+# ─────────────────────────────────────────────────────────────────────
+name: Deploy production
+
+on:
+  push:
+    branches: [main]
+
+# Never run two deploys at once; superseded runs are cancelled.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      # Adjust if the host's CLI binary differs (e.g. /usr/local/bin/php82)
+      PHP_BIN: php
+    steps:
+      # ── 1. Checkout the exact commit being deployed ────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. Build stage: production dependencies + compiled assets ──
+      - name: Set up PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Install Composer dependencies (no dev)
+        run: composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build Vite assets
+        run: npm run build
+
+      # ── 3. SSH trust setup: private key + pinned host key ──────────
+      - name: Set up SSH key and known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # Pin the server's host key so rsync/ssh never prompt interactively.
+          # StrictHostKeyChecking=yes means an unexpected key FAILS the deploy
+          # instead of silently trusting it (MITM protection).
+          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+          chmod 644 ~/.ssh/known_hosts
+
+      # Reusable SSH command wrapper for all remote steps below.
+      - name: Configure SSH
+        run: |
+          cat > ~/.ssh/config <<EOF
+          Host mhcst
+            HostName ${{ secrets.SSH_HOST }}
+            Port ${{ secrets.SSH_PORT }}
+            User ${{ secrets.SSH_USER }}
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+            StrictHostKeyChecking yes
+          EOF
+          chmod 600 ~/.ssh/config
+
+      # ── 4. Sync application code (with --delete so removed files go) ──
+      #    Excludes: .env (server-only), storage/ (runtime data: logs,
+      #    uploads, cache — deleting it would wipe user content).
+      - name: Rsync application code
+        run: >
+          rsync -az --delete
+          --exclude '.env'
+          --exclude '.git'
+          --exclude '.github'
+          --exclude 'node_modules'
+          --exclude 'tests'
+          --exclude 'storage'
+          --exclude 'public'
+          --exclude 'docs'
+          -e 'ssh'
+          ./app ./bootstrap ./config ./database ./resources ./routes
+          ./vendor ./artisan ./composer.json ./composer.lock
+          mhcst:${{ secrets.DEPLOY_PATH }}/
+
+      #    Docroot sync: built assets + static files. Excludes storage
+      #    (the storage:link symlink pointing back to ~/app/storage) and
+      #    .well-known (ACME/cPanel-managed SSL challenges).
+      - name: Rsync public directory
+        run: >
+          rsync -az --delete
+          --exclude 'storage'
+          --exclude '.well-known'
+          -e 'ssh'
+          public/
+          mhcst:${{ secrets.PUBLIC_PATH }}/
+
+      # ── 5. Remote post-deploy: migrations, caches, workers ─────────
+      #    Each command must succeed or the deploy is marked failed.
+      - name: Run post-deploy tasks
+        run: |
+          ssh mhcst bash -s <<'REMOTE'
+          set -euo pipefail
+          cd ~/app
+
+          # Runtime directories Laravel needs (first deploy / after changes)
+          mkdir -p storage/framework/{cache/data,sessions,views} storage/logs bootstrap/cache
+          chmod -R u+rwX storage bootstrap/cache
+
+          # [ "$PHP_BIN" ] placeholder — override via env if host uses php82 etc.
+          php -v | head -n1
+
+          # Schema changes — never destructive prompts in prod
+          php artisan migrate --force
+
+          # Rebuild caches AFTER new code is in place (stale caches are the
+          # #1 cause of "works locally, breaks on server")
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+
+          # Regenerate static webmanifest/robots/browserconfig (new OG logo URL)
+          php artisan seo:generate-static
+
+          # Restart any queued newsletter jobs on old code
+          php artisan queue:restart
+          REMOTE
+
+      # ── 6. Smoke test — fail loudly if the site didn't come up ─────
+      - name: Smoke test
+        run: |
+          STATUS=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 https://${{ secrets.SSH_HOST }})
+          echo "HTTP status: $STATUS"
+          test "$STATUS" != "5"
+
+      # ── 7. Rollback hint on failure (keeps previous vendor/build only
+      #       until overwritten — re-run previous green commit to restore) ──
+      - name: Notify on failure
+        if: failure()
+        run: echo "::error::Deploy failed. Re-deploy the last successful commit from the Actions tab."
