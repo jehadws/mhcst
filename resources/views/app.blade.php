@@ -41,7 +41,7 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
         <meta name="apple-mobile-web-app-title" content="{{ \App\Models\SiteSetting::get('site_name', config('app.name')) }}">
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ config('app.name', 'MHCST') }}</title>
 
         {{-- Anti-flash base styles: paints instantly while the full stylesheet loads asynchronously --}}
         <style>
