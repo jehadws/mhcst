@@ -6,13 +6,6 @@ use Illuminate\Support\Facades\File;
 
 const STATIC_SEO_FILES = ['site.webmanifest', 'robots.txt', 'browserconfig.xml'];
 
-afterEach(function () {
-    // Keep generated artifacts out of the working tree between runs.
-    foreach (STATIC_SEO_FILES as $file) {
-        File::delete(public_path($file));
-    }
-});
-
 test('seo:generate-static writes manifest, robots and browserconfig into public', function () {
     SiteSetting::updateOrCreate(
         ['key' => 'site_name'],
