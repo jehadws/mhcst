@@ -63,8 +63,11 @@ jobs:
           # Pin the server's host key so rsync/ssh never prompt interactively.
           # StrictHostKeyChecking=yes means an unexpected key FAILS the deploy
           # instead of silently trusting it (MITM protection).
-          ssh-keyscan -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
-          chmod 644 ~/.ssh/known_hosts
+          if ! ssh-keyscan -T 15 -p "${{ secrets.SSH_PORT }}" "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts; then
+            echo "::error::ssh-keyscan could not reach ${{ secrets.SSH_HOST }}:${{ secrets.SSH_PORT }} — check SSH_HOST/SSH_PORT secrets and any firewall/IP-allowlist blocking GitHub runner IPs"
+            exit 1
+          fi
+          wc -l ~/.ssh/known_hosts
 
       # Reusable SSH command wrapper for all remote steps below.
       - name: Configure SSH
