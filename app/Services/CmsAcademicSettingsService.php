@@ -17,7 +17,9 @@ class CmsAcademicSettingsService
      *     semester_start: ?string,
      *     semester_end: ?string,
      *     consecutive_absence_threshold: int,
-     *     absence_rate_threshold: float
+     *     absence_rate_threshold: float,
+     *     current_semester: ?string,
+     *     subject_registration_open: bool
      * }
      */
     public function settings(): array
@@ -29,6 +31,8 @@ class CmsAcademicSettingsService
             'semester_end' => SiteSetting::get('cms.semester_end') ?: null,
             'consecutive_absence_threshold' => $this->consecutiveAbsenceThreshold(),
             'absence_rate_threshold' => $this->absenceRateThreshold(),
+            'current_semester' => $this->currentSemester(),
+            'subject_registration_open' => $this->subjectRegistrationOpen(),
         ];
     }
 
@@ -100,6 +104,8 @@ class CmsAcademicSettingsService
         $this->persist('cms.semester_end', $data['semester_end'] ?? '');
         $this->persist('cms.consecutive_absence_threshold', (string) ($data['consecutive_absence_threshold'] ?? 3));
         $this->persist('cms.absence_rate_threshold', (string) ($data['absence_rate_threshold'] ?? 20));
+        $this->persist('cms.current_semester', (string) ($data['current_semester'] ?? ''));
+        $this->persist('cms.subject_registration_open', ($data['subject_registration_open'] ?? true) ? '1' : '0');
     }
 
     private function persist(string $key, string $value): void

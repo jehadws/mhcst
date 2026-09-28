@@ -27,6 +27,8 @@ class CmsSettingController extends Controller
             'semester_end' => ['nullable', 'date', 'after_or_equal:semester_start'],
             'consecutive_absence_threshold' => ['nullable', 'integer', 'min:1', 'max:30'],
             'absence_rate_threshold' => ['nullable', 'numeric', 'min:1', 'max:100'],
+            'current_semester' => ['nullable', 'in:first,second,summer'],
+            'subject_registration_open' => ['boolean'],
         ]);
 
         $academicSettings->updateSettings($data);

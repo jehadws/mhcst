@@ -9,6 +9,7 @@ use App\Models\CmsStudent;
 use App\Models\CmsSubject;
 use App\Models\SiteSetting;
 use App\Models\User;
+use App\Services\CmsAcademicSettingsService;
 use App\Services\CmsSubjectRegistrationService;
 use Spatie\Permission\Models\Role;
 
@@ -260,4 +261,47 @@ test('available subjects exclude blocked enrollments and keep withdrawn picks', 
     $available = app(CmsSubjectRegistrationService::class)->availableFor($student);
 
     expect($available->pluck('code')->all())->toBe(['A200']);
+});
+
+test('academic settings page controls the registration window', function () {
+    $admin = createAdminUser();
+    [$user, $student, , $department] = createRegistrationStudent();
+    $subject = createRegistrationSubject($department->id, 'R851');
+
+    $this->actingAs($admin)->put('/cms/settings', [
+        'grades_locked' => false,
+        'academic_year' => '2026-2027',
+        'current_semester' => 'first',
+        'subject_registration_open' => true,
+        'consecutive_absence_threshold' => 3,
+        'absence_rate_threshold' => 20,
+    ])->assertRedirect('/cms/settings');
+
+    expect(SiteSetting::get('cms.current_semester'))->toBe('first');
+    expect(app(CmsAcademicSettingsService::class)->subjectRegistrationOpen())->toBeTrue();
+
+    $this->actingAs($user)
+        ->post(route('dashboard.subject-registration.store'), ['subject_ids' => [$subject->id]])
+        ->assertRedirect();
+
+    expect(CmsEnrollment::where('student_id', $student->id)->count())->toBe(1);
+
+    $this->actingAs($admin)->put('/cms/settings', [
+        'grades_locked' => false,
+        'academic_year' => '2026-2027',
+        'current_semester' => 'first',
+        'subject_registration_open' => false,
+        'consecutive_absence_threshold' => 3,
+        'absence_rate_threshold' => 20,
+    ])->assertRedirect('/cms/settings');
+
+    expect(app(CmsAcademicSettingsService::class)->subjectRegistrationOpen())->toBeFalse();
+
+    $freshSubject = createRegistrationSubject($department->id, 'R852');
+
+    $this->actingAs($user)
+        ->post(route('dashboard.subject-registration.store'), ['subject_ids' => [$freshSubject->id]])
+        ->assertSessionHasErrors('subject_ids');
+
+    expect(CmsEnrollment::where('subject_id', $freshSubject->id)->count())->toBe(0);
 });

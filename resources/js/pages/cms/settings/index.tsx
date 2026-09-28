@@ -22,6 +22,8 @@ export default function CmsSettingsIndex({
         semester_end: string | null;
         consecutive_absence_threshold: number;
         absence_rate_threshold: number;
+        current_semester: string | null;
+        subject_registration_open: boolean;
     };
 }) {
     const { c } = useCms();
@@ -38,6 +40,8 @@ export default function CmsSettingsIndex({
         semester_end: settings.semester_end ?? '',
         consecutive_absence_threshold: settings.consecutive_absence_threshold,
         absence_rate_threshold: settings.absence_rate_threshold,
+        current_semester: settings.current_semester ?? '',
+        subject_registration_open: settings.subject_registration_open,
     });
 
     const submit = (e: React.FormEvent) => {
@@ -77,6 +81,36 @@ export default function CmsSettingsIndex({
                                 <Input id="semester_end" type="date" value={data.semester_end} onChange={(e) => setData('semester_end', e.target.value)} className="mt-1" />
                             </div>
                         </div>
+                    </section>
+
+                    <section className="space-y-4 bg-card border rounded-2xl p-6">
+                        <h2 className="font-semibold">{c.settings.registrationSection}</h2>
+                        <div>
+                            <Label htmlFor="current_semester">{c.settings.currentSemester}</Label>
+                            <select
+                                id="current_semester"
+                                className="w-full p-2.5 rounded-lg border bg-background text-sm mt-1"
+                                value={data.current_semester}
+                                onChange={(e) => setData('current_semester', e.target.value)}
+                            >
+                                <option value="">{c.settings.notSet}</option>
+                                <option value="first">{c.labels.semesters.first}</option>
+                                <option value="second">{c.labels.semesters.second}</option>
+                                <option value="summer">{c.labels.semesters.summer}</option>
+                            </select>
+                            <p className="text-xs text-muted-foreground mt-1">{c.settings.currentSemesterHint}</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Checkbox
+                                id="subject_registration_open"
+                                checked={data.subject_registration_open}
+                                onCheckedChange={(checked) => setData('subject_registration_open', !!checked)}
+                            />
+                            <Label htmlFor="subject_registration_open" className="cursor-pointer">
+                                {c.settings.subjectRegistrationOpen}
+                            </Label>
+                        </div>
+                        <p className="text-xs text-muted-foreground">{c.settings.subjectRegistrationOpenHint}</p>
                     </section>
 
                     <section className="space-y-4 bg-card border rounded-2xl p-6">
