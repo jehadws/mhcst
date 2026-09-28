@@ -20,7 +20,10 @@ class CmsSubjectRegistrationService
      */
     private const BLOCKING_STATUSES = ['pending', 'active', 'completed'];
 
-    public function __construct(private CmsAcademicSettingsService $academicSettings) {}
+    public function __construct(
+        private CmsAcademicSettingsService $academicSettings,
+        private RegistrationStatusNotifier $registrationNotifier,
+    ) {}
 
     /**
      * Subjects the student may self-register: their department's subjects for
@@ -184,7 +187,8 @@ class CmsSubjectRegistrationService
     /**
      * Approve pending self-registered enrollments in bulk. Only rows that are
      * currently `pending` are flipped to `active`; anything already handled is
-     * left untouched. Returns the number of enrollments approved.
+     * left untouched. Each flipped registration notifies the student by email.
+     * Returns the number of enrollments approved.
      *
      * @param  list<int>  $enrollmentIds
      */
@@ -196,15 +200,32 @@ class CmsSubjectRegistrationService
             return 0;
         }
 
-        return CmsEnrollment::query()
+        $flipped = CmsEnrollment::query()
             ->whereIn('id', $enrollmentIds)
             ->where('status', 'pending')
+            ->with(['student', 'subject'])
+            ->get();
+
+        if ($flipped->isEmpty()) {
+            return 0;
+        }
+
+        CmsEnrollment::query()
+            ->whereIn('id', $flipped->pluck('id'))
             ->update(['status' => 'active']);
+
+        $flipped->each(function (CmsEnrollment $enrollment): void {
+            $enrollment->status = 'active';
+            $this->registrationNotifier->notifyApproved($enrollment);
+        });
+
+        return $flipped->count();
     }
 
     /**
      * Reject a pending self-registered enrollment. The pick becomes
-     * `withdrawn`, which frees the subject up for re-registration.
+     * `withdrawn`, which frees the subject up for re-registration. The
+     * student is notified by email so the rejection is not silent.
      */
     public function rejectRegistration(CmsEnrollment $enrollment): CmsEnrollment
     {
@@ -215,7 +236,10 @@ class CmsSubjectRegistrationService
         }
 
         $enrollment->update(['status' => 'withdrawn']);
+        $enrollment = $enrollment->refresh();
 
-        return $enrollment->refresh();
+        $this->registrationNotifier->notifyRejected($enrollment);
+
+        return $enrollment;
     }
 }

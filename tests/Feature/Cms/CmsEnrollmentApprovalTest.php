@@ -7,6 +7,8 @@ use App\Models\CmsEnrollment;
 use App\Models\CmsLevel;
 use App\Models\CmsStudent;
 use App\Models\CmsSubject;
+use App\Models\NotificationsLog;
+use App\Models\NotificationTemplate;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Services\CmsSubjectRegistrationService;
@@ -200,4 +202,112 @@ test('approval is captured by the cms audit middleware', function () {
     expect($audit)->not->toBeNull();
     expect($audit->user_id)->toBe($admin->id);
     expect($audit->new_values['enrollment_ids'])->toBe([$pending->id]);
+});
+
+test('approving a registration emails the student and records the notification', function () {
+    $admin = createAdminUser();
+    [$user, $student, , $department] = createApprovalStudent();
+    $subject = createApprovalSubject($department->id, 'AP301');
+    $pending = createApprovalEnrollment($student->id, $subject->id);
+
+    $template = NotificationTemplate::factory()->create([
+        'trigger_event' => 'registration.approved',
+        'channel' => 'email',
+        'subject' => 'Approved {student_name} — {subject_name}',
+        'body' => '{student_name} approved for {subject_name} during {academic_year}, {semester}',
+    ]);
+
+    $this->actingAs($admin)
+        ->post(route('cms.enrollments.approve'), ['enrollment_ids' => [$pending->id]])
+        ->assertRedirect(route('cms.enrollments.index'));
+
+    expect($pending->refresh()->status)->toBe('active');
+
+    $log = NotificationsLog::query()->sole();
+    expect($log->recipient)->toBe('approval-student@test.com');
+    expect($log->channel)->toBe('email');
+    expect($log->template_id)->toBe($template->id);
+    expect($log->status)->toBe('sent');
+    expect($log->sent_at)->not->toBeNull();
+});
+
+test('rejecting a registration emails the student and records the notification', function () {
+    $admin = createAdminUser();
+    [$user, $student, , $department] = createApprovalStudent();
+    $subject = createApprovalSubject($department->id, 'AP302');
+    $pending = createApprovalEnrollment($student->id, $subject->id);
+
+    NotificationTemplate::factory()->create([
+        'trigger_event' => 'registration.rejected',
+        'channel' => 'email',
+        'subject' => 'Rejected {subject_name}',
+        'body' => 'Sorry {student_name}, {subject_name} was not approved.',
+    ]);
+
+    $this->actingAs($admin)
+        ->post(route('cms.enrollments.reject', $pending))
+        ->assertRedirect(route('cms.enrollments.index'));
+
+    expect($pending->refresh()->status)->toBe('withdrawn');
+    expect(NotificationsLog::count())->toBe(1);
+    expect(NotificationsLog::query()->sole()->recipient)->toBe('approval-student@test.com');
+});
+
+test('approval still succeeds when no notification template exists', function () {
+    $admin = createAdminUser();
+    [$user, $student, , $department] = createApprovalStudent();
+    $subject = createApprovalSubject($department->id, 'AP303');
+    $pending = createApprovalEnrollment($student->id, $subject->id);
+
+    $this->actingAs($admin)
+        ->post(route('cms.enrollments.approve'), ['enrollment_ids' => [$pending->id]])
+        ->assertRedirect(route('cms.enrollments.index'));
+
+    expect($pending->refresh()->status)->toBe('active');
+    expect(NotificationsLog::count())->toBe(0);
+});
+
+test('bulk approval emails only the registrations that were actually flipped', function () {
+    $admin = createAdminUser();
+    [$user, $student, , $department] = createApprovalStudent();
+    $subjectA = createApprovalSubject($department->id, 'AP304');
+    $subjectB = createApprovalSubject($department->id, 'AP305');
+    $pending = createApprovalEnrollment($student->id, $subjectA->id);
+    $completed = createApprovalEnrollment($student->id, $subjectB->id, 'completed', 'admin');
+
+    NotificationTemplate::factory()->create([
+        'trigger_event' => 'registration.approved',
+        'channel' => 'email',
+        'subject' => 'Approved {student_name} — {subject_name}',
+        'body' => '{student_name} approved for {subject_name}',
+    ]);
+
+    $this->actingAs($admin)
+        ->post(route('cms.enrollments.approve'), ['enrollment_ids' => [$pending->id, $completed->id]])
+        ->assertRedirect(route('cms.enrollments.index'));
+
+    expect($completed->refresh()->status)->toBe('completed');
+    expect(NotificationsLog::count())->toBe(1);
+});
+
+test('notification is skipped when the student has no email on file', function () {
+    $admin = createAdminUser();
+    [$user, $student, , $department] = createApprovalStudent();
+    $subject = createApprovalSubject($department->id, 'AP306');
+    $pending = createApprovalEnrollment($student->id, $subject->id);
+    $student->update(['email' => null]);
+
+    NotificationTemplate::factory()->create([
+        'trigger_event' => 'registration.approved',
+        'channel' => 'email',
+        'subject' => 'Approved {student_name} — {subject_name}',
+        'body' => '{student_name} approved for {subject_name}',
+    ]);
+
+    $this->actingAs($admin)
+        ->post(route('cms.enrollments.approve'), ['enrollment_ids' => [$pending->id]])
+        ->assertRedirect(route('cms.enrollments.index'));
+
+    expect($pending->refresh()->status)->toBe('active');
+    expect(NotificationsLog::count())->toBe(0);
 });

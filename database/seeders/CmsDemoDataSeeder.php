@@ -234,5 +234,23 @@ class CmsDemoDataSeeder extends Seeder
                 'body' => "عزيزي/عزيزتي {student_name},\n\nنود إبلاغكم بوجود تنبيه غياب في مادة {subject_name}:\n{reasons}\n\nيرجى مراجعة شؤون الطلاب.",
             ]
         );
+
+        NotificationTemplate::firstOrCreate(
+            ['trigger_event' => 'registration.approved', 'channel' => 'email'],
+            [
+                'name' => 'Registration Approved',
+                'subject' => 'تمت الموافقة على تسجيلك — {subject_name}',
+                'body' => "عزيزي/عزيزتي {student_name},\n\nتمت الموافقة على تسجيلكم في مادة {subject_name} للفصل {semester} من العام الدراسي {academic_year}.\n\nمع خالص التقدير,\nشؤون الطلاب",
+            ]
+        );
+
+        NotificationTemplate::firstOrCreate(
+            ['trigger_event' => 'registration.rejected', 'channel' => 'email'],
+            [
+                'name' => 'Registration Rejected',
+                'subject' => 'لم يتم قبول طلب التسجيل — {subject_name}',
+                'body' => "عزيزي/عزيزتي {student_name},\n\nنعتذر منكم، لم يتم قبول طلب تسجيلكم في مادة {subject_name} للفصل {semester} من العام الدراسي {academic_year}. يمكنكم إعادة التسجيل عبر بوابة الطالب أو مراجعة شؤون الطلاب لمعرفة الأسباب.",
+            ]
+        );
     }
 }

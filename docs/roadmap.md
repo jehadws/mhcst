@@ -37,6 +37,9 @@ Phased completion plan for CMS gaps and platform polish.
 - Uses `NotificationTemplate` with `trigger_event = attendance.alert`
 - Template seeded by `CmsDemoDataSeeder`
 - Duplicate alerts suppressed for 7 days per student email
+- `RegistrationStatusNotifier` emails students when admins approve/reject self-registrations
+- Uses `NotificationTemplate` with `trigger_event = registration.approved` / `registration.rejected` (templates seeded by `CmsDemoDataSeeder`)
+- Missing template or missing student email degrades to a silent no-op
 
 ## Phase 4 — Reports
 
