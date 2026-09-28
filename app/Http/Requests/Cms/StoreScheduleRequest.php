@@ -15,7 +15,7 @@ class StoreScheduleRequest extends FormRequest
     {
         return [
             'subject_id' => ['required', 'exists:cms_subjects,id'],
-            'teacher_id' => ['required', 'exists:cms_teachers,id'],
+            'teacher_id' => ['nullable', 'exists:cms_teachers,id'],
             'level_id' => ['required', 'exists:cms_levels,id'],
             'day' => ['required', 'in:saturday,sunday,monday,tuesday,wednesday,thursday,friday'],
             'start_time' => ['required', 'date_format:H:i'],

@@ -9,8 +9,8 @@ class ScheduleValidatorService
     /**
      * Validate schedule conflict.
      *
-     * @param array{
-     *     teacher_id: int,
+     * @param  array{
+     *     teacher_id: int|null,
      *     level_id: int,
      *     subject_id: int,
      *     day: string,
@@ -26,6 +26,7 @@ class ScheduleValidatorService
     {
         $errors = [];
 
+        $teacherId = $data['teacher_id'] ?? null;
         $startTime = strtotime($data['start_time']);
         $endTime = strtotime($data['end_time']);
 
@@ -52,7 +53,8 @@ class ScheduleValidatorService
             $hasTimeOverlap = ($startTime < $existEnd) && ($endTime > $existStart);
 
             if ($hasTimeOverlap) {
-                if ((int) $schedule->teacher_id === (int) $data['teacher_id']) {
+                if ($teacherId !== null && $schedule->teacher_id !== null
+                    && (int) $schedule->teacher_id === $teacherId) {
                     $errors[] = 'Teacher already has a scheduled class during this time slot.';
                 }
                 if ((int) $schedule->level_id === (int) $data['level_id']) {
@@ -65,10 +67,14 @@ class ScheduleValidatorService
         }
 
         // Teacher max 6 hours per day
+        if ($teacherId === null) {
+            return array_unique($errors);
+        }
+
         $teacherDaySchedules = CmsSchedule::where('academic_year', $data['academic_year'])
             ->where('semester', $data['semester'])
             ->where('day', $data['day'])
-            ->where('teacher_id', $data['teacher_id']);
+            ->where('teacher_id', $teacherId);
 
         if ($ignoreId) {
             $teacherDaySchedules->where('id', '!=', $ignoreId);
