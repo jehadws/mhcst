@@ -29,6 +29,7 @@ use App\Http\Controllers\SiteContentController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\StudentPortalController;
+use App\Http\Controllers\SubjectRegistrationController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
@@ -83,6 +84,10 @@ Route::middleware(['auth', 'dashboard.role'])->group(function () {
     Route::get('dashboard/my-transcript', MyTranscriptController::class)
         ->middleware('dashboard.access:student')
         ->name('dashboard.my-transcript');
+
+    Route::post('dashboard/subject-registration', [SubjectRegistrationController::class, 'store'])
+        ->middleware('dashboard.access:student')
+        ->name('dashboard.subject-registration.store');
 
     Route::middleware(['dashboard.access:uploads'])->group(function () {
         Route::post('uploads/image', [UploadController::class, 'store'])->name('uploads.image');
@@ -228,6 +233,10 @@ Route::middleware(['auth', 'dashboard.role'])->group(function () {
             Route::patch('enrollments/{enrollment}', [CmsEnrollmentController::class, 'update']);
             Route::delete('enrollments/{enrollment}', [CmsEnrollmentController::class, 'destroy'])->name('enrollments.destroy');
             Route::post('enrollments/bulk', [CmsEnrollmentController::class, 'bulkEnroll'])->name('enrollments.bulk');
+            Route::post('enrollments/approve', [CmsEnrollmentController::class, 'approve'])->name('enrollments.approve');
+            Route::post('enrollments/{enrollment}/reject', [CmsEnrollmentController::class, 'reject'])
+                ->whereNumber('enrollment')
+                ->name('enrollments.reject');
 
             Route::get('grades/export', [CmsGradeController::class, 'export'])->name('grades.export');
             Route::get('grades/import/template', [CmsGradeController::class, 'importTemplate'])->name('grades.import-template');

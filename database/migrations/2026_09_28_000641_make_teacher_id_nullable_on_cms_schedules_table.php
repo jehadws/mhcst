@@ -14,6 +14,9 @@ return new class extends Migration
 
         Schema::table('cms_schedules', function (Blueprint $table) {
             $table->foreignId('teacher_id')->nullable()->change();
+        });
+
+        Schema::table('cms_schedules', function (Blueprint $table) {
             $table->foreign('teacher_id')->references('id')->on('cms_teachers')->nullOnDelete();
         });
     }
@@ -26,6 +29,9 @@ return new class extends Migration
 
         Schema::table('cms_schedules', function (Blueprint $table) {
             $table->foreignId('teacher_id')->change();
+        });
+
+        Schema::table('cms_schedules', function (Blueprint $table) {
             $table->foreign('teacher_id')->references('id')->on('cms_teachers')->cascadeOnDelete();
         });
     }

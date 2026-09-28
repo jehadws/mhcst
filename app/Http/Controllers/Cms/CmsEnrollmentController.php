@@ -9,13 +9,17 @@ use App\Models\CmsLevel;
 use App\Models\CmsStudent;
 use App\Models\CmsSubject;
 use App\Services\CmsAuthorizationService;
+use App\Services\CmsSubjectRegistrationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CmsEnrollmentController extends Controller
 {
-    public function __construct(private CmsAuthorizationService $cmsAuth) {}
+    public function __construct(
+        private CmsAuthorizationService $cmsAuth,
+        private CmsSubjectRegistrationService $subjectRegistration,
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -34,12 +38,20 @@ class CmsEnrollmentController extends Controller
             $query->where('semester', $request->semester);
         }
 
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('source')) {
+            $query->where('source', $request->source);
+        }
+
         return Inertia::render('cms/enrollments/index', [
             'enrollments' => $query->latest()->paginate(15)->withQueryString(),
             'subjects' => $this->cmsAuth->isTeacher(auth()->user())
                 ? $this->cmsAuth->teacherSubjects(auth()->user())
                 : CmsSubject::get(['id', 'code', 'name']),
-            'filters' => $request->only('subject_id', 'academic_year', 'semester'),
+            'filters' => $request->only('subject_id', 'academic_year', 'semester', 'status', 'source'),
         ]);
     }
 
@@ -118,6 +130,29 @@ class CmsEnrollmentController extends Controller
         }
 
         return redirect()->route('cms.enrollments.index')->with('success', "Enrolled {$count} students successfully.");
+    }
+
+    public function approve(Request $request)
+    {
+        $validated = $request->validate([
+            'enrollment_ids' => ['required', 'array', 'min:1'],
+            'enrollment_ids.*' => ['integer', 'exists:cms_enrollments,id'],
+        ]);
+
+        $approved = $this->subjectRegistration->approveRegistrations($validated['enrollment_ids']);
+
+        $message = $approved > 0
+            ? "Approved {$approved} registration".($approved === 1 ? '' : 's').' successfully.'
+            : 'No pending registrations were approved — they were already handled.';
+
+        return redirect()->route('cms.enrollments.index')->with('success', $message);
+    }
+
+    public function reject(CmsEnrollment $enrollment)
+    {
+        $this->subjectRegistration->rejectRegistration($enrollment);
+
+        return redirect()->route('cms.enrollments.index')->with('success', 'Registration rejected successfully.');
     }
 
     public function destroy(CmsEnrollment $enrollment)

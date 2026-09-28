@@ -96,7 +96,8 @@ export interface CmsEnrollment {
     academic_year: string;
     semester: 'first' | 'second' | 'summer';
     enrollment_date: string;
-    status: 'active' | 'dropped' | 'completed';
+    status: 'pending' | 'active' | 'dropped' | 'completed' | 'withdrawn';
+    source: 'admin' | 'self';
     student?: CmsStudent;
     subject?: CmsSubject;
     grade?: CmsGrade | null;
@@ -106,7 +107,7 @@ export interface CmsEnrollment {
 export interface CmsSchedule {
     id: number;
     subject_id: number;
-    teacher_id: number;
+    teacher_id: number | null;
     level_id: number;
     day: 'saturday' | 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday';
     start_time: string;

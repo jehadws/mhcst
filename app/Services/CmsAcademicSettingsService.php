@@ -47,6 +47,45 @@ class CmsAcademicSettingsService
     }
 
     /**
+     * The academic year subjects are registered against. Reuses the existing
+     * 'cms.academic_year' settings key — it is already the admin-editable
+     * "current year" on the academic settings page.
+     */
+    public function currentAcademicYear(): ?string
+    {
+        $value = SiteSetting::get('cms.academic_year');
+
+        return $value !== null && $value !== '' ? $value : null;
+    }
+
+    /**
+     * The semester (first/second/summer) subjects are registered against.
+     * Stored under 'cms.current_semester'; admin UI lands with the
+     * subject-registration window settings.
+     */
+    public function currentSemester(): ?string
+    {
+        $value = SiteSetting::get('cms.current_semester');
+
+        return in_array($value, ['first', 'second', 'summer'], true) ? $value : null;
+    }
+
+    /**
+     * Whether the student self-registration window is open. Defaults to open
+     * until an admin closes it.
+     */
+    public function subjectRegistrationOpen(): bool
+    {
+        $value = SiteSetting::get('cms.subject_registration_open');
+
+        if ($value === null || $value === '') {
+            return true;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
      * @param  array<string, mixed>  $data
      */
     public function updateSettings(array $data): void

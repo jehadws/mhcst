@@ -16,6 +16,7 @@ class CmsEnrollment extends Model
         'semester',
         'enrollment_date',
         'status',
+        'source',
     ];
 
     protected function casts(): array
