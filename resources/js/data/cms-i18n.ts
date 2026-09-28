@@ -395,6 +395,7 @@ export const cmsEn = {
         notSet: 'Not set',
         subjectRegistrationOpen: 'Registration window open',
         subjectRegistrationOpenHint: 'When off, students cannot submit new subject registrations.',
+        registrationIncomplete: 'The window is open, but students cannot register until the current academic year (Academic calendar section) and the semester are set.',
     },
     registration: {
         title: 'Subject Registration',
@@ -889,6 +890,7 @@ export const cmsAr = {
         notSet: 'غير محدد',
         subjectRegistrationOpen: 'نافذة التسجيل مفتوحة',
         subjectRegistrationOpenHint: 'عند الإيقاف لا يمكن للطلاب إرسال تسجيلات مواد جديدة.',
+        registrationIncomplete: 'نافذة التسجيل مفتوحة، لكن الطلاب لا يستطيعون التسجيل حتى يتم تحديد السنة الأكاديمية الحالية (في قسم التقويم الأكاديمي) والفصل الدراسي.',
     },
     registration: {
         title: 'تسجيل المواد',

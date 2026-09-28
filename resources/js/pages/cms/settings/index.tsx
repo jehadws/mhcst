@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Lock, Unlock } from 'lucide-react';
+import { AlertTriangle, Lock, Unlock } from 'lucide-react';
 
 export default function CmsSettingsIndex({
     settings,
@@ -111,6 +111,12 @@ export default function CmsSettingsIndex({
                             </Label>
                         </div>
                         <p className="text-xs text-muted-foreground">{c.settings.subjectRegistrationOpenHint}</p>
+                        {data.subject_registration_open && (!data.academic_year.trim() || !data.current_semester) && (
+                            <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
+                                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                                <p>{c.settings.registrationIncomplete}</p>
+                            </div>
+                        )}
                     </section>
 
                     <section className="space-y-4 bg-card border rounded-2xl p-6">

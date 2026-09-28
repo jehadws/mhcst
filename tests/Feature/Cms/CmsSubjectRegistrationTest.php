@@ -390,3 +390,39 @@ test('teacher cannot open the subject registration page', function () {
 test('subject registration page requires authentication', function () {
     $this->get(route('dashboard.subject-registration.index'))->assertRedirect('/login');
 });
+
+test('open window stays blocked until the academic year is configured', function () {
+    [$user, $student, , $department] = createRegistrationStudent();
+    setRegistrationTerm('', 'first');
+    $subject = createRegistrationSubject($department->id, 'Y101');
+
+    $this->actingAs($user)->get(route('dashboard.subject-registration.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('dashboard/subject-registration')
+            ->where('registration_window.open', true)
+            ->where('registration_window.student_active', true)
+            ->where('term.academic_year', null)
+            ->where('term.semester', 'first')
+        );
+
+    $this->actingAs($user)
+        ->post(route('dashboard.subject-registration.store'), ['subject_ids' => [$subject->id]])
+        ->assertSessionHasErrors('subject_ids');
+    expect(CmsEnrollment::count())->toBe(0);
+
+    setRegistrationTerm('2025-2026', 'first');
+
+    $this->actingAs($user)
+        ->post(route('dashboard.subject-registration.store'), ['subject_ids' => [$subject->id]])
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('cms_enrollments', [
+        'student_id' => $student->id,
+        'subject_id' => $subject->id,
+        'academic_year' => '2025-2026',
+        'semester' => 'first',
+        'status' => 'pending',
+        'source' => 'self',
+    ]);
+});
