@@ -15,9 +15,11 @@ use App\Services\CmsStudentImportService;
 use App\Services\CmsTranscriptService;
 use App\Support\SiteLogo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\Permission\Models\Role;
 
 class CmsStudentController extends Controller
 {
@@ -66,16 +68,21 @@ class CmsStudentController extends Controller
         unset($data['create_user_account'], $data['password']);
 
         if ($createUser && ! empty($request->email) && ! empty($request->password)) {
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
-            $user->assignRole(UserRole::Student->value);
-            $data['user_id'] = $user->id;
-        }
+            DB::transaction(function () use ($data, $request) {
+                $user = User::create([
+                    'name' => $data['name'],
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
+                Role::firstOrCreate(['name' => UserRole::Student->value, 'guard_name' => 'web']);
+                $user->assignRole(UserRole::Student->value);
+                $data['user_id'] = $user->id;
 
-        CmsStudent::create($data);
+                CmsStudent::create($data);
+            });
+        } else {
+            CmsStudent::create($data);
+        }
 
         return redirect()->route('cms.students.index')->with('success', 'Student created successfully.');
     }
