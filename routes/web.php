@@ -85,6 +85,10 @@ Route::middleware(['auth', 'dashboard.role'])->group(function () {
         ->middleware('dashboard.access:student')
         ->name('dashboard.my-transcript');
 
+    Route::get('dashboard/subject-registration', [SubjectRegistrationController::class, 'index'])
+        ->middleware('dashboard.access:student')
+        ->name('dashboard.subject-registration.index');
+
     Route::post('dashboard/subject-registration', [SubjectRegistrationController::class, 'store'])
         ->middleware('dashboard.access:student')
         ->name('dashboard.subject-registration.store');

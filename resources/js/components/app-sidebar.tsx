@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { Link, usePage } from '@inertiajs/react';
 import { useSite } from '@/context/site-context';
-import { canAccessCms, canAccessCmsAdmin, canAccessContent, canAccessCrm, canAccessSettings } from '@/lib/dashboard-access';
+import { canAccessCms, canAccessCmsAdmin, canAccessContent, canAccessCrm, canAccessSettings, canAccessStudent } from '@/lib/dashboard-access';
 import { SharedData } from '@/types';
 import {
     Award,
@@ -15,6 +15,7 @@ import {
     HelpCircle,
     Inbox,
     LayoutGrid,
+    ClipboardList,
     Presentation,
     ScrollText,
     Send,
@@ -88,6 +89,15 @@ export function AppSidebar() {
                     <NavMain
                         label={c.title}
                         items={cmsCapabilities.isTeacher ? teacherNavItems : adminNavItems}
+                    />
+                )}
+
+                {canAccessStudent(roles) && (
+                    <NavMain
+                        label={c.registration.title}
+                        items={[
+                            { title: c.nav.subjectRegistration, url: '/dashboard/subject-registration', icon: ClipboardList },
+                        ]}
                     />
                 )}
 

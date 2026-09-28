@@ -43,6 +43,12 @@ export function canAccessCrm(roles: string[]): boolean {
     return hasAnyRole(roles, CRM_ROLES);
 }
 
+const STUDENT_ROLES = ['Student'];
+
+export function canAccessStudent(roles: string[]): boolean {
+    return hasAnyRole(roles, STUDENT_ROLES);
+}
+
 export const USER_ROLES = ['Admin', 'Manager', 'Content Editor', 'Support', 'Teacher', 'Student'] as const;
 
 export type UserRoleName = (typeof USER_ROLES)[number];

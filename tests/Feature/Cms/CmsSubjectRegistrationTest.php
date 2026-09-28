@@ -305,3 +305,88 @@ test('academic settings page controls the registration window', function () {
 
     expect(CmsEnrollment::where('subject_id', $freshSubject->id)->count())->toBe(0);
 });
+
+test('subject registration page shows available subjects and term for the student', function () {
+    [$user, , , $department] = createRegistrationStudent();
+    setRegistrationTerm('2026-2027', 'first');
+    createRegistrationSubject($department->id, 'P101');
+    createRegistrationSubject($department->id, 'P102', 'first', 4);
+
+    $otherDepartment = CmsDepartment::create(['name' => 'Other Registration Dept', 'description' => 'Other']);
+    createRegistrationSubject($otherDepartment->id, 'X100');
+
+    $this->actingAs($user)->get(route('dashboard.subject-registration.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('dashboard/subject-registration')
+            ->has('subjects', 2)
+            ->where('subjects.0.code', 'P101')
+            ->where('subjects.1.code', 'P102')
+            ->where('subjects.1.credits', 4)
+            ->where('term.academic_year', '2026-2027')
+            ->where('term.semester', 'first')
+            ->where('registration_window.open', true)
+            ->where('registration_window.student_active', true)
+        );
+});
+
+test('subject registration page lists current term registrations with status', function () {
+    [$user, $student, , $department] = createRegistrationStudent();
+    setRegistrationTerm();
+    $subject = createRegistrationSubject($department->id, 'P201');
+
+    $enrollment = CmsEnrollment::create([
+        'student_id' => $student->id,
+        'subject_id' => $subject->id,
+        'academic_year' => '2026-2027',
+        'semester' => 'first',
+        'enrollment_date' => now(),
+        'status' => 'pending',
+        'source' => 'self',
+    ]);
+
+    $this->actingAs($user)->get(route('dashboard.subject-registration.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('registrations.0.id', $enrollment->id)
+            ->where('registrations.0.status', 'pending')
+            ->where('registrations.0.subject.code', 'P201')
+            ->has('subjects', 0)
+        );
+});
+
+test('non-active student sees blocked registration window flag', function () {
+    [$user] = createRegistrationStudent('suspended');
+    setRegistrationTerm();
+
+    $this->actingAs($user)->get(route('dashboard.subject-registration.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('registration_window.student_active', false)
+        );
+});
+
+test('closed registration window flag is exposed on the page', function () {
+    [$user, , , $department] = createRegistrationStudent();
+    setRegistrationTerm();
+    SiteSetting::updateOrCreate(['key' => 'cms.subject_registration_open'], ['value' => '0', 'type' => 'text']);
+
+    $this->actingAs($user)->get(route('dashboard.subject-registration.index'))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('registration_window.open', false)
+        );
+});
+
+test('teacher cannot open the subject registration page', function () {
+    Role::firstOrCreate(['name' => UserRole::Teacher->value, 'guard_name' => 'web']);
+
+    $teacher = User::factory()->create();
+    $teacher->assignRole(UserRole::Teacher->value);
+
+    $this->actingAs($teacher)->get(route('dashboard.subject-registration.index'))->assertForbidden();
+});
+
+test('subject registration page requires authentication', function () {
+    $this->get(route('dashboard.subject-registration.index'))->assertRedirect('/login');
+});
