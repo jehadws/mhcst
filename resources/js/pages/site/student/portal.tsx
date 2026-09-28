@@ -21,6 +21,19 @@ interface TrainingEnrollment {
   };
 }
 
+interface AcademicSubject {
+  name: string;
+  code?: string;
+  credits?: number;
+}
+
+interface AcademicCertificate {
+  certificate_number?: string;
+  course_title_ar?: string;
+  course_title_en?: string;
+  download_url?: string;
+}
+
 interface AcademicStudent {
   id: number;
   student_no: string;
@@ -28,7 +41,8 @@ interface AcademicStudent {
   status: string;
   department?: string;
   level?: string;
-  subjects: string[];
+  subjects: AcademicSubject[];
+  certificates?: AcademicCertificate[];
 }
 
 export default function StudentPortal() {
@@ -38,25 +52,55 @@ export default function StudentPortal() {
   const [academicStudents, setAcademicStudents] = useState<AcademicStudent[]>([]);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const clearResults = () => {
+    setTrainingEnrollments([]);
+    setAcademicStudents([]);
+    setSearched(false);
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputVal.trim()) return;
 
     setLoading(true);
+    setError(null);
     try {
       const url = route
         ? route('student.portal.search', { query: inputVal.trim() })
         : `/student/portal/search?query=${encodeURIComponent(inputVal.trim())}`;
       const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (res.status === 429) {
+        clearResults();
+        setError(
+          locale === 'ar'
+            ? 'عدد كبير من المحاولات — يرجى الانتظار قليلاً ثم المحاولة مجدداً.'
+            : 'Too many attempts — please wait a moment and try again.',
+        );
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         setTrainingEnrollments(data.training_enrollments || data.enrollments || []);
         setAcademicStudents(data.academic_students || []);
         setSearched(true);
+      } else {
+        clearResults();
+        setError(
+          locale === 'ar'
+            ? 'تعذر إكمال البحث. حاول مرة أخرى.'
+            : 'Could not complete the search. Please try again.',
+        );
       }
     } catch (err) {
       console.error('Failed to search portal:', err);
+      clearResults();
+      setError(
+        locale === 'ar'
+          ? 'تعذر إكمال البحث. حاول مرة أخرى.'
+          : 'Could not complete the search. Please try again.',
+      );
     } finally {
       setLoading(false);
     }
@@ -149,6 +193,12 @@ export default function StudentPortal() {
               </div>
             </form>
 
+            {error && (
+              <div className="border-destructive/30 bg-destructive/10 text-destructive mt-6 rounded-2xl border p-4 text-center text-sm font-semibold">
+                {error}
+              </div>
+            )}
+
             {searched && (
               <div className="mt-8 space-y-8">
                 <h2 className="text-foreground font-serif text-xl font-bold">
@@ -179,9 +229,63 @@ export default function StudentPortal() {
                                   <p className="text-sm mt-2">{student.department}{student.level ? ` · ${student.level}` : ''}</p>
                                 )}
                                 {student.subjects.length > 0 && (
-                                  <p className="text-xs text-muted-foreground mt-2">
-                                    {locale === 'ar' ? 'المواد:' : 'Subjects:'} {student.subjects.join(', ')}
-                                  </p>
+                                  <div className="mt-3 flex flex-wrap gap-1.5">
+                                    {student.subjects.map((subject) => (
+                                      <span
+                                        key={subject.code ?? subject.name}
+                                        className="border-border bg-secondary inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium"
+                                      >
+                                        <BookOpen className="text-muted-foreground size-3" />
+                                        <span>
+                                          {subject.code ? `${subject.code} · ` : ''}
+                                          {subject.name}
+                                        </span>
+                                        {typeof subject.credits === 'number' && (
+                                          <span className="text-muted-foreground">
+                                            {locale === 'ar' ? ` · ${subject.credits} وحدات` : ` · ${subject.credits} cr`}
+                                          </span>
+                                        )}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                                {student.certificates && student.certificates.length > 0 && (
+                                  <div className="border-border/60 mt-3 space-y-1.5 border-t pt-3">
+                                    <p className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                                      <Award className="size-3.5" />
+                                      {locale === 'ar'
+                                        ? `الشهادات التدريبية (${student.certificates.length})`
+                                        : `Training Certificates (${student.certificates.length})`}
+                                    </p>
+                                    {student.certificates.map((cert) => {
+                                      const certTitle =
+                                        locale === 'ar'
+                                          ? cert.course_title_ar ?? cert.course_title_en
+                                          : cert.course_title_en ?? cert.course_title_ar;
+
+                                      return (
+                                        <div
+                                          key={cert.certificate_number ?? cert.download_url ?? certTitle}
+                                          className="flex flex-wrap items-center gap-2 text-xs"
+                                        >
+                                          <span className="text-foreground">{certTitle}</span>
+                                          {cert.certificate_number && (
+                                            <span className="text-muted-foreground font-mono">#{cert.certificate_number}</span>
+                                          )}
+                                          {cert.download_url && (
+                                            <a
+                                              href={cert.download_url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="font-semibold text-emerald-600 hover:underline dark:text-emerald-400"
+                                            >
+                                              {locale === 'ar' ? 'تحميل' : 'Download'}
+                                            </a>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
                                 )}
                               </div>
                               <p className="text-xs text-muted-foreground max-w-xs">
@@ -217,6 +321,11 @@ export default function StudentPortal() {
                                   <p className="text-muted-foreground text-xs">
                                     {locale === 'ar' ? 'المتدرب:' : 'Learner:'} {learnerName}
                                   </p>
+                                  {enr.certificate?.certificate_number && (
+                                    <p className="text-muted-foreground font-mono text-xs">
+                                      {locale === 'ar' ? 'رقم الشهادة:' : 'Certificate:'} {enr.certificate.certificate_number}
+                                    </p>
+                                  )}
                                 </div>
                                 {enr.certificate?.download_url && (
                                   <a
