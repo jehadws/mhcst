@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Models\CmsDepartment;
+use App\Models\CmsSchedule;
 use App\Models\CmsStudent;
 use App\Models\CmsTeacher;
 use App\Models\Faq;
@@ -58,6 +59,49 @@ class SiteController extends Controller
 
         return Inertia::render('site/departments', [
             'departments' => $departments,
+        ]);
+    }
+
+    public function teachers(): Response
+    {
+        $showTeachersPage = (bool) SiteSetting::get('show_teachers_page', false);
+        $hideInstructorNames = (bool) SiteSetting::get('hide_instructor_names', false);
+
+        // The faculty directory is opt-in and only exists while instructor
+        // names are public.
+        abort_unless($showTeachersPage && ! $hideInstructorNames, 404);
+
+        // List active teachers who currently teach; their departments are
+        // derived from the subjects they teach through the timetable.
+        $teachers = CmsTeacher::query()
+            ->where('status', 'active')
+            ->whereHas('schedules.subject')
+            ->with('schedules.subject.department:id,name')
+            ->get()
+            ->map(function (CmsTeacher $teacher) {
+                $departments = $teacher->schedules
+                    ->map(fn (CmsSchedule $schedule) => $schedule->subject?->department)
+                    ->filter()
+                    ->unique('id')
+                    ->values()
+                    ->map(fn (CmsDepartment $department) => [
+                        'id' => $department->id,
+                        'name' => $department->name,
+                    ]);
+
+                return [
+                    'id' => $teacher->id,
+                    'name' => $teacher->name,
+                    'specialization' => $teacher->specialization,
+                    'qualification' => $teacher->qualification,
+                    'departments' => $departments,
+                ];
+            })
+            ->filter(fn (array $teacher) => $teacher['departments']->isNotEmpty())
+            ->values();
+
+        return Inertia::render('site/teachers', [
+            'teachers' => $teachers,
         ]);
     }
 

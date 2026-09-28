@@ -173,6 +173,11 @@ class SiteSeoService
             $this->entry(route('privacy-policy'), '0.3', 'yearly'),
         ];
 
+        if ((bool) SiteSetting::get('show_teachers_page', false)
+            && ! (bool) SiteSetting::get('hide_instructor_names', false)) {
+            $entries[] = $this->entry(route('teachers'), '0.6', 'monthly');
+        }
+
         BlogPost::query()
             ->where('status', 'published')
             ->orderByDesc('published_at')

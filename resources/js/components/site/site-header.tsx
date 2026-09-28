@@ -1,5 +1,5 @@
 import { SiteLogo } from '@/components/site/site-logo';
-import { useBrandText } from '@/hooks/use-site-settings';
+import { useBrandText, useSiteSettings } from '@/hooks/use-site-settings';
 import { useSite } from '@/context/site-context';
 import { cn } from '@/lib/utils';
 import type { SharedData } from '@/types';
@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 export function SiteHeader() {
   const { t, theme, toggleTheme, toggleLocale, locale, isRTL } = useSite();
   const { brandName, brandSub } = useBrandText();
+  const { show_teachers_page: showTeachersPage, hide_instructor_names: hideInstructorNames } = useSiteSettings();
   const { url, props } = usePage<SharedData>();
   const { auth } = props;
   const canAccessDashboard = Boolean(auth.user && (auth.roles?.length ?? 0) > 0);
@@ -27,6 +28,9 @@ export function SiteHeader() {
     { href: '/about', label: t.nav.about },
     { href: '/contact', label: locale === 'ar' ? 'القبول والتسجيل' : 'Admissions' },
     { href: '/departments', label: locale === 'ar' ? 'الأقسام والبرامج' : 'Departments' },
+    ...(showTeachersPage && !hideInstructorNames
+      ? [{ href: '/teachers', label: locale === 'ar' ? 'أعضاء هيئة التدريس' : 'Faculty' }]
+      : []),
     { href: '/blog-posts', label: locale === 'ar' ? 'الأخبار' : 'News' },
     { href: '/faq', label: t.nav.faq },
   ];

@@ -286,6 +286,7 @@ export interface SiteSettings {
     footer_text?: string;
     meta_description?: string;
     hide_instructor_names?: boolean;
+    show_teachers_page?: boolean;
 }
 
 export interface NewsletterSubscriber {

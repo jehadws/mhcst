@@ -46,6 +46,7 @@ Route::get('/deploy/run', DeployRunController::class)->name('deploy.run');
 Route::get('/', [SiteController::class, 'home'])->name('home');
 Route::get('/about', [SiteController::class, 'about'])->name('about');
 Route::get('/departments', [SiteController::class, 'departments'])->name('departments');
+Route::get('/teachers', [SiteController::class, 'teachers'])->name('teachers');
 Route::get('/faq', [SiteController::class, 'faq'])->name('faq');
 Route::get('/contact', [SiteController::class, 'contact'])->name('contact');
 Route::get('/blog-posts', [BlogController::class, 'index'])->name('blog');

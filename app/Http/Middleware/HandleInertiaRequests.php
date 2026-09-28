@@ -26,6 +26,7 @@ class HandleInertiaRequests extends Middleware
         'footer_text',
         'meta_description',
         'hide_instructor_names',
+        'show_teachers_page',
     ];
 
     /**
