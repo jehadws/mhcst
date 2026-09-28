@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { Link, usePage } from '@inertiajs/react';
 import { useSite } from '@/context/site-context';
-import { canAccessCms, canAccessCmsAdmin, canAccessContent, canAccessCrm, canAccessSettings, canManageCms } from '@/lib/dashboard-access';
+import { canAccessCms, canAccessCmsAdmin, canAccessContent, canAccessCrm, canAccessSettings } from '@/lib/dashboard-access';
 import { SharedData } from '@/types';
 import {
     Award,
@@ -15,7 +15,6 @@ import {
     HelpCircle,
     Inbox,
     LayoutGrid,
-    MailPlus,
     Presentation,
     ScrollText,
     Send,
@@ -33,7 +32,7 @@ export function AppSidebar() {
     const c = t.cms;
     const sidebar = t.dashboard.sidebar;
     const roles = usePage<SharedData>().props.auth.roles ?? [];
-    const isTeacherOnly = canAccessCms(roles) && !canManageCms(roles);
+    const cmsCapabilities = usePage<SharedData>().props.cmsCapabilities ?? { canManage: false, isTeacher: false };
 
     const teacherNavItems = [
         { title: c.nav.grades, url: '/cms/grades', icon: Award },
@@ -88,7 +87,7 @@ export function AppSidebar() {
                 {canAccessCms(roles) && (
                     <NavMain
                         label={c.title}
-                        items={isTeacherOnly ? teacherNavItems : adminNavItems}
+                        items={cmsCapabilities.isTeacher ? teacherNavItems : adminNavItems}
                     />
                 )}
 

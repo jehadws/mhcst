@@ -78,15 +78,25 @@ export default function UsersListPage({ users = [] }: Props) {
         {
             id: 'roles',
             header: d.columns.roles,
-            cell: ({ row }) => (
-                <div className="flex flex-wrap gap-1">
-                    {(row.original.roles ?? []).map((role) => (
-                        <Badge key={role} variant="secondary" className="text-xs">
-                            {roleLabel(role, locale === 'ar' ? 'ar' : 'en')}
-                        </Badge>
-                    ))}
-                </div>
-            ),
+            cell: ({ row }) => {
+                const roles = row.original.roles ?? [];
+                const hasMixedCmsRoles = roles.includes('Teacher') && roles.some((role) => role === 'Admin' || role === 'Manager');
+
+                return (
+                    <div className="flex flex-wrap items-center gap-1">
+                        {roles.map((role) => (
+                            <Badge key={role} variant="secondary" className="text-xs">
+                                {roleLabel(role, locale === 'ar' ? 'ar' : 'en')}
+                            </Badge>
+                        ))}
+                        {hasMixedCmsRoles && (
+                            <Badge variant="destructive" className="text-xs" title={d.warnings.mixedCmsRoles}>
+                                ⚠ {d.warnings.mixedCmsRoles}
+                            </Badge>
+                        )}
+                    </div>
+                );
+            },
         },
         {
             id: 'actions',

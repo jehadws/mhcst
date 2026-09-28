@@ -472,6 +472,9 @@ export const dictionary = {
                 startDate: 'Start Date',
                 endDate: 'End Date',
             },
+            warnings: {
+                mixedCmsRoles: 'Teacher + Admin/Manager roles combined',
+            },
             actions: {
                 view: 'View',
                 edit: 'Edit',
@@ -1012,6 +1015,9 @@ export const dictionary = {
                 venue: 'العنوان',
                 startDate: 'تاريخ البداية',
                 endDate: 'تاريخ النهاية',
+            },
+            warnings: {
+                mixedCmsRoles: 'يجمع بين دور الأستاذ ودور المدير',
             },
             actions: {
                 view: 'عرض',

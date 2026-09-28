@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { useCms } from '@/hooks/use-cms';
 import { cmsBreadcrumbs, dayLabel } from '@/lib/cms-helpers';
 import { BreadcrumbItem } from '@/types';
-import { CmsLevel, CmsSchedule, CmsTeacher } from '@/types/cms';
+import { CmsSchedule } from '@/types/cms';
 import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2, Calendar, Edit } from 'lucide-react';
@@ -13,12 +13,8 @@ const DAY_KEYS = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thurs
 
 export default function SchedulesIndex({
     schedules,
-    levels,
-    teachers,
 }: {
     schedules: CmsSchedule[];
-    levels: CmsLevel[];
-    teachers: CmsTeacher[];
 }) {
     const { c, canManage } = useCms();
 
