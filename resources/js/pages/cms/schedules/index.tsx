@@ -92,7 +92,7 @@ export default function SchedulesIndex({
                                             )}
                                             <div className="font-bold text-sm text-indigo-600 dark:text-indigo-400">{s.subject?.name}</div>
                                             <div className="text-xs text-slate-600 dark:text-slate-300 mt-1">
-                                                {c.schedules.teacherLabel.replace('{name}', s.teacher?.name ?? '')}
+                                                {c.schedules.teacherLabel.replace('{name}', s.teacher?.name ?? c.schedules.teacherTba)}
                                             </div>
                                             <div className="text-xs text-slate-500 mt-0.5">
                                                 {c.schedules.sectionLabel

@@ -28,7 +28,7 @@ export default function ScheduleCreate({
 
     const { data, setData, post, processing, errors } = useForm({
         subject_id: subjects[0]?.id ? String(subjects[0].id) : '',
-        teacher_id: teachers[0]?.id ? String(teachers[0].id) : '',
+        teacher_id: '',
         level_id: levels[0]?.id ? String(levels[0].id) : '',
         day: 'saturday',
         start_time: '09:00',
@@ -86,6 +86,7 @@ export default function ScheduleCreate({
                                 value={data.teacher_id}
                                 onChange={(e) => setData('teacher_id', e.target.value)}
                             >
+                                <option value="">— {c.common.unassigned} —</option>
                                 {teachers.map((t) => (
                                     <option key={t.id} value={t.id}>{t.name}</option>
                                 ))}

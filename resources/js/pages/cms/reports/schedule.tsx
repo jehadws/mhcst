@@ -82,7 +82,7 @@ export default function ScheduleReport({
                                         <td className="p-4">{schedule.day}</td>
                                         <td className="p-4">{schedule.start_time} – {schedule.end_time}</td>
                                         <td className="p-4">{schedule.subject?.name}</td>
-                                        <td className="p-4">{schedule.teacher?.name}</td>
+                                        <td className="p-4">{schedule.teacher?.name ?? c.schedules.teacherTba}</td>
                                         <td className="p-4">{schedule.room}</td>
                                     </tr>
                                 ))

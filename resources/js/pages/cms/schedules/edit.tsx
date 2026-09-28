@@ -34,7 +34,7 @@ export default function ScheduleEdit({
 
     const { data, setData, put, processing, errors } = useForm({
         subject_id: String(schedule.subject_id),
-        teacher_id: String(schedule.teacher_id),
+        teacher_id: schedule.teacher_id != null ? String(schedule.teacher_id) : '',
         level_id: String(schedule.level_id),
         day: schedule.day,
         start_time: formatTime(schedule.start_time),
@@ -92,6 +92,7 @@ export default function ScheduleEdit({
                                 value={data.teacher_id}
                                 onChange={(e) => setData('teacher_id', e.target.value)}
                             >
+                                <option value="">— {c.common.unassigned} —</option>
                                 {teachers.map((t) => (
                                     <option key={t.id} value={t.id}>{t.name}</option>
                                 ))}

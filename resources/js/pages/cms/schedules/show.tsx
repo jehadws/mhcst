@@ -35,7 +35,7 @@ export default function ScheduleShow({ schedule }: { schedule: CmsSchedule }) {
                     </div>
                     <div className="flex justify-between p-4">
                         <dt className="text-slate-500">{c.common.teacher}</dt>
-                        <dd className="font-semibold">{schedule.teacher?.name}</dd>
+                        <dd className="font-semibold">{schedule.teacher?.name ?? c.schedules.teacherTba}</dd>
                     </div>
                     <div className="flex justify-between p-4">
                         <dt className="text-slate-500">{c.common.section}</dt>

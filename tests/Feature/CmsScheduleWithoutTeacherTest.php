@@ -95,3 +95,15 @@ test('deleting a teacher keeps their schedules and clears the assignment', funct
     expect($schedule->fresh())->not->toBeNull()
         ->and($schedule->fresh()->teacher_id)->toBeNull();
 });
+
+test('schedule pages render for a schedule without a teacher', function () {
+    $admin = actingScheduleAdmin();
+    $fixtures = createScheduleFixtures();
+
+    $schedule = CmsSchedule::create(schedulePayload($fixtures));
+
+    $this->actingAs($admin)->get('/cms/schedules')->assertOk();
+    $this->actingAs($admin)->get("/cms/schedules/{$schedule->id}")->assertOk();
+    $this->actingAs($admin)->get("/cms/schedules/{$schedule->id}/edit")->assertOk();
+    $this->actingAs($admin)->get('/cms/reports/schedule')->assertOk();
+});
