@@ -714,6 +714,7 @@ export const dictionary = {
                     address: 'Address',
                     social_links: 'Social Links',
                     footer_text: 'Footer Text',
+                    hide_instructor_names: 'Hide Instructor Names on Public Site',
                 },
                 social: {
                     add: 'Add Platform',
@@ -725,6 +726,7 @@ export const dictionary = {
                     contact: 'Contact',
                     social: 'Social',
                     footer: 'Footer',
+                    visibility: 'Visibility',
                 },
             },
             siteContent: {
@@ -1258,6 +1260,7 @@ export const dictionary = {
                     address: 'العنوان',
                     social_links: 'روابط التواصل الاجتماعي',
                     footer_text: 'نص التذييل',
+                    hide_instructor_names: 'إخفاء أسماء أعضاء هيئة التدريس في الموقع العام',
                 },
                 social: {
                     add: 'إضافة منصة',
@@ -1269,6 +1272,7 @@ export const dictionary = {
                     contact: 'الاتصال',
                     social: 'التواصل',
                     footer: 'التذييل',
+                    visibility: 'الظهور',
                 },
             },
             siteContent: {

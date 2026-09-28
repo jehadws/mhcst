@@ -5,6 +5,7 @@ import { FloatingButtons } from '@/components/site/floating-buttons';
 import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import { useSite } from '@/context/site-context';
+import { useSiteSettings } from '@/hooks/use-site-settings';
 import { Link } from '@inertiajs/react';
 import { ArrowLeft, ArrowRight, BookOpen, Building2, GraduationCap, Users } from 'lucide-react';
 
@@ -17,7 +18,7 @@ interface CmsLevel {
 
 interface CmsTeacher {
   id: number;
-  name: string;
+  name?: string;
 }
 
 interface CmsDepartment {
@@ -36,6 +37,7 @@ interface Props {
 
 export default function PublicDepartmentsPage({ departments = [] }: Props) {
   const { t, locale } = useSite();
+  const { hide_instructor_names: hideInstructorNames } = useSiteSettings();
   const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight;
 
   return (
@@ -119,7 +121,15 @@ export default function PublicDepartmentsPage({ departments = [] }: Props) {
                           <div className="text-muted-foreground mb-4 flex items-center gap-2 text-xs">
                             <GraduationCap className="text-primary size-4 shrink-0" />
                             <span>
-                              {locale === 'ar' ? 'رئيس القسم:' : 'Department Head:'} <strong className="text-foreground">{dept.head.name}</strong>
+                              {locale === 'ar' ? 'رئيس القسم:' : 'Department Head:'}{' '}
+                              <strong className="text-foreground">
+                                {dept.head.name ||
+                                  (hideInstructorNames
+                                    ? locale === 'ar'
+                                      ? 'عضو هيئة التدريس'
+                                      : 'Faculty member'
+                                    : '')}
+                              </strong>
                             </span>
                           </div>
                         )}

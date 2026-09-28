@@ -46,7 +46,13 @@ class SiteController extends Controller
 
     public function departments(): Response
     {
-        $departments = CmsDepartment::with(['levels', 'head'])
+        $hideInstructorNames = (bool) SiteSetting::get('hide_instructor_names', false);
+
+        // When names are hidden, load only the head relation's id so teacher
+        // names never reach the client; the UI shows a localized placeholder.
+        $with = $hideInstructorNames ? ['levels', 'head:id'] : ['levels', 'head'];
+
+        $departments = CmsDepartment::with($with)
             ->withCount(['students', 'subjects'])
             ->get();
 

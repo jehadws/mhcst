@@ -264,7 +264,7 @@ export interface SiteSetting {
     id: number;
     key: string;
     value: string;
-    type: 'text' | 'image' | 'json';
+    type: 'text' | 'image' | 'json' | 'boolean';
 }
 
 export interface SiteSettings {
@@ -285,6 +285,7 @@ export interface SiteSettings {
     };
     footer_text?: string;
     meta_description?: string;
+    hide_instructor_names?: boolean;
 }
 
 export interface NewsletterSubscriber {

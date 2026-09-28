@@ -27,6 +27,7 @@ class SiteSettingSeeder extends Seeder
             ]), 'type' => 'json'],
             ['key' => 'footer_text', 'value' => '© 2026 Almaayir Alhaditha College for Science and Technology. جميع الحقوق محفوظة.', 'type' => 'text'],
             ['key' => 'meta_description', 'value' => 'كلية المعايير الحديثة للعلوم والتقنية — Almaayir Alhaditha College for Science and Technology', 'type' => 'text'],
+            ['key' => 'hide_instructor_names', 'value' => '0', 'type' => 'boolean'],
         ];
 
         foreach ($settings as $s) {

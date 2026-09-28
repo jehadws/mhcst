@@ -25,6 +25,7 @@ class HandleInertiaRequests extends Middleware
         'social_links',
         'footer_text',
         'meta_description',
+        'hide_instructor_names',
     ];
 
     /**
@@ -79,14 +80,18 @@ class HandleInertiaRequests extends Middleware
                 ->whereIn('key', self::PUBLIC_SITE_SETTING_KEYS)
                 ->get()
                 ->mapWithKeys(function (SiteSetting $setting) {
-                    $value = $setting->type === 'json' ? json_decode($setting->value, true) : $setting->value;
+                    $value = match ($setting->type) {
+                        'json' => json_decode($setting->value, true),
+                        'boolean' => filter_var($setting->value, FILTER_VALIDATE_BOOLEAN),
+                        default => $setting->value,
+                    };
 
                     return [$setting->key => $value];
                 }),
             'flash' => [
-                    'success' => $request->session()->get('success'),
-                    'import_errors' => $request->session()->get('import_errors'),
-                ],
+                'success' => $request->session()->get('success'),
+                'import_errors' => $request->session()->get('import_errors'),
+            ],
         ]);
     }
 }

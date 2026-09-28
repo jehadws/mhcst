@@ -5,6 +5,7 @@ import { Plus, X } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,7 +17,7 @@ import { useSite } from '@/context/site-context';
 interface SettingField {
     key: string;
     value: string;
-    type: 'text' | 'image' | 'json';
+    type: 'text' | 'image' | 'json' | 'boolean';
 }
 
 interface SettingGroup {
@@ -216,6 +217,18 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
                             dir="ltr"
                         />
                         {error && <p className="text-sm text-destructive mt-1">{error}</p>}
+                    </div>
+                );
+
+            case 'boolean':
+                return (
+                    <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
+                        <Label htmlFor={`setting-${field.key}`}>{fieldLabel(field.key)}</Label>
+                        <Checkbox
+                            id={`setting-${field.key}`}
+                            checked={settings[field.key] === '1'}
+                            onCheckedChange={checked => handleValueChange(field.key, checked ? '1' : '0')}
+                        />
                     </div>
                 );
 

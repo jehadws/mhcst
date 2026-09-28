@@ -34,6 +34,7 @@ class SiteSetting extends Model
 
         return match ($setting->type) {
             'json' => json_decode($setting->value, true),
+            'boolean' => filter_var($setting->value, FILTER_VALIDATE_BOOLEAN),
             default => $setting->value,
         };
     }

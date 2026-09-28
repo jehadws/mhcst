@@ -26,6 +26,10 @@ class SiteSettingController extends Controller
             'label' => 'Footer',
             'fields' => ['footer_text'],
         ],
+        'visibility' => [
+            'label' => 'Visibility',
+            'fields' => ['hide_instructor_names'],
+        ],
     ];
 
     public function edit()
@@ -90,6 +94,8 @@ class SiteSettingController extends Controller
                 }
 
                 $setting->update(['value' => json_encode($decoded)]);
+            } elseif ($setting->type === 'boolean') {
+                $setting->update(['value' => filter_var($value, FILTER_VALIDATE_BOOLEAN) ? '1' : '0']);
             } else {
                 $setting->update(['value' => $value]);
             }
