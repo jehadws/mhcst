@@ -1,4 +1,5 @@
 import { SeoHead } from '@/components/seo-head';
+import { Banner } from '@/types';
 import { SiteHeader } from '@/components/site/site-header';
 import { SiteFooter } from '@/components/site/site-footer';
 import { FloatingButtons } from '@/components/site/floating-buttons';
@@ -20,6 +21,7 @@ interface Props {
   faqs?: any[];
   testimonials?: any[];
   posts?: any[];
+  banners?: Banner[];
   stats?: {
     students_count?: number;
     teachers_count?: number;
@@ -27,14 +29,14 @@ interface Props {
   };
 }
 
-export default function Welcome({ departments, testimonials, posts, stats }: Props) {
+export default function Welcome({ banners, departments, testimonials, posts, stats }: Props) {
   return (
     <>
       <SeoHead />
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="flex-1">
-          <Hero />
+          <Hero banners={banners} />
           <StatsBar stats={stats} />
           <DepartmentsShowcase departments={departments} />
           <WhyUs />

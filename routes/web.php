@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BlogPostController;
 use App\Http\Controllers\CertificateController;
@@ -110,6 +111,7 @@ Route::middleware(['auth', 'dashboard.role'])->group(function () {
 
     Route::middleware(['dashboard.access:uploads'])->group(function () {
         Route::post('uploads/image', [UploadController::class, 'store'])->name('uploads.image');
+        Route::post('uploads/video', [UploadController::class, 'storeVideo'])->name('uploads.video');
         Route::delete('uploads/image', [UploadController::class, 'destroy'])->name('uploads.destroy');
     });
 
@@ -139,6 +141,18 @@ Route::middleware(['auth', 'dashboard.role'])->group(function () {
         Route::put('dashboard/pages/privacy-policy', fn (Request $request) => app(SiteContentController::class)->update($request, 'privacy-policy'))->name('dashboard.pages.privacy-policy.update');
         Route::get('dashboard/pages/terms-of-use', fn () => app(SiteContentController::class)->edit('terms-of-use'))->name('dashboard.pages.terms-of-use.edit');
         Route::put('dashboard/pages/terms-of-use', fn (Request $request) => app(SiteContentController::class)->update($request, 'terms-of-use'))->name('dashboard.pages.terms-of-use.update');
+
+        Route::get('dashboard/pages/about', [SiteSettingController::class, 'editAbout'])->name('dashboard.pages.about.edit');
+        Route::put('dashboard/pages/about', [SiteSettingController::class, 'updateAbout'])->name('dashboard.pages.about.update');
+
+        Route::get('dashboard/banners/list', [BannerController::class, 'index'])->name('dashboard.banners.list');
+        Route::get('dashboard/banners/create', [BannerController::class, 'create'])->name('dashboard.banners.create');
+        Route::get('dashboard/banners/{banner}/edit', [BannerController::class, 'edit'])->name('dashboard.banners.edit');
+        Route::get('dashboard/banners/{banner}', [BannerController::class, 'show'])->name('dashboard.banners.show');
+        Route::post('dashboard/banners', [BannerController::class, 'store'])->name('dashboard.banners.store');
+        Route::put('dashboard/banners/{banner}', [BannerController::class, 'update'])->name('dashboard.banners.update');
+        Route::delete('dashboard/banners/{banner}', [BannerController::class, 'destroy'])->name('dashboard.banners.destroy');
+        Route::post('dashboard/banners/bulk-actions', [BannerController::class, 'bulkActions'])->name('dashboard.banners.bulk-actions');
 
         Route::get('dashboard/faqs/list', [FaqController::class, 'index'])->name('dashboard.faqs.list');
         Route::get('dashboard/faqs/create', [FaqController::class, 'create'])->name('dashboard.faqs.create');

@@ -45,6 +45,18 @@ class StoreBlogPostRequest extends FormRequest
                     $fail('قيمة الصورة غير صالحة.');
                 }
             }],
+            'cover_video' => ['nullable', function ($attribute, $value, $fail) {
+                if ($value instanceof UploadedFile) {
+                    if (! str_starts_with($value->getMimeType(), 'video/')) {
+                        $fail('يجب أن يكون الملف من نوع video.');
+                    }
+                    if ($value->getSize() > 50 * 1024 * 1024) {
+                        $fail('حجم الفيديو يتجاوز 50MB.');
+                    }
+                } elseif (! is_string($value)) {
+                    $fail('قيمة الفيديو غير صالحة.');
+                }
+            }],
             'status' => 'required|in:draft,published',
             'published_at' => 'nullable|date',
             'seo_title' => 'nullable|string|max:255',

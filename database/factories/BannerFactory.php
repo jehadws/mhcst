@@ -18,7 +18,16 @@ class BannerFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'image' => '/banner.webp',
+            'title' => fake()->sentence(4),
+            'title_ar' => 'طوّر مهاراتك المهنية',
+            'subtitle' => fake()->sentence(10),
+            'subtitle_ar' => 'انضم لأفضل الدورات التدريبية في ليبيا مع نخبة من المدربين المعتمدين',
+            'cta_text' => 'Explore courses',
+            'cta_text_ar' => 'استعرض الدورات',
+            'cta_link' => '/courses',
+            'sort_order' => fake()->numberBetween(1, 100),
+            'is_active' => true,
         ];
     }
 }

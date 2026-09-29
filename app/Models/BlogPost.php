@@ -14,8 +14,10 @@ class BlogPost extends Model
 
     protected string $imageField = 'cover_image';
 
+    protected string $videoField = 'cover_video';
+
     protected $fillable = [
-        'author_id', 'title', 'slug', 'excerpt', 'content', 'cover_image',
+        'author_id', 'title', 'slug', 'excerpt', 'content', 'cover_image', 'cover_video',
         'status', 'published_at', 'seo_title', 'seo_description',
     ];
 

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\SiteSetting;
+use App\Support\AboutPageContent;
 use Illuminate\Database\Seeder;
 
 class SiteSettingSeeder extends Seeder
@@ -29,6 +30,7 @@ class SiteSettingSeeder extends Seeder
             ['key' => 'meta_description', 'value' => 'كلية المعايير الحديثة للعلوم والتقنية — Almaayir Alhaditha College for Science and Technology', 'type' => 'text'],
             ['key' => 'hide_instructor_names', 'value' => '0', 'type' => 'boolean'],
             ['key' => 'show_teachers_page', 'value' => '0', 'type' => 'boolean'],
+            ['key' => 'about_page', 'value' => json_encode(AboutPageContent::default(), JSON_UNESCAPED_UNICODE), 'type' => 'json'],
         ];
 
         foreach ($settings as $s) {

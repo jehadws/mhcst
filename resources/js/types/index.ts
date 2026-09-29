@@ -200,8 +200,11 @@ export interface Banner {
     id: number;
     image: string;
     title?: string;
+    title_ar?: string;
     subtitle?: string;
+    subtitle_ar?: string;
     cta_text?: string;
+    cta_text_ar?: string;
     cta_link?: string;
     is_active: boolean;
     sort_order: number;
@@ -227,6 +230,7 @@ export interface BlogPost {
     excerpt?: string;
     content?: string;
     cover_image?: string;
+    cover_video?: string;
     status: 'draft' | 'published';
     published_at?: string;
     seo_title?: string;
@@ -287,6 +291,35 @@ export interface SiteSettings {
     meta_description?: string;
     hide_instructor_names?: boolean;
     show_teachers_page?: boolean;
+}
+
+export interface AboutHeroContent {
+    title: string;
+    title_ar: string;
+    description?: string;
+    description_ar?: string;
+    image?: string;
+}
+
+export interface AboutItemContent {
+    icon?: string;
+    title: string;
+    title_ar: string;
+    body: string;
+    body_ar: string;
+}
+
+export interface AboutMilestoneContent {
+    year: string;
+    label: string;
+    label_ar: string;
+}
+
+export interface AboutPageContent {
+    hero: AboutHeroContent;
+    pillars: AboutItemContent[];
+    values: AboutItemContent[];
+    milestones: AboutMilestoneContent[];
 }
 
 export interface NewsletterSubscriber {

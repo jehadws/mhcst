@@ -9,10 +9,17 @@ trait HasImage
     protected static function bootHasImage(): void
     {
         static::deleting(function ($model) {
-            $field = $model->imageField ?? 'cover_image';
-            $path = $model->{$field};
-            if (! empty($path) && Storage::disk('public')->exists($path)) {
-                Storage::disk('public')->delete($path);
+            $fields = [$model->imageField ?? 'cover_image'];
+
+            if (property_exists($model, 'videoField') && ! empty($model->videoField)) {
+                $fields[] = $model->videoField;
+            }
+
+            foreach ($fields as $field) {
+                $path = $model->{$field};
+                if (! empty($path) && Storage::disk('public')->exists($path)) {
+                    Storage::disk('public')->delete($path);
+                }
             }
         });
     }

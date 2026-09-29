@@ -39,6 +39,25 @@ class UploadController extends Controller
         ]);
     }
 
+    public function storeVideo(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:mp4,webm|max:51200',
+            'folder' => ['nullable', 'string', Rule::in(self::ALLOWED_FOLDERS)],
+        ]);
+
+        $folder = $request->input('folder', 'uploads');
+        $file = $request->file('file');
+
+        $filename = Str::random(16).'_'.time().'.'.$file->getClientOriginalExtension();
+        $path = $file->storeAs($folder, $filename, 'public');
+
+        return response()->json([
+            'path' => $path,
+            'url' => asset('storage/'.$path),
+        ]);
+    }
+
     public function destroy(Request $request)
     {
         $request->validate(['path' => 'required|string']);

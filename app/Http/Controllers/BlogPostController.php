@@ -41,6 +41,10 @@ class BlogPostController extends Controller
             $data['cover_image'] = $request->file('cover_image')->store('blog', 'public');
         }
 
+        if ($request->hasFile('cover_video')) {
+            $data['cover_video'] = $request->file('cover_video')->store('blog', 'public');
+        }
+
         BlogPost::create($data);
 
         return to_route('dashboard.blog-posts.list');
@@ -69,6 +73,13 @@ class BlogPostController extends Controller
         } else {
             $blogPost->updateImage($data['cover_image'] ?? null, 'cover_image');
             $data['cover_image'] = $blogPost->cover_image;
+        }
+
+        if ($request->hasFile('cover_video')) {
+            $data['cover_video'] = $request->file('cover_video')->store('blog', 'public');
+        } else {
+            $blogPost->updateImage($data['cover_video'] ?? null, 'cover_video');
+            $data['cover_video'] = $blogPost->cover_video;
         }
 
         $blogPost->update($data);

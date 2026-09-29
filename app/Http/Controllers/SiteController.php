@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Banner;
 use App\Models\BlogPost;
 use App\Models\CmsDepartment;
 use App\Models\CmsSchedule;
@@ -21,6 +22,7 @@ class SiteController extends Controller
 {
     public function home(): Response
     {
+        $banners = Banner::where('is_active', true)->orderBy('sort_order')->get();
         $departments = CmsDepartment::withCount(['students', 'subjects'])->get();
         $faqs = Faq::where('is_published', true)->get();
         $testimonials = Testimonial::where('is_published', true)->get();
@@ -37,6 +39,7 @@ class SiteController extends Controller
         ];
 
         return Inertia::render('welcome', [
+            'banners' => $banners,
             'departments' => $departments,
             'faqs' => $faqs,
             'testimonials' => $testimonials,
@@ -108,9 +111,11 @@ class SiteController extends Controller
     public function about(): Response
     {
         $testimonials = Testimonial::where('is_published', true)->get();
+        $aboutContent = SiteSetting::get('about_page');
 
         return Inertia::render('site/about', [
             'testimonials' => $testimonials,
+            'aboutContent' => $aboutContent,
         ]);
     }
 

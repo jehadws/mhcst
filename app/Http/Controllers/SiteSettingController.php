@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\SiteSetting;
+use App\Support\AboutPageContent;
+use App\Support\HtmlSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
@@ -100,6 +102,78 @@ class SiteSettingController extends Controller
                 $setting->update(['value' => $value]);
             }
         }
+
+        return back();
+    }
+
+    public function editAbout()
+    {
+        $about = SiteSetting::get('about_page');
+
+        return Inertia::render('dashboard/site-settings/about', [
+            'aboutContent' => $about ?? AboutPageContent::default(),
+        ]);
+    }
+
+    public function updateAbout(Request $request)
+    {
+        $data = $request->validate([
+            'hero.title' => ['required', 'string', 'max:255'],
+            'hero.title_ar' => ['required', 'string', 'max:255'],
+            'hero.description' => ['nullable', 'string', 'max:1000'],
+            'hero.description_ar' => ['nullable', 'string', 'max:1000'],
+            'hero.image' => ['nullable', 'string', 'max:2048'],
+            'pillars' => ['required', 'array', 'min:1'],
+            'pillars.*.icon' => ['nullable', 'string', 'max:50'],
+            'pillars.*.title' => ['required', 'string', 'max:255'],
+            'pillars.*.title_ar' => ['required', 'string', 'max:255'],
+            'pillars.*.body' => ['required', 'string', 'max:2000'],
+            'pillars.*.body_ar' => ['required', 'string', 'max:2000'],
+            'values' => ['required', 'array', 'min:1'],
+            'values.*.icon' => ['nullable', 'string', 'max:50'],
+            'values.*.title' => ['required', 'string', 'max:255'],
+            'values.*.title_ar' => ['required', 'string', 'max:255'],
+            'values.*.body' => ['required', 'string', 'max:500'],
+            'values.*.body_ar' => ['required', 'string', 'max:500'],
+            'milestones' => ['required', 'array', 'min:1'],
+            'milestones.*.year' => ['required', 'string', 'max:10'],
+            'milestones.*.label' => ['required', 'string', 'max:100'],
+            'milestones.*.label_ar' => ['required', 'string', 'max:100'],
+        ]);
+
+        $content = [
+            'hero' => [
+                'title' => HtmlSanitizer::plainText($data['hero']['title']),
+                'title_ar' => HtmlSanitizer::plainText($data['hero']['title_ar']),
+                'description' => HtmlSanitizer::plainText($data['hero']['description'] ?? ''),
+                'description_ar' => HtmlSanitizer::plainText($data['hero']['description_ar'] ?? ''),
+                'image' => $data['hero']['image'] ?? '',
+            ],
+            'pillars' => collect($data['pillars'])->map(fn (array $pillar): array => [
+                'icon' => HtmlSanitizer::plainText($pillar['icon'] ?? 'target'),
+                'title' => HtmlSanitizer::plainText($pillar['title']),
+                'title_ar' => HtmlSanitizer::plainText($pillar['title_ar']),
+                'body' => HtmlSanitizer::plainText($pillar['body']),
+                'body_ar' => HtmlSanitizer::plainText($pillar['body_ar']),
+            ])->all(),
+            'values' => collect($data['values'])->map(fn (array $value): array => [
+                'icon' => HtmlSanitizer::plainText($value['icon'] ?? 'shield-check'),
+                'title' => HtmlSanitizer::plainText($value['title']),
+                'title_ar' => HtmlSanitizer::plainText($value['title_ar']),
+                'body' => HtmlSanitizer::plainText($value['body']),
+                'body_ar' => HtmlSanitizer::plainText($value['body_ar']),
+            ])->all(),
+            'milestones' => collect($data['milestones'])->map(fn (array $milestone): array => [
+                'year' => HtmlSanitizer::plainText($milestone['year']),
+                'label' => HtmlSanitizer::plainText($milestone['label']),
+                'label_ar' => HtmlSanitizer::plainText($milestone['label_ar']),
+            ])->all(),
+        ];
+
+        SiteSetting::updateOrCreate(
+            ['key' => 'about_page'],
+            ['value' => json_encode($content, JSON_UNESCAPED_UNICODE), 'type' => 'json']
+        );
 
         return back();
     }

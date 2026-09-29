@@ -17,7 +17,7 @@ class Banner extends Model
     protected string $imageField = 'image';
 
     protected $fillable = [
-        'image', 'title', 'subtitle', 'cta_text', 'cta_link', 'sort_order', 'is_active',
+        'image', 'title', 'title_ar', 'subtitle', 'subtitle_ar', 'cta_text', 'cta_text_ar', 'cta_link', 'sort_order', 'is_active',
     ];
 
     protected $casts = [
