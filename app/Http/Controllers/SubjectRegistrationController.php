@@ -46,15 +46,14 @@ class SubjectRegistrationController extends Controller
             ->where('user_id', $request->user()->id)
             ->firstOrFail();
 
-        $academicYear = $academicSettings->currentAcademicYear();
-        $semester = $academicSettings->currentSemester();
+        $term = $academicSettings->currentTerm();
 
         $registrations = collect();
-        if ($academicYear !== null && $semester !== null) {
+        if ($term['academic_year'] !== null && $term['semester'] !== null) {
             $registrations = CmsEnrollment::query()
                 ->where('student_id', $student->id)
-                ->where('academic_year', $academicYear)
-                ->where('semester', $semester)
+                ->where('academic_year', $term['academic_year'])
+                ->where('semester', $term['semester'])
                 ->with('subject:id,code,name,credits,has_lab')
                 ->orderBy('id')
                 ->get(['id', 'subject_id', 'status', 'source']);
@@ -84,14 +83,8 @@ class SubjectRegistrationController extends Controller
                     ] : null,
                 ])
                 ->values(),
-            'term' => [
-                'academic_year' => $academicYear,
-                'semester' => $semester,
-            ],
-            'registration_window' => [
-                'open' => $academicSettings->subjectRegistrationOpen(),
-                'student_active' => $student->status === 'active',
-            ],
+            'term' => $academicSettings->currentTerm(),
+            'registration_window' => $academicSettings->registrationWindowFor($student),
         ]);
     }
 }

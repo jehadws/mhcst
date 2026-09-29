@@ -20,6 +20,9 @@ use App\Http\Controllers\DashboardGuideController;
 use App\Http\Controllers\DeployRunController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\MyCoursesController;
+use App\Http\Controllers\MyGradesController;
+use App\Http\Controllers\MyScheduleController;
 use App\Http\Controllers\MyTranscriptController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\NotificationLogController;
@@ -84,6 +87,18 @@ Route::middleware(['auth', 'dashboard.role'])->group(function () {
     Route::get('dashboard/my-transcript', MyTranscriptController::class)
         ->middleware('dashboard.access:student')
         ->name('dashboard.my-transcript');
+
+    Route::get('dashboard/my-courses', MyCoursesController::class)
+        ->middleware('dashboard.access:student')
+        ->name('dashboard.my-courses');
+
+    Route::get('dashboard/my-schedule', MyScheduleController::class)
+        ->middleware('dashboard.access:student')
+        ->name('dashboard.my-schedule');
+
+    Route::get('dashboard/my-grades', MyGradesController::class)
+        ->middleware('dashboard.access:student')
+        ->name('dashboard.my-grades');
 
     Route::get('dashboard/subject-registration', [SubjectRegistrationController::class, 'index'])
         ->middleware('dashboard.access:student')

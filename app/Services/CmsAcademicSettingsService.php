@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\CmsStudent;
 use App\Models\SiteSetting;
 
 class CmsAcademicSettingsService
@@ -87,6 +88,34 @@ class CmsAcademicSettingsService
         }
 
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
+     * The academic term (year + semester) registrations and schedules are
+     * keyed against; null components mean the term is not configured yet.
+     *
+     * @return array{academic_year: ?string, semester: ?string}
+     */
+    public function currentTerm(): array
+    {
+        return [
+            'academic_year' => $this->currentAcademicYear(),
+            'semester' => $this->currentSemester(),
+        ];
+    }
+
+    /**
+     * Whether the self-service registration page can accept this student's
+     * submissions: the window is open and the student profile is active.
+     *
+     * @return array{open: bool, student_active: bool}
+     */
+    public function registrationWindowFor(CmsStudent $student): array
+    {
+        return [
+            'open' => $this->subjectRegistrationOpen(),
+            'student_active' => $student->status === 'active',
+        ];
     }
 
     /**

@@ -10,12 +10,14 @@ import {
     Bell,
     BookOpen,
     Briefcase,
+    CalendarDays,
     FileText,
     GraduationCap,
     HelpCircle,
     Inbox,
     LayoutGrid,
     ClipboardList,
+    FileSpreadsheet,
     Presentation,
     ScrollText,
     Send,
@@ -94,9 +96,13 @@ export function AppSidebar() {
 
                 {canAccessStudent(roles) && (
                     <NavMain
-                        label={c.registration.title}
+                        label={c.myStudies.title}
                         items={[
+                            { title: c.myStudies.courses, url: '/dashboard/my-courses', icon: BookOpen },
+                            { title: c.myStudies.schedule, url: '/dashboard/my-schedule', icon: CalendarDays },
+                            { title: c.myStudies.grades, url: '/dashboard/my-grades', icon: Award },
                             { title: c.nav.subjectRegistration, url: '/dashboard/subject-registration', icon: ClipboardList },
+                            { title: c.myStudies.transcript, url: '/dashboard/my-transcript', icon: FileSpreadsheet },
                         ]}
                     />
                 )}

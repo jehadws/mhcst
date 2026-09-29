@@ -211,7 +211,12 @@ class DashboardController extends Controller
                 'id' => $student->id,
                 'name' => $student->name,
                 'student_no' => $student->student_no,
+                'status' => $student->status,
                 'department' => $student->level?->department?->name,
+                'level' => $student->level === null ? null : [
+                    'year' => (int) $student->level->year,
+                    'section' => $student->level->section,
+                ],
             ],
             'transcriptUrl' => route('dashboard.my-transcript'),
             'todaySchedules' => $todaySchedules,
