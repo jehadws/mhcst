@@ -61,7 +61,20 @@ class CmsGradeController extends Controller
         $enrollmentId = $data['enrollment_id'];
 
         $grade = CmsGrade::firstOrNew(['enrollment_id' => $enrollmentId]);
-        $grade->fill($data);
+
+        foreach (['midterm', 'final', 'assignments', 'projects', 'participation'] as $key) {
+            if (array_key_exists($key, $data) && $data[$key] !== null && $data[$key] !== '') {
+                $grade->{$key} = $data[$key];
+            }
+        }
+
+        if ($request->filled('_expected_updated_at')) {
+            request()->attributes->set(
+                'expected_grade_updated_at',
+                $request->input('_expected_updated_at')
+            );
+        }
+
         $grade->entered_by = auth()->id();
         $grade->entered_at = now();
         $grade->save();
@@ -93,11 +106,20 @@ class CmsGradeController extends Controller
             }
 
             $grade = CmsGrade::firstOrNew(['enrollment_id' => $item['enrollment_id']]);
-            $grade->midterm = $item['midterm'] ?? null;
-            $grade->final = $item['final'] ?? null;
-            $grade->assignments = $item['assignments'] ?? null;
-            $grade->projects = $item['projects'] ?? null;
-            $grade->participation = $item['participation'] ?? null;
+
+            foreach (['midterm', 'final', 'assignments', 'projects', 'participation'] as $key) {
+                if (array_key_exists($key, $item) && $item[$key] !== null && $item[$key] !== '') {
+                    $grade->{$key} = $item[$key];
+                }
+            }
+
+            if (isset($item['_updated_at'])) {
+                request()->attributes->set(
+                    'expected_grade_updated_at',
+                    $item['_updated_at']
+                );
+            }
+
             $grade->entered_by = auth()->id();
             $grade->entered_at = now();
             $grade->save();
@@ -148,14 +170,22 @@ class CmsGradeController extends Controller
         );
     }
 
-    public function import(Request $request)
+    public function import(Request $request, GradeLockService $gradeLock)
     {
+        if (! $gradeLock->canEditGrades(auth()->user())) {
+            return redirect()->back()
+                ->withErrors(['grades' => 'Grade entry is locked. Contact an administrator to unlock.']);
+        }
+
         $request->validate([
             'file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
         ]);
 
         $service = app(CmsGradeImportService::class);
-        $result = $service->import($request->file('file'), auth()->id());
+        $result = $service->import(
+            $request->file('file'),
+            auth()->user()
+        );
 
         return redirect()->back()
             ->with('success', "تم تحديث درجات {$result['updated']} قيد من الملف.")

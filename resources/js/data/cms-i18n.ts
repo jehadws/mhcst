@@ -458,6 +458,8 @@ export const cmsEn = {
   grades: {
     lockedForTeachers: 'Grade entry is locked for teachers — as admin you can still edit. Unlock from Academic Settings.',
     lockedContactAdmin: 'Grade entry is currently locked. Contact administration to reopen the grading window.',
+    staleVersion: 'Grades were modified by another user. Reload the page to see the latest changes before saving again.',
+    lockedMessage: 'Grade entry is locked. Contact an administrator to unlock.',
   },
   labels: {
     days: {
@@ -969,6 +971,8 @@ export const cmsAr = {
   grades: {
     lockedForTeachers: 'رصد الدرجات مقفل للمعلمين — أنت كمدير يمكنك التعديل. يمكنك فتح القفل من الإعدادات الأكاديمية.',
     lockedContactAdmin: 'رصد الدرجات مقفل حالياً. تواصل مع الإدارة لفتح موعد الرصد.',
+    staleVersion: 'تم تعديل الدرجات من قبل مستخدم آخر. أعد تحميل الصفحة لرؤية آخر التعديلات قبل الحفظ.',
+    lockedMessage: 'إدخال الدرجات مقفل حالياً. يرجى التواصل مع المسؤول للفتح.',
   },
   labels: {
     days: {

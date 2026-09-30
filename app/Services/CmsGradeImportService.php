@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Exceptions\ImportRowException;
 use App\Models\CmsEnrollment;
 use App\Models\CmsGrade;
 use App\Models\CmsStudent;
 use App\Models\CmsSubject;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CmsGradeImportService
@@ -30,7 +33,7 @@ class CmsGradeImportService
      *
      * @return array{updated: int, errors: array<int, string>}
      */
-    public function import(UploadedFile $file, ?int $enteredBy = null): array
+    public function import(UploadedFile $file, User $user): array
     {
         $rows = $this->readRows($file);
 
@@ -38,68 +41,84 @@ class CmsGradeImportService
             return ['updated' => 0, 'errors' => ['لا توجد صفوف بيانات في الملف.']];
         }
 
-        $updated = 0;
-        $errors = [];
+        return DB::transaction(function () use ($rows, $user) {
+            $cmsAuth = app(CmsAuthorizationService::class);
+            $updated = 0;
+            $errors = [];
 
-        foreach ($rows as $index => $row) {
-            $line = $index + 2;
+            foreach ($rows as $index => $row) {
+                $line = $index + 2;
 
-            $studentNo = trim((string) ($row['student_no'] ?? ''));
-            $subjectCode = strtoupper(trim((string) ($row['subject_code'] ?? '')));
+                try {
+                    $studentNo = trim((string) ($row['student_no'] ?? ''));
+                    $subjectCode = strtoupper(trim((string) ($row['subject_code'] ?? '')));
 
-            if ($studentNo === '' || $subjectCode === '') {
-                $errors[] = "الخانة {$line}: رقم القيد ورمز المادة حقلان إلزاميان.";
+                    if ($studentNo === '' || $subjectCode === '') {
+                        $errors[] = "الخانة {$line}: رقم القيد ورمز المادة حقلان إلزاميان.";
 
-                continue;
+                        continue;
+                    }
+
+                    if (! $this->hasAnyGrade($row)) {
+                        $errors[] = "الخانة {$line}: لم يتم إدخال أي درجات لهذا الصف.";
+
+                        continue;
+                    }
+
+                    $student = CmsStudent::where('student_no', $studentNo)->first();
+                    $subject = CmsSubject::where('code', $subjectCode)->first();
+
+                    if (! $student) {
+                        $errors[] = "الخانة {$line}: لا يوجد طالب برقم القيد {$studentNo}.";
+
+                        continue;
+                    }
+
+                    if (! $subject) {
+                        $errors[] = "الخانة {$line}: لا توجد مادة بالرمز {$subjectCode}.";
+
+                        continue;
+                    }
+
+                    $enrollment = CmsEnrollment::where('student_id', $student->id)
+                        ->where('subject_id', $subject->id)
+                        ->where('academic_year', $this->academicYear($row))
+                        ->where('semester', $this->semester($row))
+                        ->first();
+
+                    if (! $enrollment) {
+                        $errors[] = "الخانة {$line}: لا يوجد قيد للطالب {$studentNo} في مادة {$subjectCode} للعام {$this->academicYear($row)} ({$this->semester($row)}).";
+
+                        continue;
+                    }
+
+                    if (! $cmsAuth->teacherCanAccessEnrollment($user, $enrollment->id)) {
+                        $errors[] = "الخانة {$line}: لا تملك صلاحية تعديل درجات هذا القيد.";
+
+                        continue;
+                    }
+
+                    $grade = CmsGrade::firstOrNew(['enrollment_id' => $enrollment->id]);
+
+                    foreach (self::GRADE_FIELDS as $field) {
+                        $score = $this->validatedScore($row[$field] ?? null, $line, $field);
+                        if ($score !== null) {
+                            $grade->{$field} = $score;
+                        }
+                    }
+
+                    $grade->entered_by = $user->id;
+                    $grade->entered_at = now();
+                    $grade->save();
+
+                    $updated++;
+                } catch (ImportRowException $e) {
+                    $errors[] = $e->getMessage();
+                }
             }
 
-            if (! $this->hasAnyGrade($row)) {
-                $errors[] = "الخانة {$line}: لم يتم إدخال أي درجات لهذا الصف.";
-
-                continue;
-            }
-
-            $student = CmsStudent::where('student_no', $studentNo)->first();
-            $subject = CmsSubject::where('code', $subjectCode)->first();
-
-            if (! $student) {
-                $errors[] = "الخانة {$line}: لا يوجد طالب برقم القيد {$studentNo}.";
-
-                continue;
-            }
-
-            if (! $subject) {
-                $errors[] = "الخانة {$line}: لا توجد مادة بالرمز {$subjectCode}.";
-
-                continue;
-            }
-
-            $enrollment = CmsEnrollment::where('student_id', $student->id)
-                ->where('subject_id', $subject->id)
-                ->where('academic_year', $this->academicYear($row))
-                ->where('semester', $this->semester($row))
-                ->first();
-
-            if (! $enrollment) {
-                $errors[] = "الخانة {$line}: لا يوجد قيد للطالب {$studentNo} في مادة {$subjectCode} للعام {$this->academicYear($row)} ({$this->semester($row)}).";
-
-                continue;
-            }
-
-            $grade = CmsGrade::firstOrNew(['enrollment_id' => $enrollment->id]);
-
-            foreach (self::GRADE_FIELDS as $field) {
-                $grade->{$field} = $this->normalizedScore($row[$field] ?? null);
-            }
-
-            $grade->entered_by = $enteredBy;
-            $grade->entered_at = now();
-            $grade->save();
-
-            $updated++;
-        }
-
-        return ['updated' => $updated, 'errors' => $errors];
+            return ['updated' => $updated, 'errors' => $errors];
+        });
     }
 
     private function academicYear(array $row): string
@@ -130,7 +149,7 @@ class CmsGradeImportService
     private function hasAnyGrade(array $row): bool
     {
         foreach (self::GRADE_FIELDS as $field) {
-            if ($this->normalizedScore($row[$field] ?? null) !== null) {
+            if ($this->validatedScore($row[$field] ?? null, 0, $field) !== null) {
                 return true;
             }
         }
@@ -138,7 +157,10 @@ class CmsGradeImportService
         return false;
     }
 
-    private function normalizedScore(mixed $value): ?float
+    /**
+     * @throws ImportRowException when the value is numeric but outside 0..100
+     */
+    private function validatedScore(mixed $value, int $line, string $field): ?float
     {
         if ($value === null || trim((string) $value) === '' || ! is_numeric($value)) {
             return null;
@@ -146,7 +168,11 @@ class CmsGradeImportService
 
         $score = (float) $value;
 
-        return max(0, min(100, $score));
+        if ($score < 0 || $score > 100) {
+            throw new ImportRowException("الخانة {$line}: {$field} يجب أن يكون بين 0 و 100.");
+        }
+
+        return $score;
     }
 
     /**

@@ -40,6 +40,7 @@ export default function GradesIndex({
                 assignments: e.grade?.assignments ?? '',
                 projects: e.grade?.projects ?? '',
                 participation: e.grade?.participation ?? '',
+                _updated_at: e.grade?.updated_at ? new Date(e.grade.updated_at).toISOString() : null,
             };
         });
         setGradeState(initial);
@@ -96,6 +97,7 @@ export default function GradesIndex({
             assignments: vals.assignments !== '' ? parseFloat(vals.assignments) : null,
             projects: vals.projects !== '' ? parseFloat(vals.projects) : null,
             participation: vals.participation !== '' ? parseFloat(vals.participation) : null,
+            _updated_at: vals._updated_at ?? null,
         }));
 
         router.post(
