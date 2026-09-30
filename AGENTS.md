@@ -213,3 +213,11 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - IMPORTANT: Activate `inertia-react-development` when working with Inertia React client-side patterns.
 
 </laravel-boost-guidelines>
+
+## BANNED (instant reject)
+- Inter, Roboto, Arial, system-ui as the display font
+- Purple/blue gradients on buttons or backgrounds
+- Tailwind default palette (indigo-500, slate-*, etc.)
+- rounded-2xl on everything + shadow-sm on cards
+- Centered hero + 3 feature cards in a row
+- Gray placeholder avatars

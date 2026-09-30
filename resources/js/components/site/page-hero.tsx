@@ -15,7 +15,7 @@ export function PageHero({ title, description, crumbs = [] }: PageHeroProps) {
   const { t } = useSite();
 
   return (
-    <section className="bg-hero text-hero-foreground relative overflow-hidden pt-32 pb-16">
+    <section className="bg-hero text-hero-foreground relative overflow-hidden pt-32 pb-16 sm:pb-20">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-[0.15]"
@@ -25,12 +25,9 @@ export function PageHero({ title, description, crumbs = [] }: PageHeroProps) {
           backgroundPosition: 'center',
         }}
       />
-      <div
-        aria-hidden="true"
-        className="bg-accent/20 pointer-events-none absolute start-0 top-1/2 size-64 -translate-y-1/2 rounded-full blur-3xl"
-      />
+      <div aria-hidden="true" className="bg-accent/20 pointer-events-none absolute start-0 top-1/2 size-64 -translate-y-1/2 rounded-full blur-3xl" />
       <div className="relative mx-auto max-w-7xl px-4 text-start sm:px-6 lg:px-8">
-        <nav aria-label="Breadcrumb" className="text-hero-foreground/70 flex items-center gap-1 text-xs">
+        <nav aria-label="Breadcrumb" className="text-hero-foreground/70 flex items-center gap-1 text-xs leading-normal">
           <Link href="/" className="hover:text-accent">
             {t.nav.home}
           </Link>
@@ -43,9 +40,9 @@ export function PageHero({ title, description, crumbs = [] }: PageHeroProps) {
             </span>
           ))}
         </nav>
-        <h1 className="mt-4 text-3xl font-extrabold text-balance sm:text-5xl">{title}</h1>
+        <h1 className="font-display mt-4 text-3xl leading-tight font-extrabold text-balance sm:text-5xl">{title}</h1>
         {description ? (
-          <p className="text-hero-foreground/80 mt-4 max-w-2xl text-pretty leading-relaxed">{description}</p>
+          <p className="text-hero-foreground/80 mt-4 max-w-2xl text-base leading-relaxed text-pretty sm:text-lg">{description}</p>
         ) : null}
         <span className="bg-accent mt-6 block h-1 w-24 rounded-full" />
       </div>

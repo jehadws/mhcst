@@ -117,19 +117,18 @@ export default function PublicAboutPage({ testimonials, aboutContent }: Props) {
     return `/storage/${image}`;
   })();
 
-
   return (
     <>
       <SeoHead
         title={isAr ? 'من نحن' : 'About Us'}
-        description={isAr ? (pillars[0]?.body_ar || heroDescription) : (pillars[0]?.body || heroDescription)}
+        description={isAr ? pillars[0]?.body_ar || heroDescription : pillars[0]?.body || heroDescription}
       />
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="flex-1">
           <PageHero title={heroTitle} description={heroDescription} crumbs={[{ label: t.nav.about, href: '/about' }]} />
 
-          <section className="py-20 sm:py-28">
+          <section className="py-28">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="grid gap-6 lg:grid-cols-3">
                 {pillars.map((pillar) => {
@@ -138,12 +137,12 @@ export default function PublicAboutPage({ testimonials, aboutContent }: Props) {
                   const body = isAr ? pillar.body_ar : pillar.body;
 
                   return (
-                    <article key={title} className="border-border bg-card border p-8">
-                      <div className="bg-primary/10 text-primary flex size-11 items-center justify-center rounded-full">
+                    <article key={title} className="border-border bg-card rounded-xl border p-8 shadow-md">
+                      <div className="bg-primary/10 text-primary flex size-12 items-center justify-center rounded-full">
                         <Icon className="size-5" aria-hidden="true" />
                       </div>
-                      <h2 className="text-foreground mt-6 font-serif text-xl font-bold">{title}</h2>
-                      <p className="text-muted-foreground mt-3 text-sm leading-7">{body}</p>
+                      <h2 className="text-foreground font-display mt-6 text-2xl leading-snug font-extrabold">{title}</h2>
+                      <p className="text-muted-foreground mt-4 text-base leading-normal">{body}</p>
                     </article>
                   );
                 })}
@@ -151,19 +150,19 @@ export default function PublicAboutPage({ testimonials, aboutContent }: Props) {
             </div>
           </section>
 
-          <section className="bg-secondary py-20 sm:py-28">
+          <section className="bg-secondary py-28">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="grid items-center gap-12 lg:grid-cols-2">
-                <div className="border-border bg-card overflow-hidden border shadow-lg">
+                <div className="border-border bg-card overflow-hidden rounded-2xl border shadow-xl">
                   <img src={campusImage} alt={t.campus.title} className="aspect-[4/3] w-full object-cover" />
                 </div>
 
                 <div>
-                  <p className="text-primary text-xs font-bold tracking-[0.2em] uppercase">{isAr ? 'قيمنا' : 'Our values'}</p>
-                  <h2 className="text-foreground mt-3 font-serif text-3xl font-bold">{t.about.title}</h2>
-                  <p className="text-muted-foreground mt-4 leading-relaxed">{t.about.body}</p>
+                  <p className="text-primary text-xs font-extrabold tracking-widest uppercase">{isAr ? 'قيمنا' : 'Our values'}</p>
+                  <h2 className="text-foreground font-display mt-2 text-3xl leading-snug font-extrabold">{t.about.title}</h2>
+                  <p className="text-muted-foreground mt-4 text-base leading-normal sm:text-lg">{t.about.body}</p>
 
-                  <div className="divide-border border-border bg-card mt-8 divide-y border">
+                  <div className="divide-border border-border bg-card mt-8 divide-y rounded-xl border shadow-sm">
                     {values.map((value) => {
                       const Icon = aboutIcon(value.icon);
                       const title = isAr ? value.title_ar : value.title;
@@ -175,8 +174,8 @@ export default function PublicAboutPage({ testimonials, aboutContent }: Props) {
                             <Icon className="size-5" aria-hidden="true" />
                           </div>
                           <div>
-                            <h3 className="font-serif text-base font-bold">{title}</h3>
-                            <p className="text-muted-foreground mt-1 text-sm">{body}</p>
+                            <h3 className="font-display text-base leading-snug font-extrabold">{title}</h3>
+                            <p className="text-muted-foreground mt-2 text-sm leading-normal">{body}</p>
                           </div>
                         </div>
                       );
@@ -187,14 +186,16 @@ export default function PublicAboutPage({ testimonials, aboutContent }: Props) {
             </div>
           </section>
 
-          <section className="py-20 sm:py-28">
+          <section className="py-28">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <h2 className="text-foreground text-center font-serif text-3xl font-bold">{isAr ? 'محطات مسيرتنا' : 'Our milestones'}</h2>
+              <h2 className="text-foreground font-display text-center text-3xl leading-snug font-extrabold">
+                {isAr ? 'محطات مسيرتنا' : 'Our milestones'}
+              </h2>
               <div className="mt-12 grid gap-6 sm:grid-cols-3 lg:grid-cols-5">
                 {milestones.map((milestone) => (
-                  <div key={milestone.year} className="border-border bg-card border p-6 text-center">
-                    <p className="text-primary font-serif text-2xl font-extrabold">{milestone.year}</p>
-                    <p className="text-muted-foreground mt-2 text-sm">{isAr ? milestone.label_ar : milestone.label}</p>
+                  <div key={milestone.year} className="border-border bg-card rounded-xl border p-6 text-center shadow-sm">
+                    <p className="text-primary font-display text-2xl leading-tight font-extrabold tabular-nums">{milestone.year}</p>
+                    <p className="text-muted-foreground mt-2 text-sm leading-normal">{isAr ? milestone.label_ar : milestone.label}</p>
                   </div>
                 ))}
               </div>
