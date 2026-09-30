@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CmsSubject extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'department_id',
         'code',
@@ -23,6 +26,7 @@ class CmsSubject extends Model
         return [
             'credits' => 'integer',
             'has_lab' => 'boolean',
+            'deleted_at' => 'datetime',
         ];
     }
 

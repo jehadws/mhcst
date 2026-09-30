@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CmsEnrollment extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'student_id',
         'subject_id',
@@ -23,6 +26,7 @@ class CmsEnrollment extends Model
     {
         return [
             'enrollment_date' => 'date',
+            'deleted_at' => 'datetime',
         ];
     }
 

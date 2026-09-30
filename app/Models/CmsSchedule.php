@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CmsSchedule extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'subject_id',
         'teacher_id',
@@ -33,5 +36,12 @@ class CmsSchedule extends Model
     public function level(): BelongsTo
     {
         return $this->belongsTo(CmsLevel::class, 'level_id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'deleted_at' => 'datetime',
+        ];
     }
 }

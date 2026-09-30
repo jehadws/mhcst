@@ -2,26 +2,46 @@
 
 namespace App\Traits;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 trait HasImage
 {
     protected static function bootHasImage(): void
     {
-        static::deleting(function ($model) {
-            $fields = [$model->imageField ?? 'cover_image'];
+        $usesSoftDeletes = in_array(
+            SoftDeletes::class,
+            class_uses_recursive(static::class)
+        );
 
-            if (property_exists($model, 'videoField') && ! empty($model->videoField)) {
-                $fields[] = $model->videoField;
-            }
+        if ($usesSoftDeletes) {
+            // Only erase the physical file on a permanent (force) delete.
+            // A recoverable soft-delete must NOT remove disk assets.
+            static::forceDeleted(function ($model) {
+                static::deleteModelFiles($model);
+            });
+        } else {
+            // Model has no SoftDeletes — every delete is permanent.
+            static::deleted(function ($model) {
+                static::deleteModelFiles($model);
+            });
+        }
+    }
 
-            foreach ($fields as $field) {
-                $path = $model->{$field};
-                if (! empty($path) && Storage::disk('public')->exists($path)) {
-                    Storage::disk('public')->delete($path);
-                }
+    protected static function deleteModelFiles($model): void
+    {
+        $fields = [$model->imageField ?? 'cover_image'];
+
+        if (property_exists($model, 'videoField') && ! empty($model->videoField)) {
+            $fields[] = $model->videoField;
+        }
+
+        foreach ($fields as $field) {
+            $path = $model->{$field};
+            if (! empty($path) && Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
             }
-        });
+        }
     }
 
     public function updateImage(?string $newPath, string $field = 'cover_image'): void

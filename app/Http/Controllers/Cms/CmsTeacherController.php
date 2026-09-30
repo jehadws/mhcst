@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Cms;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreTeacherRequest;
+use App\Models\CmsDepartment;
+use App\Models\CmsSchedule;
 use App\Models\CmsTeacher;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -81,8 +84,16 @@ class CmsTeacherController extends Controller
 
     public function destroy(CmsTeacher $teacher)
     {
-        $teacher->delete();
+        DB::transaction(function () use ($teacher) {
+            CmsSchedule::where('teacher_id', $teacher->id)
+                ->chunkById(500, fn ($rows) => $rows->each->delete());
 
-        return redirect()->route('cms.teachers.index')->with('success', 'Teacher deleted successfully.');
+            CmsDepartment::where('head_id', $teacher->id)->update(['head_id' => null]);
+
+            $teacher->delete();
+        });
+
+        return redirect()->route('cms.teachers.index')
+            ->with('success', 'Teacher soft-deleted successfully.');
     }
 }

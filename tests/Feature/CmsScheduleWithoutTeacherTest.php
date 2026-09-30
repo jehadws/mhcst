@@ -85,15 +85,26 @@ test('two unassigned schedules in the same slot raise no teacher conflict', func
     expect(CmsSchedule::whereNull('teacher_id')->count())->toBe(2);
 });
 
-test('deleting a teacher keeps their schedules and clears the assignment', function () {
+test('deleting a teacher via controller soft-deletes their schedules', function () {
     $admin = actingScheduleAdmin();
     $fixtures = createScheduleFixtures();
 
     $schedule = CmsSchedule::create(array_merge(schedulePayload($fixtures), ['teacher_id' => $fixtures['teacher']->id]));
-    $fixtures['teacher']->delete();
+    $scheduleId = $schedule->id;
 
-    expect($schedule->fresh())->not->toBeNull()
-        ->and($schedule->fresh()->teacher_id)->toBeNull();
+    // Delete via HTTP endpoint so the controller cascade runs.
+    $this->actingAs($admin)
+        ->delete(route('cms.teachers.destroy', $fixtures['teacher']))
+        ->assertRedirect(route('cms.teachers.index'));
+
+    // Schedule is soft-deleted (not just nullified) per S3 cascade semantics.
+    expect(CmsSchedule::find($scheduleId))->toBeNull(
+        'Schedule should be hidden from default queries after teacher cascade soft-delete'
+    );
+    expect(CmsSchedule::withTrashed()->find($scheduleId))->not->toBeNull(
+        'Schedule should still exist via withTrashed — it was soft-deleted, not hard-deleted'
+    );
+    expect(CmsSchedule::withTrashed()->find($scheduleId)->trashed())->toBeTrue();
 });
 
 test('schedule pages render for a schedule without a teacher', function () {

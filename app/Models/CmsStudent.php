@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CmsStudent extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'user_id',
         'student_no',
@@ -28,6 +31,7 @@ class CmsStudent extends Model
         return [
             'enrollment_date' => 'date',
             'birth_date' => 'date',
+            'deleted_at' => 'datetime',
         ];
     }
 
