@@ -64,6 +64,8 @@ class CmsStudentController extends Controller
 
     public function store(StoreStudentRequest $request)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $data = $request->validated();
         $createUser = $data['create_user_account'] ?? false;
         unset($data['create_user_account'], $data['password']);
@@ -113,6 +115,8 @@ class CmsStudentController extends Controller
 
     public function update(StoreStudentRequest $request, CmsStudent $student)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $data = $request->validated();
         unset($data['create_user_account'], $data['password']);
 
@@ -123,6 +127,8 @@ class CmsStudentController extends Controller
 
     public function destroy(CmsStudent $student)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         DB::transaction(function () use ($student) {
             $student->loadMissing(['enrollments']);
 
@@ -158,6 +164,8 @@ class CmsStudentController extends Controller
 
     public function import(Request $request)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $request->validate([
             'file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
         ]);
@@ -194,10 +202,13 @@ class CmsStudentController extends Controller
 
     public function export(Request $request)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $format = $request->input('format', 'xlsx');
         $title = $request->input('title', 'كشف الطلاب الأكاديميين');
 
         $query = CmsStudent::with(['level.department', 'user']);
+        $this->cmsAuth->scopeStudentsForUser($query, auth()->user());
 
         if ($request->filled('level_id')) {
             $query->where('level_id', $request->level_id);

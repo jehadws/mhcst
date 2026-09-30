@@ -172,6 +172,8 @@ class CmsGradeController extends Controller
 
     public function import(Request $request, GradeLockService $gradeLock)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         if (! $gradeLock->canEditGrades(auth()->user())) {
             return redirect()->back()
                 ->withErrors(['grades' => 'Grade entry is locked. Contact an administrator to unlock.']);

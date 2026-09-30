@@ -56,6 +56,8 @@ class CmsScheduleController extends Controller
 
     public function store(StoreScheduleRequest $request, ScheduleValidatorService $validator)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $data = $request->validated();
         $errors = $validator->validate($data);
 
@@ -91,6 +93,8 @@ class CmsScheduleController extends Controller
 
     public function update(StoreScheduleRequest $request, CmsSchedule $schedule, ScheduleValidatorService $validator)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $data = $request->validated();
         $errors = $validator->validate($data, $schedule->id);
 
@@ -105,6 +109,8 @@ class CmsScheduleController extends Controller
 
     public function destroy(CmsSchedule $schedule)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         DB::transaction(function () use ($schedule) {
             $schedule->delete();
         });

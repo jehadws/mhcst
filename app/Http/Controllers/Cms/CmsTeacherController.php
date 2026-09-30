@@ -9,6 +9,7 @@ use App\Models\CmsDepartment;
 use App\Models\CmsSchedule;
 use App\Models\CmsTeacher;
 use App\Models\User;
+use App\Services\CmsAuthorizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -17,6 +18,8 @@ use Inertia\Response;
 
 class CmsTeacherController extends Controller
 {
+    public function __construct(private CmsAuthorizationService $cmsAuth) {}
+
     public function index(Request $request): Response
     {
         $query = CmsTeacher::with('user')->withCount('schedules');
@@ -46,6 +49,8 @@ class CmsTeacherController extends Controller
 
     public function store(StoreTeacherRequest $request)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $data = $request->validated();
         $createUser = $data['create_user_account'] ?? false;
         unset($data['create_user_account'], $data['password']);
@@ -74,6 +79,8 @@ class CmsTeacherController extends Controller
 
     public function update(StoreTeacherRequest $request, CmsTeacher $teacher)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $data = $request->validated();
         unset($data['create_user_account'], $data['password']);
 
@@ -84,6 +91,8 @@ class CmsTeacherController extends Controller
 
     public function destroy(CmsTeacher $teacher)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         DB::transaction(function () use ($teacher) {
             CmsSchedule::where('teacher_id', $teacher->id)
                 ->chunkById(500, fn ($rows) => $rows->each->delete());

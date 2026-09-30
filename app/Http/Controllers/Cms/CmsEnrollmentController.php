@@ -67,6 +67,8 @@ class CmsEnrollmentController extends Controller
 
     public function store(StoreEnrollmentRequest $request)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         CmsEnrollment::create($request->validated());
 
         return redirect()->route('cms.enrollments.index')->with('success', 'Enrollment created successfully.');
@@ -94,6 +96,8 @@ class CmsEnrollmentController extends Controller
 
     public function update(StoreEnrollmentRequest $request, CmsEnrollment $enrollment)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $enrollment->update($request->validated());
 
         return redirect()->route('cms.enrollments.index')->with('success', 'Enrollment updated successfully.');
@@ -101,6 +105,8 @@ class CmsEnrollmentController extends Controller
 
     public function bulkEnroll(Request $request)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $request->validate([
             'level_id' => ['required', 'exists:cms_levels,id'],
             'subject_id' => ['required', 'exists:cms_subjects,id'],
@@ -135,6 +141,8 @@ class CmsEnrollmentController extends Controller
 
     public function approve(Request $request)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $validated = $request->validate([
             'enrollment_ids' => ['required', 'array', 'min:1'],
             'enrollment_ids.*' => ['integer', 'exists:cms_enrollments,id'],
@@ -151,6 +159,8 @@ class CmsEnrollmentController extends Controller
 
     public function reject(CmsEnrollment $enrollment)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $this->subjectRegistration->rejectRegistration($enrollment);
 
         return redirect()->route('cms.enrollments.index')->with('success', 'Registration rejected successfully.');
@@ -158,6 +168,8 @@ class CmsEnrollmentController extends Controller
 
     public function destroy(CmsEnrollment $enrollment)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         DB::transaction(function () use ($enrollment) {
             $enrollment->delete();
         });

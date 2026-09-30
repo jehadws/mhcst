@@ -11,6 +11,7 @@ use App\Models\CmsSchedule;
 use App\Models\CmsStudent;
 use App\Models\CmsSubject;
 use App\Models\CmsTeacher;
+use App\Services\CmsAuthorizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -18,6 +19,8 @@ use Inertia\Response;
 
 class CmsDepartmentController extends Controller
 {
+    public function __construct(private CmsAuthorizationService $cmsAuth) {}
+
     public function index(Request $request): Response
     {
         $query = CmsDepartment::with(['head'])
@@ -42,6 +45,8 @@ class CmsDepartmentController extends Controller
 
     public function store(StoreDepartmentRequest $request)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         CmsDepartment::create($request->validated());
 
         return redirect()->route('cms.departments.index')->with('success', 'Department created successfully.');
@@ -57,6 +62,8 @@ class CmsDepartmentController extends Controller
 
     public function update(StoreDepartmentRequest $request, CmsDepartment $department)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $department->update($request->validated());
 
         return redirect()->route('cms.departments.index')->with('success', 'Department updated successfully.');
@@ -64,6 +71,8 @@ class CmsDepartmentController extends Controller
 
     public function destroy(CmsDepartment $department)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         DB::transaction(function () use ($department) {
             $department->loadMissing([
                 'levels.students.enrollments',

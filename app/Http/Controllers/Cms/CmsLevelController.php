@@ -9,6 +9,7 @@ use App\Models\CmsEnrollment;
 use App\Models\CmsLevel;
 use App\Models\CmsSchedule;
 use App\Models\CmsStudent;
+use App\Services\CmsAuthorizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -16,6 +17,8 @@ use Inertia\Response;
 
 class CmsLevelController extends Controller
 {
+    public function __construct(private CmsAuthorizationService $cmsAuth) {}
+
     public function index(Request $request): Response
     {
         $query = CmsLevel::with('department')->withCount('students');
@@ -44,6 +47,8 @@ class CmsLevelController extends Controller
 
     public function store(StoreLevelRequest $request)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         CmsLevel::create($request->validated());
 
         return redirect()->route('cms.levels.index')->with('success', 'Level created successfully.');
@@ -59,6 +64,8 @@ class CmsLevelController extends Controller
 
     public function update(StoreLevelRequest $request, CmsLevel $level)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $level->update($request->validated());
 
         return redirect()->route('cms.levels.index')->with('success', 'Level updated successfully.');
@@ -66,6 +73,8 @@ class CmsLevelController extends Controller
 
     public function destroy(CmsLevel $level)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         DB::transaction(function () use ($level) {
             $level->loadMissing(['students.enrollments']);
 

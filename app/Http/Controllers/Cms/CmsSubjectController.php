@@ -8,6 +8,7 @@ use App\Models\CmsDepartment;
 use App\Models\CmsEnrollment;
 use App\Models\CmsSchedule;
 use App\Models\CmsSubject;
+use App\Services\CmsAuthorizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -15,6 +16,8 @@ use Inertia\Response;
 
 class CmsSubjectController extends Controller
 {
+    public function __construct(private CmsAuthorizationService $cmsAuth) {}
+
     public function index(Request $request): Response
     {
         $query = CmsSubject::with('department')->withCount('enrollments');
@@ -50,6 +53,8 @@ class CmsSubjectController extends Controller
 
     public function store(StoreSubjectRequest $request)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         CmsSubject::create($request->validated());
 
         return redirect()->route('cms.subjects.index')->with('success', 'Subject created successfully.');
@@ -65,6 +70,8 @@ class CmsSubjectController extends Controller
 
     public function update(StoreSubjectRequest $request, CmsSubject $subject)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         $subject->update($request->validated());
 
         return redirect()->route('cms.subjects.index')->with('success', 'Subject updated successfully.');
@@ -72,6 +79,8 @@ class CmsSubjectController extends Controller
 
     public function destroy(CmsSubject $subject)
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         DB::transaction(function () use ($subject) {
             CmsSchedule::where('subject_id', $subject->id)
                 ->chunkById(500, fn ($rows) => $rows->each->delete());

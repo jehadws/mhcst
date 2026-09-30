@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -20,17 +21,43 @@ class UploadController extends Controller
         'instructors',
     ];
 
+    /** @var list<string> */
+    private const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'];
+
+    /** @var list<string> */
+    private const VIDEO_EXTENSIONS = ['mp4', 'webm'];
+
+    /** @var list<string> */
+    private const IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
+
+    /** @var list<string> */
+    private const VIDEO_MIMES = ['video/mp4', 'video/webm'];
+
     public function store(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|image|max:10240',
+            'file' => [
+                'required',
+                'file',
+                'max:10240',
+                fn ($attr, $val, $fail) => in_array($val->getMimeType(), self::IMAGE_MIMES, true)
+                    || $fail('The file must be a valid image (JPG/PNG/WEBP/GIF/AVIF).'),
+            ],
             'folder' => ['nullable', 'string', Rule::in(self::ALLOWED_FOLDERS)],
         ]);
 
         $folder = $request->input('folder', 'uploads');
         $file = $request->file('file');
 
-        $filename = Str::random(16).'_'.time().'.'.$file->getClientOriginalExtension();
+        $clientExt = strtolower((string) $file->getClientOriginalExtension());
+        abort_unless(in_array($clientExt, self::IMAGE_EXTENSIONS, true), 422,
+            'Detected file extension is not in the image allowlist.');
+
+        $ext = strtolower((string) $file->extension());
+        abort_unless(in_array($ext, self::IMAGE_EXTENSIONS, true), 422,
+            'Detected file extension is not in the image allowlist.');
+
+        $filename = Str::random(16).'_'.time().'.'.$ext;
         $path = $file->storeAs($folder, $filename, 'public');
 
         return response()->json([
@@ -42,14 +69,28 @@ class UploadController extends Controller
     public function storeVideo(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:mp4,webm|max:51200',
+            'file' => [
+                'required',
+                'file',
+                'max:51200',
+                fn ($attr, $val, $fail) => in_array($val->getMimeType(), self::VIDEO_MIMES, true)
+                    || $fail('The file must be a valid video (MP4/WEBM).'),
+            ],
             'folder' => ['nullable', 'string', Rule::in(self::ALLOWED_FOLDERS)],
         ]);
 
         $folder = $request->input('folder', 'uploads');
         $file = $request->file('file');
 
-        $filename = Str::random(16).'_'.time().'.'.$file->getClientOriginalExtension();
+        $clientExt = strtolower((string) $file->getClientOriginalExtension());
+        abort_unless(in_array($clientExt, self::VIDEO_EXTENSIONS, true), 422,
+            'Detected file extension is not in the video allowlist.');
+
+        $ext = strtolower((string) $file->extension());
+        abort_unless(in_array($ext, self::VIDEO_EXTENSIONS, true), 422,
+            'Detected file extension is not in the video allowlist.');
+
+        $filename = Str::random(16).'_'.time().'.'.$ext;
         $path = $file->storeAs($folder, $filename, 'public');
 
         return response()->json([
@@ -68,11 +109,28 @@ class UploadController extends Controller
             return response()->json(['message' => 'Invalid path'], 403);
         }
 
+        $folder = explode('/', $path, 2)[0] ?? '';
+
+        // settings/uploads stores site branding; only CMS Admin + Manager roles
+        // may delete from settings folder.
+        if ($folder === 'settings' && ! $this->userCanDeleteFromSettings(auth()->user())) {
+            return response()->json(['message' => 'Insufficient permission for this folder'], 403);
+        }
+
         if (Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
         }
 
         return response()->json(['message' => 'Deleted']);
+    }
+
+    private function userCanDeleteFromSettings(?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        return $user->hasAnyRole(['Admin', 'Manager']) || $user->can('cms.manage');
     }
 
     private function isAllowedPublicPath(string $path): bool
