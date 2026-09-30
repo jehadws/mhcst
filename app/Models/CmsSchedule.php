@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasAuditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CmsSchedule extends Model
 {
-    use SoftDeletes;
+    use HasAuditable, SoftDeletes;
 
     protected $fillable = [
         'subject_id',
