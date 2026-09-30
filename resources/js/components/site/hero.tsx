@@ -176,12 +176,12 @@ export function Hero({ banners = [] }: { banners?: Banner[] }) {
                   {t.hero.locationTag}
                 </span>
 
-                <h1 className="text-hero-foreground max-w-3xl text-balance text-4xl font-extrabold leading-[1.15] sm:text-5xl lg:text-6xl">
+                <h1 className="text-hero-foreground font-display max-w-3xl text-balance text-4xl font-extrabold leading-tight sm:text-5xl lg:text-6xl">
                   {slide.title}
                 </h1>
 
                 {slide.subtitle ? (
-                  <p className="text-hero-foreground/90 mt-6 max-w-2xl text-base sm:text-lg">{slide.subtitle}</p>
+                  <p className="text-hero-foreground/90 mt-6 max-w-2xl text-base leading-normal sm:text-lg">{slide.subtitle}</p>
                 ) : null}
 
                 <div className="mt-9 flex flex-wrap items-center gap-3">

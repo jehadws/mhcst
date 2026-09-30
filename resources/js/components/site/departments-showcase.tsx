@@ -73,17 +73,17 @@ export function DepartmentsShowcase({ departments = [] }: Props) {
         }));
 
   return (
-    <section id="programs" className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+    <section id="programs" className="mx-auto max-w-7xl px-4 py-28 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl text-center">
-        <h2 className="text-primary text-3xl font-extrabold sm:text-4xl">{ds.title}</h2>
-        <p className="text-muted-foreground mt-4 text-pretty leading-relaxed">{ds.description}</p>
+        <h2 className="font-display text-3xl font-extrabold leading-snug text-primary sm:text-4xl">{ds.title}</h2>
+        <p className="text-muted-foreground mt-4 text-pretty text-base leading-normal">{ds.description}</p>
       </div>
 
       <div className="mt-14 grid gap-6 md:grid-cols-3">
         {cards.map((c) => (
           <article
             key={c.id}
-            className="group border-border shadow-primary/5 relative flex min-h-80 flex-col justify-end overflow-hidden rounded-2xl border shadow-lg"
+            className="group border-border relative flex min-h-80 flex-col justify-end overflow-hidden rounded-2xl border shadow-lg"
           >
             <img
               src={c.image}
@@ -92,15 +92,15 @@ export function DepartmentsShowcase({ departments = [] }: Props) {
             />
             <div className="from-hero via-hero/70 to-hero/10 absolute inset-0 bg-gradient-to-t" />
             <div className="text-hero-foreground relative p-6 text-start">
-              <span className="text-accent text-xs font-bold">{cardLabel}</span>
-              <h3 className="mt-1 text-xl font-extrabold">{c.name}</h3>
-              <p className="text-hero-foreground/80 mt-2 text-sm">{c.desc}</p>
-              <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
+              <span className="text-accent text-xs font-bold tracking-wider">{cardLabel}</span>
+              <h3 className="font-display mt-2 text-xl font-extrabold leading-snug">{c.name}</h3>
+              <p className="text-hero-foreground/80 mt-3 text-sm leading-normal">{c.desc}</p>
+              <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2">
                 {c.links.map((l) => (
                   <Link
                     key={l}
                     href="/departments"
-                    className="text-accent hover:text-hero-foreground inline-flex items-center gap-1 text-sm font-bold transition-colors"
+                    className="text-accent hover:text-hero-foreground inline-flex items-center gap-1.5 text-sm font-bold transition-colors"
                   >
                     {l}
                     <Arrow className="size-4" aria-hidden="true" />

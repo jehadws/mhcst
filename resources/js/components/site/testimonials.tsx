@@ -8,9 +8,9 @@ export function Testimonials({ items }: { items?: any[] }) {
   const list = items && items.length > 0 ? items : defaultTestimonials;
 
   return (
-    <section id="testimonials" className="bg-secondary scroll-mt-20 py-24">
+    <section id="testimonials" className="bg-secondary scroll-mt-20 py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <h2 className="text-primary text-center text-3xl font-extrabold sm:text-4xl">
+        <h2 className="font-display text-center text-3xl font-extrabold leading-snug text-primary sm:text-4xl">
           {t.testimonials.title} <span className="text-accent">{t.testimonials.titleAccent}</span>
         </h2>
 
@@ -22,11 +22,11 @@ export function Testimonials({ items }: { items?: any[] }) {
             const initial = name.split(' ')[1]?.[0] ?? name[0] ?? 'M';
 
             return (
-              <figure key={idx} className="border-border bg-card relative rounded-2xl border p-8 text-start shadow-sm">
+              <figure key={idx} className="border-border bg-card relative rounded-2xl border p-8 text-start shadow-md">
                 <Quote className="text-accent/40 size-9" aria-hidden="true" />
-                <blockquote className="text-primary mt-4 text-lg font-medium leading-relaxed">&ldquo;{quoteText}&rdquo;</blockquote>
+                <blockquote className="text-foreground mt-4 text-base font-medium leading-normal">&ldquo;{quoteText}&rdquo;</blockquote>
                 <figcaption className="mt-6 flex items-center gap-3">
-                  <span className="bg-primary text-primary-foreground flex size-11 items-center justify-center rounded-full text-sm font-bold">
+                  <span className="bg-primary text-primary-foreground flex size-11 items-center justify-center rounded-full text-sm font-bold shadow-sm">
                     {initial}
                   </span>
                   <div>

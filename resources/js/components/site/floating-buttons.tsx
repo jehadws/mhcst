@@ -19,25 +19,23 @@ export function FloatingButtons() {
 
     return (
         <div className="fixed bottom-6 end-6 z-50 flex flex-col items-end gap-3">
-            {/* WhatsApp Button */}
             <a
                 href={`https://wa.me/${whatsapp}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Chat on WhatsApp"
-                className="group flex size-13 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 transition-all duration-300 hover:bg-emerald-600"
+                className="group flex size-12 items-center justify-center rounded-full bg-[oklch(0.68_0.20_145)] text-white shadow-xl transition-all duration-300 hover:bg-[oklch(0.62_0.19_145)]"
             >
-                <MessageCircle className="size-6" />
+                <MessageCircle className="size-5" />
             </a>
 
-            {/* Scroll to Top */}
             <button
                 type="button"
                 onClick={scrollToTop}
                 aria-label="Scroll to top"
                 className={cn(
-                    'flex size-11 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-md transition-all duration-300 hover:border-primary/40 hover:bg-primary hover:text-primary-foreground',
-                    showTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
+                    'flex size-12 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-lg transition-all duration-300 hover:border-primary/40 hover:bg-primary hover:text-primary-foreground',
+                    showTop ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0',
                 )}
             >
                 <ArrowUp className="size-5" />

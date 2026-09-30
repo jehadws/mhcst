@@ -11,11 +11,11 @@ import { ArrowUpRight, BookOpen, Building2, Calendar, CalendarCheck, ClipboardLi
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 const COLORS = {
-  primary: 'hsl(var(--primary))',
-  emerald: 'hsl(160 84% 39%)',
-  amber: 'hsl(38 92% 50%)',
-  sky: 'hsl(199 89% 48%)',
-  violet: 'hsl(258 90% 66%)',
+  primary: 'var(--color-primary)',
+  emerald: 'var(--color-success)',
+  amber: 'var(--color-warning)',
+  sky: 'var(--color-info)',
+  violet: 'var(--color-info)',
 };
 
 interface CmsStudent {
@@ -211,29 +211,29 @@ export default function Dashboard() {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={locale === 'ar' ? 'لوحة التحكم الكلية' : 'College Dashboard'} />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4">
+      <div className="flex h-full flex-1 flex-col gap-6 p-6">
         {adminView ? (
           <>
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold tracking-tight">
+        <div className="flex flex-col gap-2">
+          <h1 className="font-display text-3xl font-extrabold leading-snug tracking-tight">
             {locale === 'ar' ? 'مرحباً بك في النظام الأكاديمي' : 'Welcome to Academic Dashboard'}
           </h1>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-base text-muted-foreground">
             {locale === 'ar' ? 'نظرة عامة على الكلية والأحصائيات الأكاديمية' : 'Overview of college statistics and schedules'}
           </p>
         </div>
 
         {/* ─── Stat Cards ─── */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {statCards.map((card) => (
             <Card key={card.label} className="relative overflow-hidden">
               <CardContent className="flex items-center justify-between p-5">
-                <div className="space-y-1.5">
-                  <p className="text-muted-foreground text-sm font-medium">{card.label}</p>
-                  <p className="text-2xl font-bold tabular-nums">{card.value}</p>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">{card.label}</p>
+                  <p className="font-display text-3xl font-extrabold leading-snug tabular-nums">{card.value}</p>
                   {card.delta !== null && card.delta !== undefined && (
                     <p
-                      className={`flex items-center gap-1 text-xs font-medium ${card.delta >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}
+                      className={`flex items-center gap-1 text-xs font-medium ${card.delta >= 0 ? 'text-success' : 'text-destructive'}`}
                     >
                       <ArrowUpRight className={`h-3.5 w-3.5 ${card.delta < 0 ? 'rotate-90' : ''}`} />
                       {Math.abs(card.delta)}% {locale === 'ar' ? 'مقارنة بالشهر الماضي' : 'vs last month'}
@@ -249,10 +249,10 @@ export default function Dashboard() {
         </div>
 
         {/* ─── Charts ─── */}
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2">
           {/* Department Distribution */}
           <Card>
-            <CardHeader>
+            <CardHeader className="gap-2">
               <CardTitle>{locale === 'ar' ? 'توزيع الطلاب حسب القسم' : 'Students per Department'}</CardTitle>
               <CardDescription>{locale === 'ar' ? 'عدد الطلاب المقيدين بكل قسم أكاديمي' : 'Registered student breakdown by department'}</CardDescription>
             </CardHeader>
@@ -271,7 +271,7 @@ export default function Dashboard() {
 
           {/* Attendance Trend */}
           <Card>
-            <CardHeader>
+            <CardHeader className="gap-2">
               <CardTitle>{locale === 'ar' ? 'سجل الحضور الشهري' : 'Monthly Attendance Records'}</CardTitle>
               <CardDescription>{locale === 'ar' ? 'معدل تسجيل الحضور والغياب خلال الأشهر الماضية' : 'Monthly recorded attendance activity'}</CardDescription>
             </CardHeader>
@@ -280,8 +280,8 @@ export default function Dashboard() {
                 <AreaChart data={attendanceByMonth} margin={{ left: 12, right: 12, top: 8 }}>
                   <defs>
                     <linearGradient id="fillAttendance" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={COLORS.emerald} stopOpacity={0.35} />
-                      <stop offset="95%" stopColor={COLORS.emerald} stopOpacity={0.02} />
+                      <stop offset="5%" stopColor="var(--color-success)" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="var(--color-success)" stopOpacity={0.02} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid vertical={false} className="stroke-border/60" />
@@ -303,11 +303,11 @@ export default function Dashboard() {
         </div>
 
         {/* ─── Tables ─── */}
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2">
           {/* Today's Schedule Overview */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <div className="space-y-1">
+            <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
+              <div className="space-y-2">
                 <CardTitle>{locale === 'ar' ? 'الجدول الدراسي اليومي' : "Today's Schedule"}</CardTitle>
                 <CardDescription>{locale === 'ar' ? 'المحاضرات والمعامل المقررة اليوم' : 'Classes and labs scheduled'}</CardDescription>
               </div>
@@ -319,14 +319,14 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               {todaySchedules.length === 0 ? (
-                <p className="text-muted-foreground py-8 text-center text-sm">
+                <p className="py-10 text-center text-sm text-muted-foreground">
                   {locale === 'ar' ? 'لا توجد محاضرات في الجدول حالياً' : 'No schedules available'}
                 </p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="text-muted-foreground border-b text-left text-xs [&_th]:px-3 [&_th]:py-2">
+                      <tr className="border-b text-left text-xs text-muted-foreground [&_th]:px-3 [&_th]:py-2.5">
                         <th>{locale === 'ar' ? 'المادة' : 'Subject'}</th>
                         <th>{locale === 'ar' ? 'الأستاذ' : 'Teacher'}</th>
                         <th>{locale === 'ar' ? 'القاعة' : 'Room'}</th>
@@ -335,13 +335,13 @@ export default function Dashboard() {
                     </thead>
                     <tbody>
                       {todaySchedules.map((schedule) => (
-                        <tr key={schedule.id} className="hover:bg-muted/40 border-b last:border-0">
-                          <td className="px-3 py-2.5 font-medium">{schedule.subject?.name || '-'}</td>
-                          <td className="px-3 py-2.5">{schedule.teacher?.name || '-'}</td>
-                          <td className="px-3 py-2.5">
+                        <tr key={schedule.id} className="border-b last:border-0 hover:bg-muted/40">
+                          <td className="px-3 py-3 font-medium">{schedule.subject?.name || '-'}</td>
+                          <td className="px-3 py-3">{schedule.teacher?.name || '-'}</td>
+                          <td className="px-3 py-3">
                             <Badge variant="outline">{schedule.room || '—'}</Badge>
                           </td>
-                          <td className="text-muted-foreground px-3 py-2.5 text-xs dir-ltr">
+                          <td className="px-3 py-3 text-xs text-muted-foreground dir-ltr">
                             {schedule.start_time} - {schedule.end_time}
                           </td>
                         </tr>
@@ -355,8 +355,8 @@ export default function Dashboard() {
 
           {/* Recent Registered Students */}
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <div className="space-y-1">
+            <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
+              <div className="space-y-2">
                 <CardTitle>{locale === 'ar' ? 'آخر الطلاب المسجلين' : 'Recently Registered Students'}</CardTitle>
                 <CardDescription>{locale === 'ar' ? 'أحدث الطلبة الانضمام للكلية' : 'Latest enrolled CMS students'}</CardDescription>
               </div>
@@ -368,14 +368,14 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               {recentStudents.length === 0 ? (
-                <p className="text-muted-foreground py-8 text-center text-sm">
+                <p className="py-10 text-center text-sm text-muted-foreground">
                   {locale === 'ar' ? 'لا يوجد طلاب مسجلون حديثاً' : 'No recent students found'}
                 </p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="text-muted-foreground border-b text-left text-xs [&_th]:px-3 [&_th]:py-2">
+                      <tr className="border-b text-left text-xs text-muted-foreground [&_th]:px-3 [&_th]:py-2.5">
                         <th>{locale === 'ar' ? 'الرقم الدراسي' : 'Student No'}</th>
                         <th>{locale === 'ar' ? 'الاسم' : 'Name'}</th>
                         <th>{locale === 'ar' ? 'القسم' : 'Department'}</th>
@@ -383,14 +383,14 @@ export default function Dashboard() {
                     </thead>
                     <tbody>
                       {recentStudents.map((student) => (
-                        <tr key={student.id} className="hover:bg-muted/40 border-b last:border-0">
-                          <td className="px-3 py-2.5 font-mono text-xs font-semibold">{student.student_no}</td>
-                          <td className="px-3 py-2.5 font-medium">
+                        <tr key={student.id} className="border-b last:border-0 hover:bg-muted/40">
+                          <td className="px-3 py-3 font-mono text-xs font-semibold">{student.student_no}</td>
+                          <td className="px-3 py-3 font-medium">
                             <Link href={route('cms.students.show', student.id)} className="hover:underline">
                               {student.name}
                             </Link>
                           </td>
-                          <td className="px-3 py-2.5 text-xs text-muted-foreground">
+                          <td className="px-3 py-3 text-xs text-muted-foreground">
                             {student.level?.department?.name || '—'}
                           </td>
                         </tr>
@@ -405,8 +405,8 @@ export default function Dashboard() {
 
         {/* ─── Recent Grades ─── */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <div className="space-y-1">
+          <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
+            <div className="space-y-2">
               <CardTitle>{locale === 'ar' ? 'آخر الدرجات المسجلة' : 'Recently Recorded Grades'}</CardTitle>
               <CardDescription>{locale === 'ar' ? 'أحدث عمليات رصد الدرجات في النظام' : 'Latest grade entries across subjects'}</CardDescription>
             </div>
@@ -418,14 +418,14 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             {recentGrades.length === 0 ? (
-              <p className="text-muted-foreground py-8 text-center text-sm">
+              <p className="py-10 text-center text-sm text-muted-foreground">
                 {locale === 'ar' ? 'لم يتم رصد أي درجات بعد' : 'No grades recorded yet'}
               </p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-muted-foreground border-b text-left text-xs [&_th]:px-3 [&_th]:py-2">
+                    <tr className="border-b text-left text-xs text-muted-foreground [&_th]:px-3 [&_th]:py-2.5">
                       <th>{locale === 'ar' ? 'الطالب' : 'Student'}</th>
                       <th>{locale === 'ar' ? 'المادة' : 'Subject'}</th>
                       <th>{locale === 'ar' ? 'المجموع' : 'Total'}</th>
@@ -435,8 +435,8 @@ export default function Dashboard() {
                   </thead>
                   <tbody>
                     {recentGrades.map((grade) => (
-                      <tr key={grade.id} className="hover:bg-muted/40 border-b last:border-0">
-                        <td className="px-3 py-2.5 font-medium">
+                      <tr key={grade.id} className="border-b last:border-0 hover:bg-muted/40">
+                        <td className="px-3 py-3 font-medium">
                           <Link
                             href={route('cms.students.show', grade.enrollment?.student?.id)}
                             className="hover:underline"
@@ -444,18 +444,18 @@ export default function Dashboard() {
                             {grade.enrollment?.student?.name || '-'}
                           </Link>
                         </td>
-                        <td className="px-3 py-2.5">
+                        <td className="px-3 py-3">
                           {grade.enrollment?.subject?.code || '-'} - {grade.enrollment?.subject?.name || ''}
                         </td>
-                        <td className="px-3 py-2.5 font-semibold tabular-nums">{grade.total ?? '-'}</td>
-                        <td className="px-3 py-2.5">
+                        <td className="px-3 py-3 font-semibold tabular-nums">{grade.total ?? '-'}</td>
+                        <td className="px-3 py-3">
                           {grade.grade_letter ? (
                             <Badge>{grade.grade_letter}</Badge>
                           ) : (
                             <span className="text-muted-foreground">-</span>
                           )}
                         </td>
-                        <td className="text-muted-foreground px-3 py-2.5 text-xs">
+                        <td className="px-3 py-3 text-xs text-muted-foreground">
                           {grade.entered_at
                             ? new Date(grade.entered_at).toLocaleDateString(locale === 'ar' ? 'ar-LY' : 'en-GB')
                             : '-'}

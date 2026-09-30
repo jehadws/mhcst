@@ -5,12 +5,12 @@ export function Accreditation() {
   const { t } = useSite();
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl px-4 py-28 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl text-center">
-        <h2 className="text-primary text-3xl font-extrabold sm:text-4xl">
+        <h2 className="font-display text-3xl font-extrabold leading-snug text-primary sm:text-4xl">
           {t.accreditation.title} <span className="text-accent">{t.accreditation.titleAccent}</span>
         </h2>
-        <p className="text-muted-foreground mt-4 text-pretty leading-relaxed">{t.accreditation.description}</p>
+        <p className="text-muted-foreground mt-4 text-pretty text-base leading-normal">{t.accreditation.description}</p>
       </div>
 
       <div className="mt-14 grid gap-6 md:grid-cols-3">
@@ -19,10 +19,10 @@ export function Accreditation() {
             key={b}
             className="border-border bg-card flex flex-col items-center gap-4 rounded-2xl border p-8 text-center shadow-sm"
           >
-            <span className="bg-primary/5 text-primary flex size-14 items-center justify-center rounded-2xl">
-              <BadgeCheck className="text-accent size-7" aria-hidden="true" />
+            <span className="bg-primary/5 text-primary flex size-16 items-center justify-center rounded-2xl shadow-sm">
+              <BadgeCheck className="size-8 text-accent" aria-hidden="true" />
             </span>
-            <p className="text-primary text-sm font-medium leading-relaxed">{b}</p>
+            <p className="font-display text-foreground text-base font-semibold leading-normal">{b}</p>
           </div>
         ))}
       </div>

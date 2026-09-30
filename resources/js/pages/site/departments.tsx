@@ -54,15 +54,15 @@ export default function PublicDepartmentsPage({ departments = [] }: Props) {
         <SiteHeader />
         <main className="flex-1">
           {/* ─── Hero Banner ─── */}
-          <div className="bg-hero text-hero-foreground border-hero-foreground/10 border-b pb-20 pt-[calc(4.25rem+3rem)] sm:pb-24 sm:pt-[calc(4.25rem+4rem)]">
+          <div className="bg-hero text-hero-foreground border-hero-foreground/10 border-b pb-20 pt-[calc(4.25rem+3rem)] sm:pb-28 sm:pt-[calc(4.25rem+4rem)]">
             <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-              <p className="text-hero-muted text-xs font-bold tracking-[0.2em] uppercase">
+              <p className="text-hero-muted text-xs font-bold tracking-widest uppercase">
                 {locale === 'ar' ? 'التخصصات الأكاديمية' : 'Academic majors'}
               </p>
-              <h1 className="mt-4 font-serif text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl">
+              <h1 className="mt-4 font-display text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
                 {locale === 'ar' ? 'الأقسام والبرامج الدراسية' : 'Academic departments & programs'}
               </h1>
-              <p className="text-hero-muted mx-auto mt-4 max-w-2xl text-base leading-relaxed sm:text-lg">
+              <p className="text-hero-muted mx-auto mt-4 max-w-2xl text-base leading-normal sm:text-lg">
                 {locale === 'ar'
                   ? 'يقدم المعهد مجموعة متميزة من الأقسام العلمية والتطبيقية المُصمَّمة لإعداد كوادر مؤهلة لمواكبة متطلبات سوق العمل.'
                   : 'Specialized academic departments designed to empower students with theoretical knowledge and practical expertise.'}
@@ -71,13 +71,13 @@ export default function PublicDepartmentsPage({ departments = [] }: Props) {
           </div>
 
           {/* ─── Departments Grid ─── */}
-          <section className="py-16 sm:py-20">
+          <section className="py-20 sm:py-28">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="mx-auto mb-12 max-w-2xl text-center">
-                <h2 className="text-foreground font-serif text-3xl font-bold tracking-tight sm:text-4xl">
+                <h2 className="text-primary font-display text-3xl font-extrabold leading-snug tracking-tight sm:text-4xl">
                   {locale === 'ar' ? 'الأقسام الأكاديمية بالكلية' : 'Our Academic Departments'}
                 </h2>
-                <p className="text-muted-foreground mt-3 text-sm sm:text-base">
+                <p className="text-muted-foreground mt-4 text-base leading-normal sm:text-lg">
                   {locale === 'ar'
                     ? 'تعرّف على الأقسام المتاحة والمواد والتخصصات الأكاديمية'
                     : 'Discover specialized departments and academic levels available'}
@@ -85,12 +85,12 @@ export default function PublicDepartmentsPage({ departments = [] }: Props) {
               </div>
 
               {departments.length === 0 ? (
-                <div className="border-border bg-card rounded-3xl border border-dashed py-12 text-center">
+                <div className="border-border bg-card border-dashed border shadow-sm rounded-xl py-12 text-center">
                   <Building2 className="text-muted-foreground/50 mx-auto size-12" />
                   <p className="text-foreground mt-4 text-base font-semibold">
                     {locale === 'ar' ? 'لا توجد أقسام مضافة حالياً' : 'No departments listed yet'}
                   </p>
-                  <p className="text-muted-foreground mt-1 text-sm">
+                  <p className="text-muted-foreground mt-1 text-sm leading-normal">
                     {locale === 'ar' ? 'سيتم إضافة الأقسام الأكاديمية قريباً.' : 'Academic departments will be published soon.'}
                   </p>
                 </div>
@@ -99,16 +99,16 @@ export default function PublicDepartmentsPage({ departments = [] }: Props) {
                   {departments.map((dept) => (
                     <div
                       key={dept.id}
-                      className="group border-border/80 bg-card hover:border-primary/30 flex flex-col justify-between rounded-xl border p-6 transition-colors"
+                      className="group border-border/80 bg-card hover:border-primary/30 flex flex-col justify-between border p-6 transition-all duration-200 shadow-sm hover:shadow-lg rounded-lg"
                     >
                       <div>
                         <div className="bg-primary/10 text-primary mb-5 flex size-12 items-center justify-center rounded-lg">
                           <Building2 className="size-6" />
                         </div>
 
-                        <h3 className="text-foreground font-serif text-xl font-bold">{dept.name}</h3>
+                        <h3 className="text-foreground font-display text-xl font-extrabold leading-snug">{dept.name}</h3>
 
-                        <p className="text-muted-foreground mt-3 line-clamp-3 text-sm leading-relaxed">
+                        <p className="text-muted-foreground mt-3 line-clamp-3 text-sm leading-normal">
                           {dept.description ||
                             (locale === 'ar'
                               ? 'قسم أكاديمي متكامل يوفر بيئة تعليمية حديثة معتمدة.'
@@ -116,9 +116,9 @@ export default function PublicDepartmentsPage({ departments = [] }: Props) {
                         </p>
                       </div>
 
-                      <div className="border-border/60 mt-8 border-t pt-6">
+                      <div className="border-border/60 mt-6 border-t pt-5">
                         {dept.head && (
-                          <div className="text-muted-foreground mb-4 flex items-center gap-2 text-xs">
+                          <div className="text-muted-foreground mb-3 flex items-center gap-2 text-xs">
                             <GraduationCap className="text-primary size-4 shrink-0" />
                             <span>
                               {locale === 'ar' ? 'رئيس القسم:' : 'Department Head:'}{' '}
@@ -136,22 +136,22 @@ export default function PublicDepartmentsPage({ departments = [] }: Props) {
 
                         <div className="flex items-center justify-between gap-4 text-xs font-semibold">
                           <span className="bg-secondary text-secondary-foreground inline-flex items-center gap-1.5 rounded-full px-3 py-1">
-                            <Users className="text-primary size-3.5" />
-                            {dept.students_count || 0} {locale === 'ar' ? 'طالب' : 'Students'}
+                            <Users className="text-primary size-4 shrink-0" />
+                            <span className="tabular-nums">{dept.students_count || 0}</span> {locale === 'ar' ? 'طالب' : 'Students'}
                           </span>
 
                           <span className="bg-secondary text-secondary-foreground inline-flex items-center gap-1.5 rounded-full px-3 py-1">
-                            <BookOpen className="text-primary size-3.5" />
-                            {dept.subjects_count || 0} {locale === 'ar' ? 'مادة' : 'Subjects'}
+                            <BookOpen className="text-primary size-4 shrink-0" />
+                            <span className="tabular-nums">{dept.subjects_count || 0}</span> {locale === 'ar' ? 'مادة' : 'Subjects'}
                           </span>
                         </div>
 
                         <Link
                           href="/contact"
-                          className="border-border text-primary hover:border-primary/30 hover:bg-primary/5 mt-6 flex items-center justify-center gap-2 rounded-lg border py-2.5 text-xs font-semibold transition-colors"
+                          className="border-border text-primary hover:border-primary/30 hover:bg-primary/5 mt-5 flex items-center justify-center gap-1.5 rounded-lg border py-3 text-xs font-semibold transition-colors"
                         >
                           <span>{locale === 'ar' ? 'استفسر عن التكلفة والتسجيل' : 'Inquire & Apply'}</span>
-                          <Arrow className="size-3.5" />
+                          <Arrow className="size-4 shrink-0" />
                         </Link>
                       </div>
                     </div>

@@ -17,9 +17,9 @@ export function BlogPostsSection({ items = [] }: Props) {
   }
 
   return (
-    <section id="blog" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-24 sm:px-6 lg:px-8">
+    <section id="blog" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-28 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="text-primary text-3xl font-extrabold sm:text-4xl">
+        <h2 className="font-display text-3xl font-extrabold leading-snug text-primary sm:text-4xl">
           {t.news.title} <span className="text-accent">{t.news.titleAccent}</span>
         </h2>
         <Link href="/blog-posts" className="text-accent hover:text-primary inline-flex shrink-0 items-center gap-1.5 text-sm font-bold">

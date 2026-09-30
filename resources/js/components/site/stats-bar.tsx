@@ -48,13 +48,13 @@ function StatItem({ stat, run }: { stat: Stat; run: boolean }) {
   const n = useCountUp(stat.value, run, stat.plain);
 
   return (
-    <div className="flex flex-col items-center gap-2 px-4 py-6 text-center">
-      <span className="text-primary text-3xl font-extrabold sm:text-4xl">
+    <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
+      <span className="font-display text-primary text-3xl font-extrabold leading-tight tabular-nums sm:text-4xl">
         {stat.prefix}
         {n.toLocaleString('en-US')}
         {stat.suffix}
       </span>
-      <p className="text-muted-foreground text-sm font-medium">{stat.label}</p>
+      <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
     </div>
   );
 }
@@ -107,7 +107,7 @@ export function StatsBar({ stats }: StatsBarProps) {
     <section className="relative z-10 -mt-16 px-4 sm:px-6 lg:px-8">
       <div
         ref={ref}
-        className="border-border bg-card shadow-primary/5 mx-auto grid max-w-6xl grid-cols-2 divide-x divide-border rounded-2xl border shadow-xl sm:grid-cols-3 lg:grid-cols-5"
+        className="border-border bg-card shadow-lg mx-auto grid max-w-6xl grid-cols-2 divide-x divide-border rounded-xl border sm:grid-cols-3 lg:grid-cols-5"
       >
         {statItems.map((s) => (
           <StatItem key={s.label} stat={s} run={run} />

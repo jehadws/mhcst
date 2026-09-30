@@ -7,48 +7,122 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ════════════════════════════════════════════════════════════════
+   MHCST Design System tokens — Tailwind v4 @theme block
+   Authority: DESIGN.md at repo root.
+   Every token listed here generates matching Tailwind utilities.
+   Do NOT ad-hoc override these in components; add tokens instead.
+   ════════════════════════════════════════════════════════════════ */
 @theme {
-  --font-sans: 'Tajawal', 'Cairo', system-ui, -apple-system, sans-serif;
-  --font-serif: 'Tajawal', 'Cairo', Georgia, serif;
+  /* ── Typography: fonts ───────────────────────────────────── */
+  /* Tajawal is used for both interface and display. Cairo is the
+     Arabic fallback chain. system-ui is the Latin-script fallback
+     for when no self-hosted font loads. */
+  --font-sans: 'Tajawal', 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'Tajawal', 'Cairo', Georgia, 'Times New Roman', serif;
+  --font-display: 'Tajawal', 'Cairo', Georgia, 'Times New Roman', serif;
 
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  /* ── Typography: weights (only ones shipped in self-hosted fonts) ── */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
 
+  /* ── Typography: modular scale (ratio 1.25, base 16px) ───── */
+  --font-size-xs: 0.75rem;   /* 12px — captions, badges */
+  --font-size-xs--line-height: 1.15;
+  --font-size-sm: 0.875rem;  /* 14px — labels, table cells */
+  --font-size-sm--line-height: 1.5;
+  --font-size-base: 1rem;    /* 16px — body */
+  --font-size-base--line-height: 1.5;
+  --font-size-lg: 1.125rem;  /* 18px — lead paragraphs */
+  --font-size-lg--line-height: 1.5;
+  --font-size-xl: 1.25rem;   /* 20px — KPI labels, card subtitles */
+  --font-size-xl--line-height: 1.25;
+  --font-size-2xl: 1.5rem;   /* 24px — card titles, dialog titles */
+  --font-size-2xl--line-height: 1.25;
+  --font-size-3xl: 1.875rem; /* 30px — h3 */
+  --font-size-3xl--line-height: 1.25;
+  --font-size-4xl: 2.25rem;  /* 36px — h2 section titles */
+  --font-size-4xl--line-height: 1.25;
+  --font-size-5xl: 3rem;     /* 48px — h1 page titles */
+  --font-size-5xl--line-height: 1.15;
+  --font-size-6xl: 3.75rem;  /* 60px — hero headline only */
+  --font-size-6xl--line-height: 1.15;
+
+  /* ── Typography: line-height semantic aliases ────────────── */
+  --leading-tight: 1.15;    /* hero, h1-h2, display numbers */
+  --leading-snug: 1.25;     /* h3-h6, card titles, stats */
+  --leading-normal: 1.5;    /* all body 14–18px */
+  --leading-relaxed: 1.7;   /* long-form: blog, about, legal */
+
+  /* ── Typography: letter-spacing (small caps) ─────────────── */
+  --tracking-widest: 0.2em; /* section eyebrow labels */
+
+  /* ── Radius: 4-tier + full (shadcn compat kept) ─────────── */
+  /* --radius is the shadcn master (= 10px rounded-lg card base).
+     Shadcn components expect:
+       rounded-sm = --radius-sm (6px), checkboxes/badges
+       rounded-md = --radius-md (8px), buttons/inputs
+       rounded-lg = --radius (= 10px), standard cards
+     Extensions for the MHCST system:
+       rounded-xl = 16px, large CMS wrappers / dialogs
+       rounded-2xl = 24px, marketing cards / testimonial tiles */
+  --radius: 0.625rem;                       /* md-lg pivot = 10px */
+  --radius-sm: calc(var(--radius) - 4px);   /* 6px */
+  --radius-md: calc(var(--radius) - 2px);   /* 8px */
+  --radius-lg: var(--radius);               /* 10px — shadcn card */
+  --radius-xl: 1rem;                        /* 16px — CMS wrappers */
+  --radius-2xl: 1.5rem;                     /* 24px — marketing */
+
+  /* ── Colors ──────────────────────────────────────────────── */
+  /* Every --color-* below generates `bg-*`, `text-*`, `border-*`,
+     `ring-*`, `shadow-*`, and `divide-*` utilities.
+     Values resolve to CSS custom properties defined in :root and
+     .dark so that light/dark mode can swap palettes without a
+     theme rebuild. The raw palette itself lives in :root/.dark. */
+
+  /* Global surfaces */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
 
+  /* Brand */
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
 
+  /* Interactions */
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  /* Status / semantic (new — chart + badges + alerts) */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  /* Brand bands: hero, footer, stats, CTA banner */
   --color-hero: var(--hero);
   --color-hero-foreground: var(--hero-foreground);
   --color-hero-muted: var(--hero-muted);
   --color-hero-accent: var(--hero-accent);
   --color-hero-accent-foreground: var(--hero-accent-foreground);
 
+  /* App sidebar */
   --color-sidebar: var(--sidebar-background);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -57,114 +131,166 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* ── Shadows / Elevation (6-tier) ────────────────────────── */
+  /* Light-mode compositions use slate-tinted rgb(15,23,42).
+     Dark-mode overrides are in the .dark block below. */
+  --shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+  --shadow-md:
+    0 4px 6px -1px rgb(15 23 42 / 0.08),
+    0 2px 4px -2px rgb(15 23 42 / 0.05);
+  --shadow-lg:
+    0 10px 15px -3px rgb(15 23 42 / 0.10),
+    0 4px 6px -4px rgb(15 23 42 / 0.05);
+  --shadow-xl:
+    0 20px 25px -5px rgb(15 23 42 / 0.12),
+    0 8px 10px -6px rgb(15 23 42 / 0.08);
+  --shadow-2xl: 0 25px 50px -12px rgb(15 23 42 / 0.20);
+
+  /* Layout tokens */
+  --container-7xl: 80rem; /* 1280px — shared content max-width */
+  --breakpoint-sm: 40rem;   /*  640px */
+  --breakpoint-md: 48rem;   /*  768px */
+  --breakpoint-lg: 64rem;   /* 1024px */
+  --breakpoint-xl: 80rem;   /* 1280px */
+  --breakpoint-2xl: 96rem;  /* 1536px */
 }
 
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
-}
-
-/* ─── AMC-inspired OKLCH palette ─── */
+/* ════════════════════════════════════════════════════════════════
+   Palette — OKLCH raw values (light mode + dark mode overrides)
+   ════════════════════════════════════════════════════════════════ */
 :root {
   color-scheme: light;
+
+  /* Surfaces */
   --background: oklch(0.985 0.005 240);
-  --foreground: oklch(0.2 0.055 260);
+  --foreground: oklch(0.20 0.055 260);
+  --card: oklch(1.0 0 0);
+  --card-foreground: oklch(0.20 0.055 260);
+  --popover: oklch(1.0 0 0);
+  --popover-foreground: oklch(0.20 0.055 260);
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.055 260);
-
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.055 260);
-
-  --primary: oklch(0.3 0.1 262);
+  /* Brand (MHCST navy + amber) */
+  --primary: oklch(0.30 0.10 262);
   --primary-foreground: oklch(0.985 0.005 240);
-
-  --secondary: oklch(0.95 0.01 250);
-  --secondary-foreground: oklch(0.3 0.1 262);
-
-  --muted: oklch(0.95 0.01 250);
-  --muted-foreground: oklch(0.5 0.04 260);
-
-  --accent: oklch(0.72 0.1 78);
+  --secondary: oklch(0.95 0.010 250);
+  --secondary-foreground: oklch(0.30 0.10 262);
+  --muted: oklch(0.95 0.010 250);
+  --muted-foreground: oklch(0.50 0.040 260);
+  --accent: oklch(0.72 0.10 78);
   --accent-foreground: oklch(0.22 0.05 260);
 
-  --destructive: oklch(0.577 0.245 27.325);
+  /* Status / semantic */
+  --success: oklch(0.62 0.19 145);
+  --success-foreground: oklch(0.985 0.005 240);
+  --warning: oklch(0.72 0.15 85);
+  --warning-foreground: oklch(0.15 0.040 60);
+  --info: oklch(0.68 0.15 235);
+  --info-foreground: oklch(0.985 0.005 240);
+  --destructive: oklch(0.577 0.245 27.3);
   --destructive-foreground: oklch(0.985 0.005 240);
 
-  --border: oklch(0.9 0.012 255);
-  --input: oklch(0.9 0.012 255);
-  --ring: oklch(0.3 0.1 262);
+  /* Interactions */
+  --border: oklch(0.90 0.012 255);
+  --input: oklch(0.90 0.012 255);
+  --ring: oklch(0.30 0.10 262);
 
-  --hero: oklch(0.3 0.1 262);
+  /* Brand bands */
+  --hero: oklch(0.30 0.10 262);
   --hero-foreground: oklch(0.985 0.005 240);
-  --hero-muted: oklch(0.75 0.03 260);
-  --hero-accent: oklch(0.72 0.1 78);
+  --hero-muted: oklch(0.75 0.030 260);
+  --hero-accent: oklch(0.72 0.10 78);
   --hero-accent-foreground: oklch(0.22 0.05 260);
 
-  --radius: 0.625rem;
-
+  /* App sidebar */
   --sidebar-background: oklch(0.985 0.005 240);
-  --sidebar-foreground: oklch(0.2 0.055 260);
-  --sidebar-primary: oklch(0.3 0.1 262);
+  --sidebar-foreground: oklch(0.20 0.055 260);
+  --sidebar-primary: oklch(0.30 0.10 262);
   --sidebar-primary-foreground: oklch(0.985 0.005 240);
-  --sidebar-accent: oklch(0.95 0.01 250);
-  --sidebar-accent-foreground: oklch(0.3 0.1 262);
-  --sidebar-border: oklch(0.9 0.012 255);
-  --sidebar-ring: oklch(0.3 0.1 262);
+  --sidebar-accent: oklch(0.95 0.010 250);
+  --sidebar-accent-foreground: oklch(0.30 0.10 262);
+  --sidebar-border: oklch(0.90 0.012 255);
+  --sidebar-ring: oklch(0.30 0.10 262);
 }
 
 .dark {
   color-scheme: dark;
 
+  /* Surfaces */
   --background: oklch(0.17 0.035 262);
   --foreground: oklch(0.94 0.008 240);
-
-  --card: oklch(0.21 0.04 262);
+  --card: oklch(0.21 0.040 262);
   --card-foreground: oklch(0.94 0.008 240);
-
-  --popover: oklch(0.21 0.04 262);
+  --popover: oklch(0.21 0.040 262);
   --popover-foreground: oklch(0.94 0.008 240);
 
-  /* Interactive: soft blue for buttons, links, and text-primary on dark cards */
+  /* Brand — primary softens in dark so buttons have contrast on navy bg */
   --primary: oklch(0.78 0.07 262);
   --primary-foreground: oklch(0.18 0.04 262);
-
   --secondary: oklch(0.22 0.038 262);
   --secondary-foreground: oklch(0.92 0.01 240);
-
   --muted: oklch(0.25 0.035 262);
-  --muted-foreground: oklch(0.65 0.03 260);
-
+  --muted-foreground: oklch(0.65 0.030 260);
   --accent: oklch(0.76 0.11 78);
   --accent-foreground: oklch(0.18 0.04 262);
 
+  /* Status / semantic — darkened base slightly, on-color same */
+  --success: oklch(0.68 0.16 145);
+  --success-foreground: oklch(0.10 0.030 260);
+  --warning: oklch(0.75 0.14 82);
+  --warning-foreground: oklch(0.15 0.040 60);
+  --info: oklch(0.72 0.13 235);
+  --info-foreground: oklch(0.18 0.040 262);
   --destructive: oklch(0.62 0.22 25);
   --destructive-foreground: oklch(0.98 0.01 240);
 
-  --border: oklch(0.3 0.04 262);
+  /* Interactions — ring uses accent in dark for a11y pop on navy */
+  --border: oklch(0.30 0.040 262);
   --input: oklch(0.26 0.038 262);
   --ring: oklch(0.76 0.11 78);
 
-  /* Brand surfaces: header, footer, heroes — deep navy in both modes */
+  /* Brand bands — kept deep navy even in dark (brand identity) */
   --hero: oklch(0.24 0.085 262);
-  --hero-foreground: oklch(0.95 0.01 240);
-  --hero-muted: oklch(0.65 0.03 260);
+  --hero-foreground: oklch(0.95 0.010 240);
+  --hero-muted: oklch(0.65 0.030 260);
   --hero-accent: oklch(0.76 0.11 78);
   --hero-accent-foreground: oklch(0.18 0.04 262);
 
+  /* App sidebar — darker in dark mode, primary accent shifts to amber */
   --sidebar-background: oklch(0.15 0.035 262);
   --sidebar-foreground: oklch(0.88 0.01 240);
   --sidebar-primary: oklch(0.76 0.11 78);
   --sidebar-primary-foreground: oklch(0.18 0.04 262);
   --sidebar-accent: oklch(0.24 0.04 262);
   --sidebar-accent-foreground: oklch(0.94 0.008 240);
-  --sidebar-border: oklch(0.3 0.04 262);
+  --sidebar-border: oklch(0.30 0.04 262);
   --sidebar-ring: oklch(0.76 0.11 78);
+
+  /* ── Shadow re-tint for dark mode (navy black 20,16,48) ──── */
+  --tw-shadow-sm: 0 1px 2px 0 rgb(20 16 48 / 0.25);
+  --tw-shadow-md:
+    0 4px 6px -1px rgb(20 16 48 / 0.30),
+    0 2px 4px -2px rgb(20 16 48 / 0.25);
+  --tw-shadow-lg:
+    0 10px 15px -3px rgb(20 16 48 / 0.38),
+    0 4px 6px -4px rgb(20 16 48 / 0.25);
+  --tw-shadow-xl:
+    0 20px 25px -5px rgb(20 16 48 / 0.45),
+    0 8px 10px -6px rgb(20 16 48 / 0.32);
+  --tw-shadow-2xl: 0 25px 50px -12px rgb(20 16 48 / 0.55);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   Base layer — element resets + body defaults
+   ════════════════════════════════════════════════════════════════ */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-border, currentColor);
+  }
 }
 
 @layer base {
@@ -172,10 +298,13 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-background text-foreground selection:bg-accent/25 selection:text-foreground font-sans antialiased;
     font-family: 'Tajawal', 'Cairo', system-ui, sans-serif;
-    scroll-behavior: smooth;
   }
 
   .dark body {
@@ -183,53 +312,77 @@
   }
 }
 
-/* ─── Premium Glassmorphism & UI Utilities ─── */
+/* ════════════════════════════════════════════════════════════════
+   Custom component-level utility classes
+   (Not design tokens, but shared visual recipes)
+   ════════════════════════════════════════════════════════════════ */
+
+/* Glass cards — translucent nav/drop surfaces */
 .glass-card {
-  background: oklch(1 0 0 / 0.75);
+  background: color-mix(in oklab, var(--color-card) 75%, transparent);
   backdrop-filter: blur(16px);
-  border: 1px solid oklch(0.9 0.012 255 / 0.8);
+  border: 1px solid color-mix(in oklab, var(--color-border) 80%, transparent);
 }
 
-.dark .glass-card {
-  background: oklch(0.21 0.04 262 / 0.85);
-  backdrop-filter: blur(16px);
-  border: 1px solid oklch(0.32 0.04 262 / 0.6);
-}
-
+/* Gradient-text — hero CTA headline variant */
 .gradient-text {
-  background: linear-gradient(135deg, oklch(0.3 0.1 262) 0%, oklch(0.45 0.1 262) 50%, oklch(0.72 0.1 78) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    color-mix(in oklab, var(--color-primary) 80%, white 20%) 50%,
+    var(--color-accent) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .dark .gradient-text {
-  background: linear-gradient(135deg, oklch(0.82 0.06 262) 0%, oklch(0.76 0.11 78) 50%, oklch(0.85 0.08 78) 100%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-primary) 85%, white 15%) 0%,
+    var(--color-accent) 50%,
+    color-mix(in oklab, var(--color-accent) 90%, white 10%) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
+/* Hero subtle ambient glow — sits behind hero content on page top */
 .hero-glow {
-  background: radial-gradient(ellipse 80% 60% at 50% 0%, oklch(0.3 0.1 262 / 0.08) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    color-mix(in oklab, var(--color-primary) 8%, transparent) 0%,
+    transparent 70%
+  );
 }
 
 .dark .hero-glow {
-  background: radial-gradient(ellipse 80% 60% at 50% 0%, oklch(0.76 0.11 78 / 0.1) 0%, transparent 70%);
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    color-mix(in oklab, var(--color-accent) 10%, transparent) 0%,
+    transparent 70%
+  );
 }
 
+/* Underline highlight — callout underline for marketing copy */
 .text-accent-underline {
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
-  background-image: linear-gradient(to top, oklch(0.72 0.1 78 / 0.35) 0.35em, transparent 0.35em);
+  background-image: linear-gradient(
+    to top,
+    color-mix(in oklab, var(--color-accent) 35%, transparent) 0.35em,
+    transparent 0.35em
+  );
 }
 
+/* Section surface — muted translucent overlay for alternating bands */
 .section-surface {
-  background: oklch(1 0 0 / 0.6);
+  background: color-mix(in oklab, var(--color-card) 60%, transparent);
 }
 
-.dark .section-surface {
-  background: oklch(0.21 0.04 262 / 0.55);
-}
-
+/* Glow border — premium card edge gradient (Why-Us hero image etc.) */
 .glow-border {
   position: relative;
 }
@@ -240,7 +393,11 @@
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.4), rgba(245, 158, 11, 0.3));
+  background: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--color-primary) 40%, transparent),
+    color-mix(in oklab, var(--color-accent) 30%, transparent)
+  );
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -249,9 +406,12 @@
   pointer-events: none;
 }
 
+/* ════════════════════════════════════════════════════════════════
+   Motion utilities
+   ════════════════════════════════════════════════════════════════ */
 @layer utilities {
   .animate-fade-up {
-    animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: fade-up 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .animate-float {
@@ -284,34 +444,37 @@
   }
 }
 
-/* TipTap Editor Styles */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-float,
+  .animate-pulse-slow {
+    animation: none !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   TipTap rich text editor
+   ════════════════════════════════════════════════════════════════ */
 .tiptap-wrapper {
-  --tt-radius: 0.5rem;
+  --tt-radius: var(--radius-md);
 }
 
 .tiptap-content {
   min-height: inherit;
 }
 
-.tiptap-content .is-editor-empty:first-child::before {
-  content: attr(data-placeholder);
-  float: left;
-  color: hsl(var(--muted-foreground));
-  pointer-events: none;
-  height: 0;
-  font-style: italic;
-}
-
+/* Fixed from original: vars are OKLCH (not hsl tuples) so drop hsl() wrap */
+.tiptap-content .is-editor-empty:first-child::before,
 .tiptap-content .is-empty::before {
   content: attr(data-placeholder);
   float: left;
-  color: hsl(var(--muted-foreground));
+  color: var(--color-muted-foreground);
   pointer-events: none;
   height: 0;
   font-style: italic;
 }
 
-/* RTL Specifics */
+/* RTL block formatting */
 .tiptap-content[dir='rtl'] {
   text-align: right;
 }
@@ -323,7 +486,7 @@
 }
 
 .tiptap-content[dir='rtl'] blockquote {
-  border-right: 3px solid hsl(var(--border));
+  border-right: 3px solid var(--color-border);
   border-left: none;
   padding-right: 1rem;
   padding-left: 0;
@@ -336,19 +499,17 @@
 }
 
 .tiptap-content[dir='ltr'] blockquote {
-  border-left: 3px solid hsl(var(--border));
+  border-left: 3px solid var(--color-border);
   border-right: none;
   padding-left: 1rem;
   padding-right: 0;
 }
 
-/* Image */
 .tiptap-content img {
   margin: 1rem auto;
   display: block;
 }
 
-/* Code block */
 .tiptap-content pre {
   direction: ltr;
   text-align: left;
@@ -361,47 +522,48 @@
 }
 
 .ProseMirror h1 {
-  font-size: 2.25rem;
-  font-weight: 700;
-  line-height: 2.5rem;
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-snug);
   margin: 1rem 0;
 }
 
 .ProseMirror h2 {
-  font-size: 1.875rem;
-  font-weight: 600;
-  line-height: 2.25rem;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-snug);
   margin: 0.875rem 0;
 }
 
 .ProseMirror h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  line-height: 2rem;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-snug);
   margin: 0.75rem 0;
 }
 
 .ProseMirror h4 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  line-height: 1.75rem;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-snug);
   margin: 0.625rem 0;
 }
 
 .ProseMirror h5 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  line-height: 1.5rem;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-normal);
   margin: 0.5rem 0;
 }
 
 .ProseMirror h6 {
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.5rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-normal);
   margin: 0.5rem 0;
 }
 
 .ProseMirror p {
   margin: 0.5rem 0;
+  line-height: var(--leading-normal);
 }
