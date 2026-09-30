@@ -34,6 +34,7 @@ use App\Http\Controllers\SiteContentController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\StudentPortalController;
+use App\Http\Controllers\StudentRegistrationController;
 use App\Http\Controllers\SubjectRegistrationController;
 use App\Http\Controllers\TestimonialController;
 use App\Http\Controllers\UploadController;
@@ -71,6 +72,15 @@ Route::get('/student/portal', [StudentPortalController::class, 'index'])->name('
 Route::get('/student/portal/search', [StudentPortalController::class, 'search'])
     ->middleware('throttle:20,1')
     ->name('student.portal.search');
+
+// Student self-registration (public, guests only)
+Route::middleware('guest')->group(function () {
+    Route::get('/student/register', [StudentRegistrationController::class, 'create'])
+        ->name('student.register');
+    Route::post('/student/register', [StudentRegistrationController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('student.register.store');
+});
 Route::get('/terms-of-use', fn () => app(SiteContentController::class)->show('terms-of-use'))->name('terms-of-use');
 Route::get('/privacy-policy', fn () => app(SiteContentController::class)->show('privacy-policy'))->name('privacy-policy');
 

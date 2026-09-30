@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('phone', 20)->nullable();
             $table->foreignId('level_id')->constrained('cms_levels')->cascadeOnDelete();
             $table->date('enrollment_date');
-            $table->enum('status', ['active', 'suspended', 'graduated', 'withdrawn'])->default('active');
+            $table->enum('status', ['active', 'suspended', 'graduated', 'withdrawn', 'pending'])->default('active');
             $table->enum('gender', ['male', 'female'])->nullable();
             $table->date('birth_date')->nullable();
             $table->text('address')->nullable();
