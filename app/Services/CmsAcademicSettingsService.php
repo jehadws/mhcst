@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\CmsStudent;
 use App\Models\SiteSetting;
+use Illuminate\Support\Facades\DB;
 
 class CmsAcademicSettingsService
 {
@@ -123,18 +124,20 @@ class CmsAcademicSettingsService
      */
     public function updateSettings(array $data): void
     {
-        $this->gradeLock->updateSettings([
-            'grade_entry_deadline' => $data['grade_entry_deadline'] ?? null,
-            'grades_locked' => $data['grades_locked'] ?? false,
-        ]);
+        DB::transaction(function () use ($data) {
+            $this->gradeLock->updateSettings([
+                'grade_entry_deadline' => $data['grade_entry_deadline'] ?? null,
+                'grades_locked' => $data['grades_locked'] ?? false,
+            ]);
 
-        $this->persist('cms.academic_year', $data['academic_year'] ?? '');
-        $this->persist('cms.semester_start', $data['semester_start'] ?? '');
-        $this->persist('cms.semester_end', $data['semester_end'] ?? '');
-        $this->persist('cms.consecutive_absence_threshold', (string) ($data['consecutive_absence_threshold'] ?? 3));
-        $this->persist('cms.absence_rate_threshold', (string) ($data['absence_rate_threshold'] ?? 20));
-        $this->persist('cms.current_semester', (string) ($data['current_semester'] ?? ''));
-        $this->persist('cms.subject_registration_open', ($data['subject_registration_open'] ?? true) ? '1' : '0');
+            $this->persist('cms.academic_year', $data['academic_year'] ?? '');
+            $this->persist('cms.semester_start', $data['semester_start'] ?? '');
+            $this->persist('cms.semester_end', $data['semester_end'] ?? '');
+            $this->persist('cms.consecutive_absence_threshold', (string) ($data['consecutive_absence_threshold'] ?? 3));
+            $this->persist('cms.absence_rate_threshold', (string) ($data['absence_rate_threshold'] ?? 20));
+            $this->persist('cms.current_semester', (string) ($data['current_semester'] ?? ''));
+            $this->persist('cms.subject_registration_open', ($data['subject_registration_open'] ?? true) ? '1' : '0');
+        });
     }
 
     private function persist(string $key, string $value): void

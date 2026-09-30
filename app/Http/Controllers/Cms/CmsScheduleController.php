@@ -59,13 +59,23 @@ class CmsScheduleController extends Controller
         $this->cmsAuth->ensureCanManage(auth()->user());
 
         $data = $request->validated();
-        $errors = $validator->validate($data);
+
+        $errors = DB::transaction(function () use ($data, $validator) {
+            CmsSchedule::query()
+                ->where('academic_year', $data['academic_year'] ?? null)
+                ->where('semester', $data['semester'] ?? null)
+                ->where('day', $data['day'] ?? null)
+                ->lockForUpdate()
+                ->count();
+
+            return $validator->validate($data);
+        });
 
         if (! empty($errors)) {
             return redirect()->back()->withErrors(['conflict' => implode(' ', $errors)])->withInput();
         }
 
-        CmsSchedule::create($data);
+        DB::transaction(fn () => CmsSchedule::create($data));
 
         return redirect()->route('cms.schedules.index')->with('success', 'Schedule created successfully.');
     }
@@ -96,13 +106,23 @@ class CmsScheduleController extends Controller
         $this->cmsAuth->ensureCanManage(auth()->user());
 
         $data = $request->validated();
-        $errors = $validator->validate($data, $schedule->id);
+
+        $errors = DB::transaction(function () use ($data, $schedule, $validator) {
+            CmsSchedule::query()
+                ->where('academic_year', $data['academic_year'] ?? null)
+                ->where('semester', $data['semester'] ?? null)
+                ->where('day', $data['day'] ?? null)
+                ->lockForUpdate()
+                ->count();
+
+            return $validator->validate($data, $schedule->id);
+        });
 
         if (! empty($errors)) {
             return redirect()->back()->withErrors(['conflict' => implode(' ', $errors)])->withInput();
         }
 
-        $schedule->update($data);
+        DB::transaction(fn () => $schedule->update($data));
 
         return redirect()->route('cms.schedules.index')->with('success', 'Schedule updated successfully.');
     }

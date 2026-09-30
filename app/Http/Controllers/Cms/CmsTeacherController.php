@@ -56,16 +56,19 @@ class CmsTeacherController extends Controller
         unset($data['create_user_account'], $data['password']);
 
         if ($createUser && ! empty($request->email) && ! empty($request->password)) {
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
-            $user->assignRole(UserRole::Teacher->value);
-            $data['user_id'] = $user->id;
+            DB::transaction(function () use (&$data, $request) {
+                $user = User::create([
+                    'name' => $data['name'],
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                ]);
+                $user->assignRole(UserRole::Teacher->value);
+                $data['user_id'] = $user->id;
+                CmsTeacher::create($data);
+            });
+        } else {
+            DB::transaction(fn () => CmsTeacher::create($data));
         }
-
-        CmsTeacher::create($data);
 
         return redirect()->route('cms.teachers.index')->with('success', 'Teacher created successfully.');
     }

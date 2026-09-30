@@ -107,36 +107,60 @@ class CmsEnrollmentController extends Controller
     {
         $this->cmsAuth->ensureCanManage(auth()->user());
 
-        $request->validate([
+        $validated = $request->validate([
             'level_id' => ['required', 'exists:cms_levels,id'],
             'subject_id' => ['required', 'exists:cms_subjects,id'],
             'academic_year' => ['required', 'string', 'max:20'],
             'semester' => ['required', 'in:first,second,summer'],
         ]);
 
-        $students = CmsStudent::where('level_id', $request->level_id)->where('status', 'active')->get();
-        $count = 0;
+        $level = CmsLevel::with('department')->findOrFail($validated['level_id']);
+        $capacity = max(0, (int) ($level->capacity ?? 0));
+        $subjectId = (int) $validated['subject_id'];
+        $academicYear = (string) $validated['academic_year'];
+        $semester = (string) $validated['semester'];
 
-        foreach ($students as $student) {
-            $exists = CmsEnrollment::where('student_id', $student->id)
-                ->where('subject_id', $request->subject_id)
-                ->where('academic_year', $request->academic_year)
-                ->where('semester', $request->semester)
-                ->exists();
+        $created = DB::transaction(function () use ($level, $capacity, $subjectId, $academicYear, $semester) {
+            $students = CmsStudent::where('level_id', $level->id)
+                ->where('status', 'active')
+                ->orderBy('id')
+                ->get();
 
-            if (! $exists) {
-                CmsEnrollment::create([
-                    'student_id' => $student->id,
-                    'subject_id' => $request->subject_id,
-                    'academic_year' => $request->academic_year,
-                    'semester' => $request->semester,
-                    'status' => 'active',
-                ]);
-                $count++;
+            $created = 0;
+            foreach ($students as $student) {
+                // Reuse the same capacity logic that lives in StoreEnrollmentRequest
+                $enrolledCount = CmsEnrollment::query()
+                    ->where('subject_id', $subjectId)
+                    ->where('academic_year', $academicYear)
+                    ->where('semester', $semester)
+                    ->where('status', 'active')
+                    ->whereHas('student', fn ($q) => $q->where('level_id', $level->id))
+                    ->count();
+
+                if ($capacity > 0 && $enrolledCount >= $capacity) {
+                    break;
+                }
+
+                $enrollment = CmsEnrollment::firstOrCreate(
+                    [
+                        'student_id' => $student->id,
+                        'subject_id' => $subjectId,
+                        'academic_year' => $academicYear,
+                        'semester' => $semester,
+                    ],
+                    ['status' => 'active', 'source' => 'admin']
+                );
+
+                if ($enrollment->wasRecentlyCreated) {
+                    $created++;
+                }
             }
-        }
 
-        return redirect()->route('cms.enrollments.index')->with('success', "Enrolled {$count} students successfully.");
+            return $created;
+        });
+
+        return redirect()->route('cms.enrollments.index')
+            ->with('success', "Enrolled {$created} students successfully.");
     }
 
     public function approve(Request $request)
