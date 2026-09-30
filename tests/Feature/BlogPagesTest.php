@@ -97,3 +97,49 @@ test('legacy /blog route redirects to /blog-posts', function () {
 test('missing blog post returns 404', function () {
     $this->get('/blog-posts/non-existent')->assertNotFound();
 });
+
+test('blog post show page includes cover_video path when post has a video', function () {
+    $user = User::factory()->create();
+
+    BlogPost::create([
+        'author_id' => $user->id,
+        'title' => 'Video Post',
+        'slug' => 'video-post',
+        'content' => '<p>Content</p>',
+        'status' => 'published',
+        'published_at' => now(),
+        'cover_image' => 'blog/poster.jpg',
+        'cover_video' => 'blog/video.mp4',
+    ]);
+
+    $this->get('/blog-posts/video-post')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->component('site/blog/show')
+            ->where('post.cover_video', 'blog/video.mp4')
+            ->where('post.cover_image', 'blog/poster.jpg')
+        );
+});
+
+test('home page posts list contains poster image but no eager video data', function () {
+    $user = User::factory()->create();
+
+    BlogPost::create([
+        'author_id' => $user->id,
+        'title' => 'Video News',
+        'slug' => 'video-news',
+        'content' => '<p>Content</p>',
+        'status' => 'published',
+        'published_at' => now(),
+        'cover_image' => 'blog/poster.jpg',
+        'cover_video' => 'blog/video.mp4',
+    ]);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->has('posts', 1)
+            ->where('posts.0.cover_image', 'blog/poster.jpg')
+            ->where('posts.0.cover_video', 'blog/video.mp4')
+        );
+});

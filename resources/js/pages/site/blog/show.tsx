@@ -5,7 +5,7 @@ import { PageHero } from '@/components/site/page-hero';
 import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import { useSite } from '@/context/site-context';
-import { formatNewsDate, newsExcerpt, newsImage, newsSeoDescription, newsSeoTitle, newsTagKey, newsTitle, type NewsPost } from '@/lib/news';
+import { formatNewsDate, newsExcerpt, newsImage, newsSeoDescription, newsSeoTitle, newsTagKey, newsTitle, newsVideoUrl, type NewsPost } from '@/lib/news';
 import { Link } from '@inertiajs/react';
 import { ArrowLeft, ArrowRight, CalendarDays } from 'lucide-react';
 
@@ -15,6 +15,7 @@ interface Props {
     content_ar?: string;
     content_en?: string;
     reading_time?: number;
+    cover_video?: string;
   };
   related: NewsPost[];
 }
@@ -26,6 +27,7 @@ export default function BlogShow({ post, related = [] }: Props) {
   const content = post.content || (locale === 'ar' ? post.content_ar : post.content_en) || post.content_ar || '';
   const excerpt = newsExcerpt(post);
   const coverImage = post.cover_image ? newsImage(post) : undefined;
+  const videoUrl = newsVideoUrl(post);
   const tag = t.news.tags[newsTagKey(post)];
 
   return (
@@ -52,14 +54,27 @@ export default function BlogShow({ post, related = [] }: Props) {
           />
 
           <article className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-            {post.cover_image && (
+            {videoUrl ? (
+              <div className="border-border relative mb-10 overflow-hidden rounded-3xl border shadow-lg">
+                <video
+                  src={videoUrl}
+                  controls
+                  preload="metadata"
+                  poster={coverImage}
+                  className="aspect-[16/9] w-full bg-black object-contain"
+                />
+                <span className="bg-accent text-accent-foreground absolute end-4 top-4 rounded-full px-3 py-1 text-xs font-bold">
+                  {post.category || tag}
+                </span>
+              </div>
+            ) : post.cover_image ? (
               <div className="border-border relative mb-10 overflow-hidden rounded-3xl border shadow-lg">
                 <img src={newsImage(post)} alt={newsTitle(post)} className="aspect-[16/9] w-full object-cover" />
                 <span className="bg-accent text-accent-foreground absolute end-4 top-4 rounded-full px-3 py-1 text-xs font-bold">
                   {post.category || tag}
                 </span>
               </div>
-            )}
+            ) : null}
 
             <div className="text-muted-foreground mb-8 flex flex-wrap items-center gap-4 text-xs">
               <span className="inline-flex items-center gap-1.5">

@@ -8,7 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ImageUploader from "@/components/image-uploader";
+import VideoUploader from "@/components/video-uploader";
 import { toast } from "sonner";
+import { useState } from "react";
 
 interface Props {
   post?: BlogPost;
@@ -18,6 +20,10 @@ export default function BlogPostForm({ post }: Props) {
   const { t } = useSite();
   const d = t.dashboard;
   const isEditing = !!post;
+
+  const [mediaKind, setMediaKind] = useState<'image' | 'video'>(
+    post?.cover_video ? 'video' : 'image'
+  );
 
   const { data, setData, post: submitPost, put, processing, errors } = useForm({
     title: post?.title || '',
@@ -29,6 +35,7 @@ export default function BlogPostForm({ post }: Props) {
     seo_title: post?.seo_title || '',
     seo_description: post?.seo_description || '',
     cover_image: post?.cover_image || null,
+    cover_video: post?.cover_video || null,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -86,9 +93,55 @@ export default function BlogPostForm({ post }: Props) {
             {errors.content && <p className="text-sm text-red-500 mt-1">{errors.content}</p>}
           </div>
 
-          <div>
-            <ImageUploader value={data.cover_image} onChange={(path) => setData('cover_image', path)} folder="blog" label={d.form.labels.coverImage} />
-            {errors.cover_image && <p className="text-sm text-red-500 mt-1">{errors.cover_image}</p>}
+          {/* Media kind toggle */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Label>{d.form.labels.coverImage}</Label>
+              <div className="ms-auto flex rounded-md border overflow-hidden text-sm">
+                <button
+                  type="button"
+                  onClick={() => setMediaKind('image')}
+                  className={`px-3 py-1 transition-colors ${mediaKind === 'image' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
+                >
+                  {d.form.labels.mediaImage ?? 'صورة'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMediaKind('video')}
+                  className={`px-3 py-1 transition-colors ${mediaKind === 'video' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
+                >
+                  {d.form.labels.mediaVideo ?? 'فيديو'}
+                </button>
+              </div>
+            </div>
+
+            {mediaKind === 'image' ? (
+              <div>
+                <ImageUploader value={data.cover_image} onChange={(path) => setData('cover_image', path)} folder="blog" label={d.form.labels.coverImage} />
+                {errors.cover_image && <p className="text-sm text-red-500 mt-1">{errors.cover_image}</p>}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <VideoUploader
+                  value={data.cover_video}
+                  onChange={(path) => setData('cover_video', path)}
+                  folder="blog"
+                  label={d.form.labels.coverVideo ?? 'فيديو الغلاف'}
+                />
+                {errors.cover_video && <p className="text-sm text-red-500 mt-1">{errors.cover_video}</p>}
+                <div>
+                  <ImageUploader
+                    value={data.cover_image}
+                    onChange={(path) => setData('cover_image', path)}
+                    folder="blog"
+                    label={d.form.labels.videoPoster ?? 'صورة مصغرة (Poster)'}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {d.form.labels.videoPosterHint ?? 'الصورة المصغرة تُستخدم في قائمة الأخبار وكصورة ترويجية للفيديو.'}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           <div>
@@ -110,3 +163,4 @@ export default function BlogPostForm({ post }: Props) {
     </Card>
   );
 }
+

@@ -17,6 +17,7 @@ export interface NewsPost {
   excerpt_ar?: string;
   excerpt_en?: string;
   cover_image?: string;
+  cover_video?: string;
   published_at?: string;
   updated_at?: string;
   seo_title?: string;
@@ -46,6 +47,12 @@ export function newsImage(post: NewsPost, index = 0): string {
   }
 
   return NEWS_FALLBACK_IMAGES[index % NEWS_FALLBACK_IMAGES.length];
+}
+
+export function newsVideoUrl(post: NewsPost): string | undefined {
+  if (!post.cover_video) return undefined;
+
+  return post.cover_video.startsWith('http') ? post.cover_video : `/storage/${post.cover_video}`;
 }
 
 export function newsTagKey(post: NewsPost): NewsTagKey {
