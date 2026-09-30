@@ -21,6 +21,7 @@ use App\Http\Controllers\DashboardGuideController;
 use App\Http\Controllers\DeployRunController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MyCoursesController;
 use App\Http\Controllers\MyGradesController;
 use App\Http\Controllers\MyScheduleController;
@@ -46,7 +47,9 @@ Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('seo.sitemap
 Route::get('/browserconfig.xml', [SeoController::class, 'browserConfig'])->name('seo.browserconfig');
 
 // Post-deploy hook (FTP deploys cannot run artisan directly) — token-guarded.
-Route::get('/deploy/run', DeployRunController::class)->name('deploy.run');
+Route::get('/deploy/run', DeployRunController::class)
+    ->middleware('throttle:5,1')
+    ->name('deploy.run');
 
 Route::get('/', [SiteController::class, 'home'])->name('home');
 Route::get('/about', [SiteController::class, 'about'])->name('about');
@@ -309,7 +312,9 @@ Route::middleware(['auth', 'dashboard.role'])->group(function () {
 
 });
 
-Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
+Route::post('/locale', [LocaleController::class, 'update'])
+    ->middleware('throttle:30,1')
+    ->name('locale.update');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

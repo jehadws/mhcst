@@ -10,33 +10,27 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::create([
-            'name' => 'System Admin',
-            'email' => 'admin@mhcst.ly',
-            'password' => Hash::make('password'),
-            'is_active' => true,
-        ]);
-        $admin->assignRole('Admin');
+        $accounts = [
+            ['email' => 'admin@mhcst.ly',   'name' => 'System Admin',  'role' => 'Admin'],
+            ['email' => 'manager@mhcst.ly', 'name' => 'Manager User',  'role' => 'Manager'],
+            ['email' => 'editor@mhcst.ly',  'name' => 'Editor User',   'role' => 'Content Editor'],
+            ['email' => 'support@mhcst.ly', 'name' => 'Support User',  'role' => 'Support'],
+        ];
 
-        User::create([
-            'name' => 'Manager User',
-            'email' => 'manager@mhcst.ly',
-            'password' => Hash::make('password'),
-            'is_active' => true,
-        ])->assignRole('Manager');
+        $defaultPassword = env('SEEDER_DEFAULT_PASSWORD', null);
+        abort_if($defaultPassword === null && app()->environment('production'),
+            500, 'Set SEEDER_DEFAULT_PASSWORD in production before running UserSeeder.');
 
-        User::create([
-            'name' => 'Editor User',
-            'email' => 'editor@mhcst.ly',
-            'password' => Hash::make('password'),
-            'is_active' => true,
-        ])->assignRole('Content Editor');
+        $password = Hash::make($defaultPassword ?? 'change-me-on-first-login');
 
-        User::create([
-            'name' => 'Support User',
-            'email' => 'support@mhcst.ly',
-            'password' => Hash::make('password'),
-            'is_active' => true,
-        ])->assignRole('Support');
+        foreach ($accounts as $acc) {
+            $user = User::firstOrCreate(
+                ['email' => $acc['email']],
+                ['name' => $acc['name'], 'password' => $password, 'is_active' => true]
+            );
+            if (! $user->hasRole($acc['role'])) {
+                $user->assignRole($acc['role']);
+            }
+        }
     }
 }

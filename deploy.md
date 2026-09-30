@@ -204,3 +204,22 @@ php artisan queue:restart   # picks up any new queued job classes
 
 Never skip `config:cache`/`route:cache` after a deploy — stale cached config/routes are a
 common source of "it works locally but not on the server" bugs.
+
+---
+
+## Post-deploy security checklist (hardening phase S1)
+
+1. Set `APP_DEBUG=false` in production `.env`.
+2. Set `SESSION_SECURE_COOKIE=true` in production `.env`
+   (requires HTTPS on the production origin; confirm with curl -I before enabling).
+3. Set `DEPLOY_TOKEN` to a 40+ char random string in production `.env`
+   (e.g. `php -r 'echo bin2hex(random_bytes(32));'`).
+4. Set `SEEDER_DEFAULT_PASSWORD` to a unique strong value before running
+   UserSeeder in production; after seeding, rotate each account's password
+   in the dashboard or via `php artisan tinker`.
+5. If `APP_KEY` was rotated:
+   - Existing user sessions are invalidated (force login = expected).
+   - Existing signed URLs (e.g. certificate download links) are invalidated;
+     regenerate any public signed links currently in circulation.
+6. Confirm throttling is applied: hit `GET /deploy/run?token=wrong` 6 times
+   in 60 seconds from one IP → the 6th returns 429 Too Many Attempts.
