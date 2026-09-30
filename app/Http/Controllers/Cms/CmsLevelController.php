@@ -5,8 +5,12 @@ namespace App\Http\Controllers\Cms;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreLevelRequest;
 use App\Models\CmsDepartment;
+use App\Models\CmsEnrollment;
 use App\Models\CmsLevel;
+use App\Models\CmsSchedule;
+use App\Models\CmsStudent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -62,8 +66,28 @@ class CmsLevelController extends Controller
 
     public function destroy(CmsLevel $level)
     {
-        $level->delete();
+        DB::transaction(function () use ($level) {
+            $level->loadMissing(['students.enrollments']);
 
-        return redirect()->route('cms.levels.index')->with('success', 'Level deleted successfully.');
+            $studentIds = $level->students->pluck('id');
+            $enrollmentIds = collect();
+
+            foreach ($level->students as $student) {
+                foreach ($student->enrollments as $enrollment) {
+                    $enrollmentIds->push($enrollment->id);
+                }
+            }
+
+            CmsSchedule::where('level_id', $level->id)
+                ->chunkById(500, fn ($rows) => $rows->each->delete());
+
+            CmsEnrollment::whereIn('id', $enrollmentIds->unique())->delete();
+            CmsStudent::whereIn('id', $studentIds)->delete();
+
+            $level->delete();
+        });
+
+        return redirect()->route('cms.levels.index')
+            ->with('success', 'Level and all descendants soft-deleted.');
     }
 }

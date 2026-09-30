@@ -11,6 +11,7 @@ use App\Models\CmsTeacher;
 use App\Services\CmsAuthorizationService;
 use App\Services\ScheduleValidatorService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -104,8 +105,11 @@ class CmsScheduleController extends Controller
 
     public function destroy(CmsSchedule $schedule)
     {
-        $schedule->delete();
+        DB::transaction(function () use ($schedule) {
+            $schedule->delete();
+        });
 
-        return redirect()->route('cms.schedules.index')->with('success', 'Schedule deleted successfully.');
+        return redirect()->route('cms.schedules.index')
+            ->with('success', 'Schedule soft-deleted successfully.');
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Cms;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreStudentRequest;
+use App\Models\CmsEnrollment;
 use App\Models\CmsLevel;
 use App\Models\CmsStudent;
 use App\Models\SiteSetting;
@@ -122,9 +123,18 @@ class CmsStudentController extends Controller
 
     public function destroy(CmsStudent $student)
     {
-        $student->delete();
+        DB::transaction(function () use ($student) {
+            $student->loadMissing(['enrollments']);
 
-        return redirect()->route('cms.students.index')->with('success', 'Student deleted successfully.');
+            $enrollmentIds = $student->enrollments->pluck('id');
+
+            CmsEnrollment::whereIn('id', $enrollmentIds)->delete();
+
+            $student->delete();
+        });
+
+        return redirect()->route('cms.students.index')
+            ->with('success', 'Student and related enrollments soft-deleted successfully.');
     }
 
     public function idCard(CmsStudent $student)

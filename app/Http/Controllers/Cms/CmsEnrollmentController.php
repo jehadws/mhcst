@@ -11,6 +11,7 @@ use App\Models\CmsSubject;
 use App\Services\CmsAuthorizationService;
 use App\Services\CmsSubjectRegistrationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -157,8 +158,11 @@ class CmsEnrollmentController extends Controller
 
     public function destroy(CmsEnrollment $enrollment)
     {
-        $enrollment->delete();
+        DB::transaction(function () use ($enrollment) {
+            $enrollment->delete();
+        });
 
-        return redirect()->route('cms.enrollments.index')->with('success', 'Enrollment deleted successfully.');
+        return redirect()->route('cms.enrollments.index')
+            ->with('success', 'Enrollment soft-deleted successfully.');
     }
 }

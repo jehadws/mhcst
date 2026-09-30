@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Cms;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreSubjectRequest;
 use App\Models\CmsDepartment;
+use App\Models\CmsEnrollment;
+use App\Models\CmsSchedule;
 use App\Models\CmsSubject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -69,8 +72,16 @@ class CmsSubjectController extends Controller
 
     public function destroy(CmsSubject $subject)
     {
-        $subject->delete();
+        DB::transaction(function () use ($subject) {
+            CmsSchedule::where('subject_id', $subject->id)
+                ->chunkById(500, fn ($rows) => $rows->each->delete());
 
-        return redirect()->route('cms.subjects.index')->with('success', 'Subject deleted successfully.');
+            CmsEnrollment::where('subject_id', $subject->id)->delete();
+
+            $subject->delete();
+        });
+
+        return redirect()->route('cms.subjects.index')
+            ->with('success', 'Subject and all related enrollments and schedules soft-deleted.');
     }
 }
