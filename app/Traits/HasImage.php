@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
 trait HasImage
@@ -14,15 +15,13 @@ trait HasImage
             class_uses_recursive(static::class)
         );
 
+        // Purge files on soft delete as well as hard delete (no restore UI exists)
+        static::deleted(function ($model) {
+            static::deleteModelFiles($model);
+        });
+
         if ($usesSoftDeletes) {
-            // Only erase the physical file on a permanent (force) delete.
-            // A recoverable soft-delete must NOT remove disk assets.
             static::forceDeleted(function ($model) {
-                static::deleteModelFiles($model);
-            });
-        } else {
-            // Model has no SoftDeletes — every delete is permanent.
-            static::deleted(function ($model) {
                 static::deleteModelFiles($model);
             });
         }
@@ -30,10 +29,18 @@ trait HasImage
 
     protected static function deleteModelFiles($model): void
     {
-        $fields = [$model->imageField ?? 'cover_image'];
+        $imageField = (function () {
+            return $this->imageField ?? 'cover_image';
+        })->call($model);
 
-        if (property_exists($model, 'videoField') && ! empty($model->videoField)) {
-            $fields[] = $model->videoField;
+        $videoField = (function () {
+            return $this->videoField ?? null;
+        })->call($model);
+
+        $fields = [$imageField ?: 'cover_image'];
+
+        if (! empty($videoField)) {
+            $fields[] = $videoField;
         }
 
         foreach ($fields as $field) {
@@ -42,6 +49,19 @@ trait HasImage
                 Storage::disk('public')->delete($path);
             }
         }
+    }
+
+    public function purgeFiles(): void
+    {
+        static::deleteModelFiles($this);
+    }
+
+    /**
+     * @param  Collection<int, static>  $models
+     */
+    public static function purgeFilesForModels(Collection $models): void
+    {
+        $models->each(fn ($model) => static::deleteModelFiles($model));
     }
 
     public function updateImage(?string $newPath, string $field = 'cover_image'): void

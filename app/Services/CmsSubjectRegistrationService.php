@@ -49,6 +49,7 @@ class CmsSubjectRegistrationService
                     ->from('cms_enrollments')
                     ->whereColumn('cms_enrollments.subject_id', 'cms_subjects.id')
                     ->where('cms_enrollments.student_id', $student->id)
+                    ->whereNull('cms_enrollments.deleted_at')
                     ->whereIn('cms_enrollments.status', self::BLOCKING_STATUSES);
             })
             ->orderBy('code')
@@ -115,9 +116,10 @@ class CmsSubjectRegistrationService
                 ]);
             }
 
-            $blocking = CmsEnrollment::query()
+            $blocking = CmsEnrollment::withTrashed()
                 ->where('student_id', $student->id)
                 ->where('subject_id', $subject->id)
+                ->whereNull('deleted_at')
                 ->whereIn('status', self::BLOCKING_STATUSES)
                 ->exists();
 
@@ -132,7 +134,7 @@ class CmsSubjectRegistrationService
 
         DB::transaction(function () use ($student, $subjects, $academicYear, $semester, &$registered) {
             foreach ($subjects as $subject) {
-                $existing = CmsEnrollment::query()
+                $existing = CmsEnrollment::withTrashed()
                     ->where('student_id', $student->id)
                     ->where('subject_id', $subject->id)
                     ->where('academic_year', $academicYear)
@@ -140,8 +142,11 @@ class CmsSubjectRegistrationService
                     ->first();
 
                 if ($existing) {
-                    // A previously withdrawn/dropped pick for this term is
-                    // re-opened instead of inserting a duplicate row.
+                    // A previously withdrawn/dropped or trashed pick for this
+                    // term is re-opened instead of inserting a duplicate row.
+                    if ($existing->trashed()) {
+                        $existing->restore();
+                    }
                     $existing->update([
                         'status' => 'pending',
                         'source' => 'self',

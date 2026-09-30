@@ -12,6 +12,7 @@ use App\Services\CmsAuthorizationService;
 use App\Services\CmsSubjectRegistrationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -69,7 +70,20 @@ class CmsEnrollmentController extends Controller
     {
         $this->cmsAuth->ensureCanManage(auth()->user());
 
-        CmsEnrollment::create($request->validated());
+        $data = $request->validated();
+
+        $enrollment = CmsEnrollment::withTrashed()->firstOrNew([
+            'student_id' => $data['student_id'],
+            'subject_id' => $data['subject_id'],
+            'academic_year' => $data['academic_year'],
+            'semester' => $data['semester'],
+        ]);
+
+        if ($enrollment->trashed()) {
+            $enrollment->restore();
+        }
+
+        $enrollment->fill($data)->save();
 
         return redirect()->route('cms.enrollments.index')->with('success', 'Enrollment created successfully.');
     }
@@ -108,8 +122,8 @@ class CmsEnrollmentController extends Controller
         $this->cmsAuth->ensureCanManage(auth()->user());
 
         $validated = $request->validate([
-            'level_id' => ['required', 'exists:cms_levels,id'],
-            'subject_id' => ['required', 'exists:cms_subjects,id'],
+            'level_id' => ['required', Rule::exists('cms_levels', 'id')->whereNull('deleted_at')],
+            'subject_id' => ['required', Rule::exists('cms_subjects', 'id')->whereNull('deleted_at')],
             'academic_year' => ['required', 'string', 'max:20'],
             'semester' => ['required', 'in:first,second,summer'],
         ]);
@@ -141,17 +155,19 @@ class CmsEnrollmentController extends Controller
                     break;
                 }
 
-                $enrollment = CmsEnrollment::firstOrCreate(
-                    [
-                        'student_id' => $student->id,
-                        'subject_id' => $subjectId,
-                        'academic_year' => $academicYear,
-                        'semester' => $semester,
-                    ],
-                    ['status' => 'active', 'source' => 'admin']
-                );
+                $enrollment = CmsEnrollment::withTrashed()->firstOrNew([
+                    'student_id' => $student->id,
+                    'subject_id' => $subjectId,
+                    'academic_year' => $academicYear,
+                    'semester' => $semester,
+                ]);
 
-                if ($enrollment->wasRecentlyCreated) {
+                if ($enrollment->trashed()) {
+                    $enrollment->restore();
+                    $enrollment->update(['status' => 'active', 'source' => 'admin']);
+                    $created++;
+                } elseif (! $enrollment->exists) {
+                    $enrollment->fill(['status' => 'active', 'source' => 'admin'])->save();
                     $created++;
                 }
             }

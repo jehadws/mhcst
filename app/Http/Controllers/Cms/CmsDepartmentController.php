@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Cms;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreDepartmentRequest;
+use App\Models\CmsAttendance;
 use App\Models\CmsDepartment;
 use App\Models\CmsEnrollment;
+use App\Models\CmsGrade;
+use App\Models\CmsGradeRevision;
 use App\Models\CmsLevel;
 use App\Models\CmsSchedule;
 use App\Models\CmsStudent;
@@ -74,39 +77,23 @@ class CmsDepartmentController extends Controller
         $this->cmsAuth->ensureCanManage(auth()->user());
 
         DB::transaction(function () use ($department) {
-            $department->loadMissing([
-                'levels.students.enrollments',
-                'levels.students',
-                'subjects.enrollments',
-                'subjects',
-            ]);
-
-            $scheduleIds = collect();
-            $enrollmentIds = collect();
-            $studentIds = collect();
-            $levelIds = $department->levels->pluck('id');
-            $subjectIds = $department->subjects->pluck('id');
-
-            foreach ($department->levels as $level) {
-                foreach ($level->students as $student) {
-                    $studentIds->push($student->id);
-                    foreach ($student->enrollments as $enrollment) {
-                        $enrollmentIds->push($enrollment->id);
-                    }
-                }
-            }
-            foreach ($department->subjects as $subject) {
-                foreach ($subject->enrollments as $enrollment) {
-                    $enrollmentIds->push($enrollment->id);
-                }
-            }
+            $levelIds = CmsLevel::where('department_id', $department->id)->toBase()->pluck('id');
+            $subjectIds = CmsSubject::where('department_id', $department->id)->toBase()->pluck('id');
+            $studentIds = CmsStudent::whereIn('level_id', $levelIds)->toBase()->pluck('id');
+            $enrollmentIds = CmsEnrollment::where(function ($query) use ($studentIds, $subjectIds) {
+                $query->whereIn('student_id', $studentIds)
+                    ->orWhereIn('subject_id', $subjectIds);
+            })->toBase()->pluck('id')->unique();
 
             CmsSchedule::whereIn('level_id', $levelIds)
                 ->orWhereIn('subject_id', $subjectIds)
                 ->chunkById(500, fn ($rows) => $rows->each->delete());
 
-            CmsEnrollment::whereIn('id', $enrollmentIds->unique())->delete();
-            CmsStudent::whereIn('id', $studentIds->unique())->delete();
+            CmsGradeRevision::whereIn('enrollment_id', $enrollmentIds)->delete();
+            CmsGrade::whereIn('enrollment_id', $enrollmentIds)->delete();
+            CmsAttendance::whereIn('enrollment_id', $enrollmentIds)->delete();
+            CmsEnrollment::whereIn('id', $enrollmentIds)->delete();
+            CmsStudent::whereIn('id', $studentIds)->delete();
             CmsLevel::whereIn('id', $levelIds)->delete();
             CmsSubject::whereIn('id', $subjectIds)->delete();
 

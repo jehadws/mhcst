@@ -89,6 +89,7 @@ class BlogPostController extends Controller
 
     public function destroy(BlogPost $blogPost)
     {
+        $blogPost->purgeFiles();
         $blogPost->delete();
 
         return to_route('dashboard.blog-posts.list');
@@ -97,7 +98,15 @@ class BlogPostController extends Controller
     public function bulkActions(Request $request)
     {
         if ($request->input('action') === 'delete_selected') {
-            BlogPost::whereIn('id', $request->input('entries', []))->delete();
+            BlogPost::whereIn('id', $request->input('entries', []))
+                ->get()
+                ->chunk(500)
+                ->each(function ($chunk) {
+                    $chunk->each(function (BlogPost $post) {
+                        $post->purgeFiles();
+                        $post->delete();
+                    });
+                });
         }
 
         return to_route('dashboard.blog-posts.list');

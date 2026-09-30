@@ -6,6 +6,7 @@ use App\Models\CmsDepartment;
 use App\Models\CmsLevel;
 use App\Models\CmsStudent;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
@@ -41,6 +42,7 @@ class CmsStudentImportService
 
         $created = 0;
         $errors = [];
+        $validRows = [];
 
         foreach ($rows as $index => $row) {
             $line = $index + 2;
@@ -54,8 +56,8 @@ class CmsStudentImportService
                 continue;
             }
 
-            if (CmsStudent::where('student_no', $studentNo)->exists()) {
-                $errors[] = "الخانة {$line}: رقم القيد {$studentNo} مسجل مسبقاً.";
+            if (CmsStudent::withTrashed()->where('student_no', $studentNo)->exists()) {
+                $errors[] = "الخانة {$line}: رقم القيد {$studentNo} مسجل مسبقاً (أو محذوف مؤقتاً — قم باستعادته أو حذفه نهائياً أولاً).";
 
                 continue;
             }
@@ -66,7 +68,7 @@ class CmsStudentImportService
                 continue;
             }
 
-            CmsStudent::create([
+            $validRows[] = [
                 'student_no' => $studentNo,
                 'name' => $name,
                 'email' => $this->nullable($row['email'] ?? null),
@@ -77,10 +79,19 @@ class CmsStudentImportService
                 'gender' => $this->normalizeGender($row['gender'] ?? null),
                 'birth_date' => $this->nullableDate($row['birth_date'] ?? null),
                 'address' => $this->nullable($row['address'] ?? null),
-            ]);
-
-            $created++;
+            ];
         }
+
+        if (! empty($errors)) {
+            return ['created' => 0, 'errors' => $errors];
+        }
+
+        DB::transaction(function () use ($validRows, &$created) {
+            foreach ($validRows as $row) {
+                CmsStudent::create($row);
+                $created++;
+            }
+        });
 
         return ['created' => $created, 'errors' => $errors];
     }

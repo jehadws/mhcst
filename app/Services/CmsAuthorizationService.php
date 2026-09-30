@@ -171,13 +171,17 @@ class CmsAuthorizationService
 
     public function teacherCanAccessEnrollment(?User $user, int $enrollmentId): bool
     {
-        if (! $this->isTeacher($user)) {
-            return true;
-        }
-
         $enrollment = CmsEnrollment::query()->find($enrollmentId);
 
         if (! $enrollment) {
+            return false;
+        }
+
+        if ($this->canManage($user)) {
+            return true;
+        }
+
+        if (! $this->isTeacher($user)) {
             return false;
         }
 

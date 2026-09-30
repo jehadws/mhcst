@@ -66,6 +66,7 @@ class BannerController extends Controller
 
     public function destroy(Banner $banner)
     {
+        $banner->purgeFiles();
         $banner->delete();
 
         return to_route('dashboard.banners.list');
@@ -74,7 +75,15 @@ class BannerController extends Controller
     public function bulkActions(Request $request)
     {
         if ($request->input('action') === 'delete_selected') {
-            Banner::whereIn('id', $request->input('entries', []))->delete();
+            Banner::whereIn('id', $request->input('entries', []))
+                ->get()
+                ->chunk(500)
+                ->each(function ($chunk) {
+                    $chunk->each(function (Banner $banner) {
+                        $banner->purgeFiles();
+                        $banner->delete();
+                    });
+                });
         }
 
         return to_route('dashboard.banners.list');

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Cms;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreSubjectRequest extends FormRequest
 {
@@ -16,7 +17,7 @@ class StoreSubjectRequest extends FormRequest
         $subjectId = $this->route('subject')?->id;
 
         return [
-            'department_id' => ['required', 'exists:cms_departments,id'],
+            'department_id' => ['required', Rule::exists('cms_departments', 'id')->whereNull('deleted_at')],
             'code' => ['required', 'string', 'max:50', 'unique:cms_subjects,code,'.$subjectId],
             'name' => ['required', 'string', 'max:255'],
             'credits' => ['required', 'integer', 'min:1', 'max:10'],

@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Cms;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreLevelRequest;
+use App\Models\CmsAttendance;
 use App\Models\CmsDepartment;
 use App\Models\CmsEnrollment;
+use App\Models\CmsGrade;
+use App\Models\CmsGradeRevision;
 use App\Models\CmsLevel;
 use App\Models\CmsSchedule;
 use App\Models\CmsStudent;
@@ -76,21 +79,16 @@ class CmsLevelController extends Controller
         $this->cmsAuth->ensureCanManage(auth()->user());
 
         DB::transaction(function () use ($level) {
-            $level->loadMissing(['students.enrollments']);
-
-            $studentIds = $level->students->pluck('id');
-            $enrollmentIds = collect();
-
-            foreach ($level->students as $student) {
-                foreach ($student->enrollments as $enrollment) {
-                    $enrollmentIds->push($enrollment->id);
-                }
-            }
+            $studentIds = CmsStudent::where('level_id', $level->id)->toBase()->pluck('id');
+            $enrollmentIds = CmsEnrollment::whereIn('student_id', $studentIds)->toBase()->pluck('id');
 
             CmsSchedule::where('level_id', $level->id)
                 ->chunkById(500, fn ($rows) => $rows->each->delete());
 
-            CmsEnrollment::whereIn('id', $enrollmentIds->unique())->delete();
+            CmsGradeRevision::whereIn('enrollment_id', $enrollmentIds)->delete();
+            CmsGrade::whereIn('enrollment_id', $enrollmentIds)->delete();
+            CmsAttendance::whereIn('enrollment_id', $enrollmentIds)->delete();
+            CmsEnrollment::whereIn('id', $enrollmentIds)->delete();
             CmsStudent::whereIn('id', $studentIds)->delete();
 
             $level->delete();

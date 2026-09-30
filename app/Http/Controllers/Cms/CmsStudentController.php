@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Cms;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreStudentRequest;
+use App\Models\CmsAttendance;
 use App\Models\CmsEnrollment;
+use App\Models\CmsGrade;
+use App\Models\CmsGradeRevision;
 use App\Models\CmsLevel;
 use App\Models\CmsStudent;
 use App\Models\SiteSetting;
@@ -130,10 +133,11 @@ class CmsStudentController extends Controller
         $this->cmsAuth->ensureCanManage(auth()->user());
 
         DB::transaction(function () use ($student) {
-            $student->loadMissing(['enrollments']);
+            $enrollmentIds = CmsEnrollment::where('student_id', $student->id)->toBase()->pluck('id');
 
-            $enrollmentIds = $student->enrollments->pluck('id');
-
+            CmsGradeRevision::whereIn('enrollment_id', $enrollmentIds)->delete();
+            CmsGrade::whereIn('enrollment_id', $enrollmentIds)->delete();
+            CmsAttendance::whereIn('enrollment_id', $enrollmentIds)->delete();
             CmsEnrollment::whereIn('id', $enrollmentIds)->delete();
 
             $student->delete();

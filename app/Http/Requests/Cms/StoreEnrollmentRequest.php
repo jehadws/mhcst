@@ -5,6 +5,7 @@ namespace App\Http\Requests\Cms;
 use App\Models\CmsEnrollment;
 use App\Models\CmsStudent;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class StoreEnrollmentRequest extends FormRequest
@@ -17,8 +18,8 @@ class StoreEnrollmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'student_id' => ['required', 'exists:cms_students,id'],
-            'subject_id' => ['required', 'exists:cms_subjects,id'],
+            'student_id' => ['required', Rule::exists('cms_students', 'id')->whereNull('deleted_at')],
+            'subject_id' => ['required', Rule::exists('cms_subjects', 'id')->whereNull('deleted_at')],
             'academic_year' => ['required', 'string', 'max:20'],
             'semester' => ['required', 'in:first,second,summer'],
             'status' => ['required', 'in:active,dropped,completed'],
@@ -37,11 +38,12 @@ class StoreEnrollmentRequest extends FormRequest
             $academicYear = (string) $this->input('academic_year');
             $semester = (string) $this->input('semester');
 
-            $duplicate = CmsEnrollment::query()
+            $duplicate = CmsEnrollment::withTrashed()
                 ->where('student_id', $studentId)
                 ->where('subject_id', $subjectId)
                 ->where('academic_year', $academicYear)
                 ->where('semester', $semester)
+                ->whereNull('deleted_at')
                 ->when($this->route('enrollment'), function ($query, $enrollment) {
                     return $query->where('id', '!=', $enrollment->id);
                 })
@@ -58,11 +60,12 @@ class StoreEnrollmentRequest extends FormRequest
             }
 
             if ($student?->level && $this->input('status') === 'active') {
-                $enrolledInSection = CmsEnrollment::query()
+                $enrolledInSection = CmsEnrollment::withTrashed()
                     ->where('subject_id', $subjectId)
                     ->where('academic_year', $academicYear)
                     ->where('semester', $semester)
                     ->where('status', 'active')
+                    ->whereNull('deleted_at')
                     ->whereHas('student', fn ($query) => $query->where('level_id', $student->level_id))
                     ->when($this->route('enrollment'), function ($query, $enrollment) {
                         return $query->where('id', '!=', $enrollment->id);

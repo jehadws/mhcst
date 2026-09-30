@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Cms;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreSubjectRequest;
+use App\Models\CmsAttendance;
 use App\Models\CmsDepartment;
 use App\Models\CmsEnrollment;
+use App\Models\CmsGrade;
+use App\Models\CmsGradeRevision;
 use App\Models\CmsSchedule;
 use App\Models\CmsSubject;
 use App\Services\CmsAuthorizationService;
@@ -85,7 +88,12 @@ class CmsSubjectController extends Controller
             CmsSchedule::where('subject_id', $subject->id)
                 ->chunkById(500, fn ($rows) => $rows->each->delete());
 
-            CmsEnrollment::where('subject_id', $subject->id)->delete();
+            $enrollmentIds = CmsEnrollment::where('subject_id', $subject->id)->toBase()->pluck('id');
+
+            CmsGradeRevision::whereIn('enrollment_id', $enrollmentIds)->delete();
+            CmsGrade::whereIn('enrollment_id', $enrollmentIds)->delete();
+            CmsAttendance::whereIn('enrollment_id', $enrollmentIds)->delete();
+            CmsEnrollment::whereIn('id', $enrollmentIds)->delete();
 
             $subject->delete();
         });

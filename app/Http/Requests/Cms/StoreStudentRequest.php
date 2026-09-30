@@ -27,7 +27,7 @@ class StoreStudentRequest extends FormRequest
                 ]),
             ],
             'phone' => ['nullable', 'string', 'max:20'],
-            'level_id' => ['required', 'exists:cms_levels,id'],
+            'level_id' => ['required', Rule::exists('cms_levels', 'id')->whereNull('deleted_at')],
             'enrollment_date' => ['required', 'date'],
             'status' => ['required', 'in:active,suspended,graduated,withdrawn'],
             'gender' => ['nullable', 'in:male,female'],
