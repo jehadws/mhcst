@@ -55,7 +55,7 @@ export default function BlogShow({ post, related = [] }: Props) {
 
           <article className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
             {videoUrl ? (
-              <div className="border-border relative mb-10 overflow-hidden rounded-3xl border shadow-lg">
+              <div className="border-border relative mb-10 overflow-hidden rounded-2xl border shadow-lg">
                 <video
                   src={videoUrl}
                   controls
@@ -68,7 +68,7 @@ export default function BlogShow({ post, related = [] }: Props) {
                 </span>
               </div>
             ) : post.cover_image ? (
-              <div className="border-border relative mb-10 overflow-hidden rounded-3xl border shadow-lg">
+              <div className="border-border relative mb-10 overflow-hidden rounded-2xl border shadow-lg">
                 <img src={newsImage(post)} alt={newsTitle(post)} className="aspect-[16/9] w-full object-cover" />
                 <span className="bg-accent text-accent-foreground absolute end-4 top-4 rounded-full px-3 py-1 text-xs font-bold">
                   {post.category || tag}

@@ -29,7 +29,7 @@ class SiteController extends Controller
         $posts = BlogPost::with('author')
             ->where('status', 'published')
             ->latest('published_at')
-            ->limit(3)
+            ->limit(4)
             ->get();
 
         $stats = [

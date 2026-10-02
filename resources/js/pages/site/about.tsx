@@ -6,6 +6,7 @@ import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import { Testimonials } from '@/components/site/testimonials';
 import { useSite } from '@/context/site-context';
+import { cn } from '@/lib/utils';
 import { aboutIcon } from '@/lib/about-icons';
 import type { AboutItemContent, AboutMilestoneContent, AboutPageContent } from '@/types';
 
@@ -128,21 +129,21 @@ export default function PublicAboutPage({ testimonials, aboutContent }: Props) {
         <main className="flex-1">
           <PageHero title={heroTitle} description={heroDescription} crumbs={[{ label: t.nav.about, href: '/about' }]} />
 
-          <section className="py-28">
+          {/* Pillars — one hairline register, not three boxed cards. */}
+          <section className="py-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="grid gap-6 lg:grid-cols-3">
-                {pillars.map((pillar) => {
-                  const Icon = aboutIcon(pillar.icon);
+              <div className="bg-border grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border md:grid-cols-3">
+                {pillars.map((pillar, index) => {
                   const title = isAr ? pillar.title_ar : pillar.title;
                   const body = isAr ? pillar.body_ar : pillar.body;
 
                   return (
-                    <article key={title} className="border-border bg-card rounded-xl border p-8 shadow-md">
-                      <div className="bg-primary/10 text-primary flex size-12 items-center justify-center rounded-full">
-                        <Icon className="size-5" aria-hidden="true" />
-                      </div>
-                      <h2 className="text-foreground font-display mt-6 text-2xl leading-snug font-extrabold">{title}</h2>
-                      <p className="text-muted-foreground mt-4 text-base leading-normal">{body}</p>
+                    <article key={title} className="bg-card flex flex-col gap-3 p-6 sm:p-8">
+                      <span className="font-display text-primary/20 text-3xl leading-tight font-extrabold tabular-nums">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <h2 className="font-display text-foreground text-xl leading-snug font-extrabold">{title}</h2>
+                      <p className="text-muted-foreground text-sm leading-normal sm:text-base">{body}</p>
                     </article>
                   );
                 })}
@@ -150,15 +151,15 @@ export default function PublicAboutPage({ testimonials, aboutContent }: Props) {
             </div>
           </section>
 
-          <section className="bg-secondary py-28">
+          <section className="bg-secondary py-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="grid items-center gap-12 lg:grid-cols-2">
                 <div className="border-border bg-card overflow-hidden rounded-2xl border shadow-xl">
-                  <img src={campusImage} alt={t.campus.title} className="aspect-[4/3] w-full object-cover" />
+                  <img src={campusImage} alt={`${t.campus.title} ${t.campus.titleAccent}`} className="aspect-[4/3] w-full object-cover" />
                 </div>
 
                 <div>
-                  <p className="text-primary text-xs font-extrabold tracking-widest uppercase">{isAr ? 'قيمنا' : 'Our values'}</p>
+                  <p className="text-accent text-xs font-extrabold tracking-widest uppercase">{isAr ? 'قيمنا' : 'Our values'}</p>
                   <h2 className="text-foreground font-display mt-2 text-3xl leading-snug font-extrabold">{t.about.title}</h2>
                   <p className="text-muted-foreground mt-4 text-base leading-normal sm:text-lg">{t.about.body}</p>
 
@@ -170,12 +171,12 @@ export default function PublicAboutPage({ testimonials, aboutContent }: Props) {
 
                       return (
                         <div key={title} className="flex items-start gap-4 p-5">
-                          <div className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-full">
-                            <Icon className="size-5" aria-hidden="true" />
+                          <div className="bg-accent/10 text-accent flex size-9 shrink-0 items-center justify-center rounded-md">
+                            <Icon className="size-4.5" aria-hidden="true" />
                           </div>
                           <div>
                             <h3 className="font-display text-base leading-snug font-extrabold">{title}</h3>
-                            <p className="text-muted-foreground mt-2 text-sm leading-normal">{body}</p>
+                            <p className="text-muted-foreground mt-1.5 text-sm leading-normal">{body}</p>
                           </div>
                         </div>
                       );
@@ -186,17 +187,26 @@ export default function PublicAboutPage({ testimonials, aboutContent }: Props) {
             </div>
           </section>
 
-          <section className="py-28">
+          {/* Milestones — one hairline timeline strip, not five tiles. */}
+          <section className="py-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <h2 className="text-foreground font-display text-center text-3xl leading-snug font-extrabold">
-                {isAr ? 'محطات مسيرتنا' : 'Our milestones'}
-              </h2>
-              <div className="mt-12 grid gap-6 sm:grid-cols-3 lg:grid-cols-5">
-                {milestones.map((milestone) => (
-                  <div key={milestone.year} className="border-border bg-card rounded-xl border p-6 text-center shadow-sm">
-                    <p className="text-primary font-display text-2xl leading-tight font-extrabold tabular-nums">{milestone.year}</p>
-                    <p className="text-muted-foreground mt-2 text-sm leading-normal">{isAr ? milestone.label_ar : milestone.label}</p>
-                  </div>
+              <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
+                <h2 className="font-display text-foreground max-w-2xl text-3xl leading-snug font-extrabold text-balance sm:text-4xl">
+                  {isAr ? 'محطات مسيرتنا' : 'Our milestones'}
+                </h2>
+                <p className="text-muted-foreground max-w-md text-sm leading-normal sm:text-base">
+                  {isAr ? 'من التأسيس إلى اليوم — محطات صنعت الكلية.' : 'From founding day to today — the milestones that shaped the college.'}
+                </p>
+              </div>
+
+              <div className="border-border mt-10 grid grid-cols-2 gap-x-6 gap-y-10 border-t pt-10 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-8">
+                {milestones.map((milestone, index) => (
+                  <article key={milestone.year} className={cn(index > 0 && 'lg:border-s lg:border-border lg:ps-8')}>
+                    <p className="font-display text-primary/20 text-4xl leading-tight font-extrabold tabular-nums">{milestone.year}</p>
+                    <p className="text-foreground mt-2 text-sm font-semibold leading-normal">
+                      {isAr ? milestone.label_ar : milestone.label}
+                    </p>
+                  </article>
                 ))}
               </div>
             </div>

@@ -1,16 +1,32 @@
+import { DepartmentCard, type DepartmentCardData } from '@/components/site/department-card';
+import { Button } from '@/components/ui/button';
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel';
 import { useSite } from '@/context/site-context';
+import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
 
 interface Department {
   id: number;
   name: string;
   description?: string;
+  image?: string | null;
+  students_count?: number;
+  subjects_count?: number;
 }
 
 interface Props {
   departments?: Department[];
 }
+
+const IMAGE_POOL = [
+  '/images/college-medicine.webp',
+  '/images/college-nursing.webp',
+  '/images/college-health.webp',
+  '/images/research.webp',
+  '/images/news-forum.webp',
+];
 
 const FALLBACK_DEPARTMENTS = [
   {
@@ -20,8 +36,6 @@ const FALLBACK_DEPARTMENTS = [
       en: 'Bachelor programs in software engineering, networks, and information systems.',
       ar: 'برامج بكالوريوس في هندسة البرمجيات والشبكات ونظم المعلومات.',
     },
-    image: '/images/college-medicine.webp',
-    links: [{ en: 'Software Engineering', ar: 'هندسة البرمجيات' }],
   },
   {
     id: 2,
@@ -30,8 +44,6 @@ const FALLBACK_DEPARTMENTS = [
       en: 'Programs in management, accounting, and entrepreneurship.',
       ar: 'برامج في الإدارة والمحاسبة وريادة الأعمال.',
     },
-    image: '/images/college-nursing.webp',
-    links: [{ en: 'Management', ar: 'الإدارة' }],
   },
   {
     id: 3,
@@ -40,20 +52,19 @@ const FALLBACK_DEPARTMENTS = [
       en: 'Applied engineering programs with practical lab training.',
       ar: 'برامج هندسية تطبيقية مع تدريب عملي في المعامل.',
     },
-    image: '/images/college-health.webp',
-    links: [{ en: 'Civil Engineering', ar: 'الهندسة المدنية' }],
   },
 ];
 
 export function DepartmentsShowcase({ departments = [] }: Props) {
   const { t, locale, tr, isRTL } = useSite();
   const ds = t.departmentsSection;
-  const cardLabel = locale === 'ar' ? 'قسم' : 'Department';
-  const Arrow = isRTL ? ArrowLeft : ArrowRight;
+  const [api, setApi] = useState<CarouselApi>();
+  const PrevIcon = isRTL ? ArrowRight : ArrowLeft;
+  const NextIcon = isRTL ? ArrowLeft : ArrowRight;
 
-  const cards =
+  const cards: DepartmentCardData[] =
     departments.length > 0
-      ? departments.slice(0, 3).map((dept, idx) => ({
+      ? departments.map((dept, index) => ({
           id: dept.id,
           name: dept.name,
           desc:
@@ -61,55 +72,64 @@ export function DepartmentsShowcase({ departments = [] }: Props) {
             (locale === 'ar'
               ? 'برنامج أكاديمي متكامل يوفر بيئة تعليمية حديثة معتمدة.'
               : 'A comprehensive academic program in a modern accredited learning environment.'),
-          image: FALLBACK_DEPARTMENTS[idx % 3].image,
-          links: [dept.name],
+          image: dept.image ? (dept.image.startsWith('http') ? dept.image : `/storage/${dept.image}`) : IMAGE_POOL[index % IMAGE_POOL.length],
+          studentsCount: dept.students_count,
+          subjectsCount: dept.subjects_count,
         }))
-      : FALLBACK_DEPARTMENTS.map((d) => ({
+      : FALLBACK_DEPARTMENTS.map((d, index) => ({
           id: d.id,
           name: tr(d.name),
           desc: tr(d.desc),
-          image: d.image,
-          links: d.links.map((l) => tr(l)),
+          image: IMAGE_POOL[index % IMAGE_POOL.length],
+          studentsCount: undefined,
+          subjectsCount: undefined,
         }));
 
   return (
-    <section id="programs" className="mx-auto max-w-7xl px-4 py-28 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl text-center">
-        <h2 className="font-display text-3xl font-extrabold leading-snug text-primary sm:text-4xl">{ds.title}</h2>
-        <p className="text-muted-foreground mt-4 text-pretty text-base leading-normal">{ds.description}</p>
+    <section id="programs" aria-labelledby="departments-heading" className="bg-muted overflow-x-clip py-10 sm:py-14 lg:py-[70px]">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-start justify-between gap-x-8 gap-y-5 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl">
+          <h2
+            id="departments-heading"
+            className={cn('font-display text-primary text-3xl leading-snug font-extrabold sm:text-4xl', locale === 'ar' ? '' : 'tracking-tight')}
+          >
+            {ds.title}
+          </h2>
+          <p className="text-muted-foreground mt-3 text-sm sm:text-base">{ds.description}</p>
+        </div>
+        <Link
+          href="/departments"
+          className="bg-accent text-accent-foreground inline-flex shrink-0 items-center gap-1.5 rounded-lg px-6 py-2.5 text-sm font-bold transition-all hover:-translate-y-0.5 hover:brightness-110 sm:py-3"
+        >
+          {ds.viewPrograms}
+        </Link>
       </div>
 
-      <div className="mt-14 grid gap-6 md:grid-cols-3">
-        {cards.map((c) => (
-          <article
-            key={c.id}
-            className="group border-border relative flex min-h-80 flex-col justify-end overflow-hidden rounded-2xl border shadow-lg"
-          >
-            <img
-              src={c.image}
-              alt={typeof c.name === 'string' ? c.name : ''}
-              className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <div className="from-hero via-hero/70 to-hero/10 absolute inset-0 bg-gradient-to-t" />
-            <div className="text-hero-foreground relative p-6 text-start">
-              <span className="text-accent text-xs font-bold tracking-wider">{cardLabel}</span>
-              <h3 className="font-display mt-2 text-xl font-extrabold leading-snug">{c.name}</h3>
-              <p className="text-hero-foreground/80 mt-3 text-sm leading-normal">{c.desc}</p>
-              <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2">
-                {c.links.map((l) => (
-                  <Link
-                    key={l}
-                    href="/departments"
-                    className="text-accent hover:text-hero-foreground inline-flex items-center gap-1.5 text-sm font-bold transition-colors"
-                  >
-                    {l}
-                    <Arrow className="size-4" aria-hidden="true" />
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </article>
-        ))}
+      <div className="mt-8 select-none sm:mt-12">
+        <Carousel opts={{ direction: isRTL ? 'rtl' : 'ltr', align: 'start', dragFree: true }} setApi={setApi} aria-label={ds.title} className="">
+          <CarouselContent className="ps-4 sm:ps-6 lg:ps-[max(2rem,calc((100%_-_80rem)/2_+_2rem))]">
+            {cards.map((card, index) => (
+              <CarouselItem
+                key={card.id}
+                className={cn(
+                  'basis-[85%] pb-2 sm:basis-[47%] lg:basis-[29%]',
+                  index === cards.length - 1 && 'me-4 sm:me-6 lg:me-[max(2rem,calc((100%_-_80rem)/2_+_2rem))]',
+                )}
+              >
+                <DepartmentCard card={card} index={index} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </div>
+
+      <div className="mx-auto mt-6 flex max-w-7xl items-center justify-end gap-1 px-4 sm:px-6 lg:px-8">
+        <Button variant="outline" size="icon" onClick={() => api?.scrollPrev()} aria-label="Previous">
+          <PrevIcon className="size-5" />
+        </Button>
+        <Button variant="outline" size="icon" onClick={() => api?.scrollNext()} aria-label="Next">
+          <NextIcon className="size-5" />
+        </Button>
       </div>
     </section>
   );

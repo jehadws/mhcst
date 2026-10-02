@@ -60,6 +60,7 @@ export function SiteFooter() {
     { href: '/blog-posts', label: locale === 'ar' ? 'الأخبار' : 'News' },
     { href: '/faq', label: t.nav.faq },
     { href: '/student/portal', label: locale === 'ar' ? 'بوابة الطالب' : 'Student portal' },
+    { href: '/student/register', label: locale === 'ar' ? 'تسجيل طالب جديد' : 'Student registration' },
     { href: '/terms-of-use', label: t.footer.terms },
     { href: '/privacy-policy', label: t.footer.privacy },
   ];

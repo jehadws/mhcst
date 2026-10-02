@@ -73,3 +73,15 @@ export function formatNewsDate(date: string | undefined, locale: 'ar' | 'en'): s
     day: 'numeric',
   });
 }
+
+export function formatNewsDateShort(date: string | undefined, locale: 'ar' | 'en'): string {
+  if (!date) {
+    return '';
+  }
+
+  return new Date(date).toLocaleDateString(locale === 'ar' ? 'ar-LY' : 'en-GB', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}

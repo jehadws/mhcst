@@ -18,7 +18,7 @@ export function PageHero({ title, description, crumbs = [] }: PageHeroProps) {
     <section className="bg-hero text-hero-foreground relative overflow-hidden pt-32 pb-16 sm:pb-20">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.15]"
+        className="photo-veil pointer-events-none absolute inset-0"
         style={{
           backgroundImage: 'url(/banner.webp)',
           backgroundSize: 'cover',

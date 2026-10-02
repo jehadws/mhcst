@@ -1,20 +1,17 @@
 import { SeoHead } from '@/components/seo-head';
-import { Banner } from '@/types';
-import { SiteHeader } from '@/components/site/site-header';
-import { SiteFooter } from '@/components/site/site-footer';
+import { About } from '@/components/site/about';
+import { Accreditation } from '@/components/site/accreditation';
+import { ApplicationSteps } from '@/components/site/application-steps';
+import { CtaBanner } from '@/components/site/cta-banner';
+import { DepartmentsShowcase } from '@/components/site/departments-showcase';
+import { FixedVideoSection } from '@/components/site/fixed-video-section';
 import { FloatingButtons } from '@/components/site/floating-buttons';
 import { Hero } from '@/components/site/hero';
-import { StatsBar } from '@/components/site/stats-bar';
-import { DepartmentsShowcase } from '@/components/site/departments-showcase';
+import { NewsCarousel } from '@/components/site/news-carousel';
+import { SiteFooter } from '@/components/site/site-footer';
+import { SiteHeader } from '@/components/site/site-header';
 import { WhyUs } from '@/components/site/why-us';
-import { ApplicationSteps } from '@/components/site/application-steps';
-import { Scholarships } from '@/components/site/scholarships';
-import { About } from '@/components/site/about';
-import { Testimonials } from '@/components/site/testimonials';
-import { Accreditation } from '@/components/site/accreditation';
-import { Partnerships } from '@/components/site/partnerships';
-import { BlogPostsSection } from '@/components/site/blog-posts-section';
-import { CtaBanner } from '@/components/site/cta-banner';
+import { Banner } from '@/types';
 
 interface Props {
   departments?: any[];
@@ -29,6 +26,10 @@ interface Props {
   };
 }
 
+// Placeholder assets until the real campus video is produced.
+const DEMO_VIDEO_URL = 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4';
+const DEMO_VIDEO_POSTER = '/banner.webp';
+
 export default function Welcome({ banners, departments, testimonials, posts, stats }: Props) {
   return (
     <>
@@ -37,16 +38,13 @@ export default function Welcome({ banners, departments, testimonials, posts, sta
         <SiteHeader />
         <main className="flex-1">
           <Hero banners={banners} />
-          <StatsBar stats={stats} />
           <DepartmentsShowcase departments={departments} />
           <WhyUs />
           <ApplicationSteps />
-          <Scholarships />
           <About stats={stats} />
-          <Testimonials items={testimonials} />
+          <FixedVideoSection src={DEMO_VIDEO_URL} poster={DEMO_VIDEO_POSTER} />
           <Accreditation />
-          <Partnerships />
-          <BlogPostsSection items={posts} />
+          <NewsCarousel items={posts} />
           <CtaBanner />
         </main>
         <SiteFooter />

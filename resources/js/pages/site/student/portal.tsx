@@ -1,8 +1,10 @@
 import { SeoHead } from '@/components/seo-head';
+import { FloatingButtons } from '@/components/site/floating-buttons';
+import { PageHero } from '@/components/site/page-hero';
 import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import { useSite } from '@/context/site-context';
-import { Award, BookOpen, GraduationCap, Search, School } from 'lucide-react';
+import { Award, BookOpen, Search } from 'lucide-react';
 import { useState } from 'react';
 
 interface TrainingEnrollment {
@@ -110,14 +112,14 @@ export default function StudentPortal() {
     switch (status) {
       case 'completed':
         return (
-          <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+          <span className="bg-success/10 text-success rounded-full px-3 py-1 text-xs font-bold">
             {locale === 'ar' ? 'مكتملة' : 'Completed'}
           </span>
         );
       case 'confirmed':
       case 'active':
         return (
-          <span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-bold text-blue-600 dark:text-blue-400">
+          <span className="bg-info/10 text-info rounded-full px-3 py-1 text-xs font-bold">
             {locale === 'ar' ? 'نشط' : 'Active'}
           </span>
         );
@@ -130,7 +132,7 @@ export default function StudentPortal() {
         );
       default:
         return (
-          <span className="rounded-full bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-600 dark:text-amber-400">
+          <span className="bg-warning/10 text-warning rounded-full px-3 py-1 text-xs font-bold">
             {locale === 'ar' ? 'قيد المراجعة' : 'Pending'}
           </span>
         );
@@ -152,25 +154,18 @@ export default function StudentPortal() {
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="flex-1">
-          <div className="border-border bg-secondary relative border-b py-14 sm:py-16">
-            <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-              <span className="border-primary/20 bg-primary/5 text-primary inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-xs font-semibold">
-                <GraduationCap className="size-3.5" />
-                <span>{locale === 'ar' ? 'بوابة الطالب' : 'Student Portal'}</span>
-              </span>
-              <h1 className="text-foreground mt-4 font-serif text-4xl font-extrabold tracking-tight sm:text-5xl">
-                {locale === 'ar' ? 'استعلام عن الدورات والسجل الأكاديمي' : 'Courses & Academic Record'}
-              </h1>
-              <p className="text-muted-foreground mx-auto mt-3 max-w-xl text-sm sm:text-base">
-                {locale === 'ar'
-                  ? 'ابحث برقم القيد أو البريد أو الهاتف — يشمل الدورات التدريبية والتسجيل الأكاديمي'
-                  : 'Search by student ID, email, or phone — includes training courses and college enrollment'}
-              </p>
-            </div>
-          </div>
+          <PageHero
+            title={locale === 'ar' ? 'استعلام عن الدورات والسجل الأكاديمي' : 'Courses & academic record'}
+            description={
+              locale === 'ar'
+                ? 'ابحث برقم القيد أو البريد أو الهاتف — يشمل الدورات التدريبية والتسجيل الأكاديمي'
+                : 'Search by student ID, email, or phone — includes training courses and college enrollment'
+            }
+            crumbs={[{ label: locale === 'ar' ? 'بوابة الطالب' : 'Student portal', href: '/student/portal' }]}
+          />
 
           <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-            <form onSubmit={handleSearch} className="border-border/80 bg-card rounded-3xl border p-6 shadow-xl sm:p-8">
+            <form onSubmit={handleSearch} className="border-border/80 bg-card rounded-2xl border p-6 shadow-xl sm:p-8">
               <div className="flex flex-col gap-3 sm:flex-row">
                 <div className="relative flex-1">
                   <Search className="text-muted-foreground absolute start-3.5 top-1/2 size-4 -translate-y-1/2" />
@@ -179,13 +174,13 @@ export default function StudentPortal() {
                     value={inputVal}
                     onChange={(e) => setInputVal(e.target.value)}
                     placeholder={locale === 'ar' ? 'رقم القيد، البريد، أو الهاتف...' : 'Student ID, email, or phone...'}
-                    className="border-input bg-background focus:border-primary focus:ring-primary/20 w-full rounded-xl border py-3 ps-10 pe-4 text-sm transition-colors outline-none focus:ring-2"
+                    className="border-input bg-background focus:border-primary focus:ring-primary/20 w-full rounded-lg border py-3 ps-10 pe-4 text-sm transition-colors outline-none focus:ring-2"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={loading || !inputVal.trim()}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold shadow-lg transition-all disabled:opacity-50"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-bold shadow-md transition-all disabled:opacity-50"
                 >
                   <Search className="size-4" />
                   {loading ? t.enroll.submitting : locale === 'ar' ? 'بحث' : 'Search'}
@@ -201,21 +196,23 @@ export default function StudentPortal() {
 
             {searched && (
               <div className="mt-8 space-y-8">
-                <h2 className="text-foreground font-serif text-xl font-bold">
+                <h2 className="font-display text-foreground text-xl leading-snug font-extrabold">
                   {locale === 'ar' ? `نتائج البحث (${totalResults})` : `Search Results (${totalResults})`}
                 </h2>
 
                 {totalResults === 0 ? (
-                  <div className="border-border bg-card rounded-3xl border p-10 text-center">
+                  <div className="border-border bg-card rounded-2xl border p-10 text-center">
                     <BookOpen className="text-muted-foreground/60 mx-auto size-12" />
-                    <h3 className="mt-4 font-serif text-lg font-bold">{locale === 'ar' ? 'لم يتم العثور على نتائج' : 'No Results Found'}</h3>
+                    <h3 className="font-display mt-4 text-lg leading-snug font-extrabold">
+                      {locale === 'ar' ? 'لم يتم العثور على نتائج' : 'No Results Found'}
+                    </h3>
                   </div>
                 ) : (
                   <>
                     {academicStudents.length > 0 && (
                       <section className="space-y-4">
-                        <h3 className="flex items-center gap-2 font-bold text-indigo-700 dark:text-indigo-300">
-                          <School className="size-5" />
+                        <h3 className="font-display text-primary flex items-center gap-2 text-lg leading-snug font-extrabold">
+                          <Award className="size-5" />
                           {locale === 'ar' ? 'السجل الأكاديمي (CMS)' : 'College Academic Record'}
                         </h3>
                         {academicStudents.map((student) => (
@@ -251,7 +248,7 @@ export default function StudentPortal() {
                                 )}
                                 {student.certificates && student.certificates.length > 0 && (
                                   <div className="border-border/60 mt-3 space-y-1.5 border-t pt-3">
-                                    <p className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                                    <p className="text-success flex items-center gap-1.5 text-xs font-bold">
                                       <Award className="size-3.5" />
                                       {locale === 'ar'
                                         ? `الشهادات التدريبية (${student.certificates.length})`
@@ -277,7 +274,7 @@ export default function StudentPortal() {
                                               href={cert.download_url}
                                               target="_blank"
                                               rel="noopener noreferrer"
-                                              className="font-semibold text-emerald-600 hover:underline dark:text-emerald-400"
+                                              className="text-success font-semibold hover:underline"
                                             >
                                               {locale === 'ar' ? 'تحميل' : 'Download'}
                                             </a>
@@ -301,7 +298,7 @@ export default function StudentPortal() {
 
                     {trainingEnrollments.length > 0 && (
                       <section className="space-y-4">
-                        <h3 className="flex items-center gap-2 font-bold text-emerald-700 dark:text-emerald-300">
+                        <h3 className="font-display text-success flex items-center gap-2 text-lg leading-snug font-extrabold">
                           <Award className="size-5" />
                           {locale === 'ar' ? 'الدورات التدريبية' : 'Training Courses'}
                         </h3>
@@ -317,7 +314,7 @@ export default function StudentPortal() {
                                     {statusBadge(enr.status)}
                                     <span className="text-muted-foreground text-xs">{new Date(enr.created_at).toLocaleDateString()}</span>
                                   </div>
-                                  <h4 className="text-foreground font-serif text-lg font-bold">{courseName}</h4>
+                                  <h4 className="font-display text-foreground text-lg leading-snug font-extrabold">{courseName}</h4>
                                   <p className="text-muted-foreground text-xs">
                                     {locale === 'ar' ? 'المتدرب:' : 'Learner:'} {learnerName}
                                   </p>
@@ -332,7 +329,7 @@ export default function StudentPortal() {
                                     href={enr.certificate.download_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white shadow transition-colors hover:bg-emerald-700"
+                                    className="bg-success text-success-foreground inline-flex shrink-0 items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-xs font-bold shadow-md transition-colors hover:brightness-110"
                                   >
                                     <Award className="size-4" />
                                     <span>{locale === 'ar' ? 'تحميل الشهادة' : 'Download Certificate'}</span>

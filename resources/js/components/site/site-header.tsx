@@ -1,6 +1,6 @@
 import { SiteLogo } from '@/components/site/site-logo';
-import { useBrandText, useSiteSettings } from '@/hooks/use-site-settings';
 import { useSite } from '@/context/site-context';
+import { useBrandText, useSiteSettings } from '@/hooks/use-site-settings';
 import { cn } from '@/lib/utils';
 import type { SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -26,11 +26,9 @@ export function SiteHeader() {
 
   const links = [
     { href: '/about', label: t.nav.about },
-    { href: '/contact', label: locale === 'ar' ? 'القبول والتسجيل' : 'Admissions' },
+    { href: '/student/register', label: locale === 'ar' ? 'القبول والتسجيل' : 'Admissions' },
     { href: '/departments', label: locale === 'ar' ? 'الأقسام والبرامج' : 'Departments' },
-    ...(showTeachersPage && !hideInstructorNames
-      ? [{ href: '/teachers', label: locale === 'ar' ? 'أعضاء هيئة التدريس' : 'Faculty' }]
-      : []),
+    ...(showTeachersPage && !hideInstructorNames ? [{ href: '/teachers', label: locale === 'ar' ? 'أعضاء هيئة التدريس' : 'Faculty' }] : []),
     { href: '/blog-posts', label: locale === 'ar' ? 'الأخبار' : 'News' },
     { href: '/faq', label: t.nav.faq },
   ];
@@ -43,11 +41,11 @@ export function SiteHeader() {
       className={cn(
         'fixed inset-x-0 top-0 z-50 transition-colors duration-300',
         scrolled
-          ? 'bg-hero/95 shadow-lg shadow-black/20 backdrop-blur supports-[backdrop-filter]:bg-hero/80'
-          : 'bg-transparent',
+          ? 'bg-hero/95 supports-[backdrop-filter]:bg-hero/80 shadow-lg shadow-black/20 backdrop-blur'
+          : 'bg-hero sm:bg-transparent sm:bg-linear-to-b sm:from-black/60 sm:to-transparent',
       )}
     >
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:h-20 sm:px-6 lg:px-8">
         <Link href="/" className="text-hero-foreground flex items-center gap-3" aria-label={brandName}>
           <span className="border-accent/60 flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-full border bg-white p-0.5">
             <SiteLogo variant="header" className="size-10" />
@@ -64,7 +62,7 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               className={cn(
-                'whitespace-nowrap text-sm font-medium transition-colors',
+                'text-sm font-medium whitespace-nowrap transition-colors',
                 isActive(item.href) ? 'text-accent' : 'text-hero-foreground/85 hover:text-accent',
               )}
             >
@@ -107,13 +105,7 @@ export function SiteHeader() {
               {t.nav.login}
             </Link>
           )}
-          <Link
-            href="/contact"
-            className="bg-accent text-accent-foreground inline-flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-bold transition-transform hover:-translate-y-0.5"
-          >
-            {t.nav.enroll}
-            <EnrollArrow className="size-4" aria-hidden="true" />
-          </Link>
+
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -126,10 +118,7 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <nav
-          className="border-hero-foreground/10 bg-hero border-t px-4 py-4 xl:hidden"
-          aria-label={locale === 'ar' ? 'قائمة الجوال' : 'Mobile menu'}
-        >
+        <nav className="border-hero-foreground/10 bg-hero border-t px-4 py-4 xl:hidden" aria-label={locale === 'ar' ? 'قائمة الجوال' : 'Mobile menu'}>
           <ul className="grid gap-1">
             {links.map((item) => (
               <li key={item.href}>
@@ -138,15 +127,23 @@ export function SiteHeader() {
                   onClick={() => setOpen(false)}
                   className={cn(
                     'block rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
-                    isActive(item.href)
-                      ? 'text-accent bg-white/5'
-                      : 'text-hero-foreground/85 hover:bg-white/5 hover:text-accent',
+                    isActive(item.href) ? 'text-accent bg-white/5' : 'text-hero-foreground/85 hover:text-accent hover:bg-white/5',
                   )}
                 >
                   {item.label}
                 </Link>
               </li>
             ))}
+            <li>
+              <Link
+                href="/student/register"
+                onClick={() => setOpen(false)}
+                className="bg-accent text-accent-foreground mt-2 flex items-center justify-center gap-1.5 rounded-md px-3 py-2.5 text-sm font-bold transition-transform hover:-translate-y-0.5"
+              >
+                {t.nav.enroll}
+                <EnrollArrow className="size-4" aria-hidden="true" />
+              </Link>
+            </li>
             <li className="border-hero-foreground/10 mt-2 border-t pt-2">
               {canAccessDashboard ? (
                 <Link

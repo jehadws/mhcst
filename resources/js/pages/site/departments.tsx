@@ -2,12 +2,13 @@ import { SeoHead } from '@/components/seo-head';
 import { Contact } from '@/components/site/contact';
 import { CtaBanner } from '@/components/site/cta-banner';
 import { FloatingButtons } from '@/components/site/floating-buttons';
+import { PageHero } from '@/components/site/page-hero';
 import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import { useSite } from '@/context/site-context';
 import { useSiteSettings } from '@/hooks/use-site-settings';
 import { Link } from '@inertiajs/react';
-import { ArrowLeft, ArrowRight, BookOpen, Building2, GraduationCap, Users } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface CmsLevel {
   id: number;
@@ -38,14 +39,15 @@ interface Props {
 export default function PublicDepartmentsPage({ departments = [] }: Props) {
   const { t, locale } = useSite();
   const { hide_instructor_names: hideInstructorNames } = useSiteSettings();
-  const Arrow = locale === 'ar' ? ArrowLeft : ArrowRight;
+  const isAr = locale === 'ar';
+  const Arrow = isAr ? ArrowLeft : ArrowRight;
 
   return (
     <>
       <SeoHead
-        title={locale === 'ar' ? 'الأقسام الأكاديمية' : 'Academic Departments'}
+        title={isAr ? 'الأقسام الأكاديمية' : 'Academic Departments'}
         description={
-          locale === 'ar'
+          isAr
             ? `استكشف التخصصات والأقسام الأكاديمية المتنوعة في ${t.brandFull}`
             : `Explore our academic departments and specialized study programs at ${t.brandFull}`
         }
@@ -53,115 +55,117 @@ export default function PublicDepartmentsPage({ departments = [] }: Props) {
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="flex-1">
-          {/* ─── Hero Banner ─── */}
-          <div className="bg-hero text-hero-foreground border-hero-foreground/10 border-b pb-20 pt-[calc(4.25rem+3rem)] sm:pb-28 sm:pt-[calc(4.25rem+4rem)]">
-            <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-              <p className="text-hero-muted text-xs font-bold tracking-widest uppercase">
-                {locale === 'ar' ? 'التخصصات الأكاديمية' : 'Academic majors'}
-              </p>
-              <h1 className="mt-4 font-display text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-                {locale === 'ar' ? 'الأقسام والبرامج الدراسية' : 'Academic departments & programs'}
-              </h1>
-              <p className="text-hero-muted mx-auto mt-4 max-w-2xl text-base leading-normal sm:text-lg">
-                {locale === 'ar'
-                  ? 'يقدم المعهد مجموعة متميزة من الأقسام العلمية والتطبيقية المُصمَّمة لإعداد كوادر مؤهلة لمواكبة متطلبات سوق العمل.'
-                  : 'Specialized academic departments designed to empower students with theoretical knowledge and practical expertise.'}
+          <PageHero
+            title={isAr ? 'الأقسام والبرامج الدراسية' : 'Academic departments & programs'}
+            description={
+              isAr
+                ? 'يقدم المعهد مجموعة متميزة من الأقسام العلمية والتطبيقية المُصمَّمة لإعداد كوادر مؤهلة لمواكبة متطلبات سوق العمل.'
+                : 'Specialized academic departments designed to empower students with theoretical knowledge and practical expertise.'
+            }
+            crumbs={[{ label: isAr ? 'الأقسام' : 'Departments', href: '/departments' }]}
+          />
+
+          {/* Academic register — full-width rows, not boxed cards. */}
+          <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+            <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
+              <h2 className="font-display text-primary max-w-2xl text-3xl leading-snug font-extrabold text-balance sm:text-4xl">
+                {isAr ? 'الأقسام الأكاديمية بالكلية' : 'Our academic departments'}
+              </h2>
+              <p className="text-muted-foreground max-w-md text-sm leading-normal sm:text-base">
+                {isAr
+                  ? `${departments.length} قسم أكاديمي — تعرّف على المواد والمستويات المتاحة.`
+                  : `${departments.length} academic departments — explore available subjects and levels.`}
               </p>
             </div>
-          </div>
 
-          {/* ─── Departments Grid ─── */}
-          <section className="py-20 sm:py-28">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="mx-auto mb-12 max-w-2xl text-center">
-                <h2 className="text-primary font-display text-3xl font-extrabold leading-snug tracking-tight sm:text-4xl">
-                  {locale === 'ar' ? 'الأقسام الأكاديمية بالكلية' : 'Our Academic Departments'}
-                </h2>
-                <p className="text-muted-foreground mt-4 text-base leading-normal sm:text-lg">
-                  {locale === 'ar'
-                    ? 'تعرّف على الأقسام المتاحة والمواد والتخصصات الأكاديمية'
-                    : 'Discover specialized departments and academic levels available'}
+            {departments.length === 0 ? (
+              <div className="border-border bg-card mt-10 rounded-xl border border-dashed py-14 text-center shadow-sm">
+                <p className="text-foreground text-base font-semibold">
+                  {isAr ? 'لا توجد أقسام مضافة حالياً' : 'No departments listed yet'}
+                </p>
+                <p className="text-muted-foreground mt-1.5 text-sm leading-normal">
+                  {isAr ? 'سيتم إضافة الأقسام الأكاديمية قريباً.' : 'Academic departments will be published soon.'}
                 </p>
               </div>
+            ) : (
+              <ul className="border-border mt-10 border-t">
+                {departments.map((dept, index) => {
+                  const hasLevels = (dept.levels?.length ?? 0) > 0;
 
-              {departments.length === 0 ? (
-                <div className="border-border bg-card border-dashed border shadow-sm rounded-xl py-12 text-center">
-                  <Building2 className="text-muted-foreground/50 mx-auto size-12" />
-                  <p className="text-foreground mt-4 text-base font-semibold">
-                    {locale === 'ar' ? 'لا توجد أقسام مضافة حالياً' : 'No departments listed yet'}
-                  </p>
-                  <p className="text-muted-foreground mt-1 text-sm leading-normal">
-                    {locale === 'ar' ? 'سيتم إضافة الأقسام الأكاديمية قريباً.' : 'Academic departments will be published soon.'}
-                  </p>
-                </div>
-              ) : (
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {departments.map((dept) => (
-                    <div
+                  return (
+                    <li
                       key={dept.id}
-                      className="group border-border/80 bg-card hover:border-primary/30 flex flex-col justify-between border p-6 transition-all duration-200 shadow-sm hover:shadow-lg rounded-lg"
+                      className="border-border border-b py-8 sm:py-10"
                     >
-                      <div>
-                        <div className="bg-primary/10 text-primary mb-5 flex size-12 items-center justify-center rounded-lg">
-                          <Building2 className="size-6" />
+                      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-5 gap-y-5 sm:gap-x-8 lg:grid-cols-[auto_minmax(0,2fr)_minmax(0,1fr)] lg:gap-x-12">
+                        <span className="font-display text-primary/20 pt-1 text-4xl leading-tight font-extrabold tabular-nums sm:text-5xl">
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+
+                        <div className="min-w-0">
+                          <h3 className="font-display text-foreground text-xl leading-snug font-extrabold sm:text-2xl">{dept.name}</h3>
+                          <p className="text-muted-foreground mt-2.5 max-w-xl text-sm leading-normal sm:text-base">
+                            {dept.description ||
+                              (isAr
+                                ? 'قسم أكاديمي متكامل يوفر بيئة تعليمية حديثة معتمدة.'
+                                : 'Full academic department providing modern accredited learning environment.')}
+                          </p>
+
+                          {hasLevels && (
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {dept.levels!.map((level) => (
+                                <span
+                                  key={level.id}
+                                  className="bg-secondary text-secondary-foreground inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
+                                >
+                                  {isAr ? `السنة ${level.year} — شعبة ${level.section}` : `Year ${level.year} — Section ${level.section}`}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
 
-                        <h3 className="text-foreground font-display text-xl font-extrabold leading-snug">{dept.name}</h3>
-
-                        <p className="text-muted-foreground mt-3 line-clamp-3 text-sm leading-normal">
-                          {dept.description ||
-                            (locale === 'ar'
-                              ? 'قسم أكاديمي متكامل يوفر بيئة تعليمية حديثة معتمدة.'
-                              : 'Full academic department providing modern accredited learning environment.')}
-                        </p>
-                      </div>
-
-                      <div className="border-border/60 mt-6 border-t pt-5">
-                        {dept.head && (
-                          <div className="text-muted-foreground mb-3 flex items-center gap-2 text-xs">
-                            <GraduationCap className="text-primary size-4 shrink-0" />
-                            <span>
-                              {locale === 'ar' ? 'رئيس القسم:' : 'Department Head:'}{' '}
-                              <strong className="text-foreground">
+                        <div className="col-span-2 flex flex-col items-start gap-4 border-border/60 lg:col-span-1 lg:items-end lg:border-s lg:ps-10">
+                          {dept.head && (
+                            <p className="text-muted-foreground flex items-center gap-2 text-xs leading-normal">
+                              <span>{isAr ? 'رئيس القسم:' : 'Department head:'}</span>
+                              <span className="text-foreground font-semibold">
                                 {dept.head.name ||
                                   (hideInstructorNames
-                                    ? locale === 'ar'
-                                      ? 'عضو هيئة التدريس'
-                                      : 'Faculty member'
+                                    ? (isAr ? 'عضو هيئة التدريس' : 'Faculty member')
                                     : '')}
-                              </strong>
+                              </span>
+                            </p>
+                          )}
+
+                          <div className="text-muted-foreground flex items-center gap-4 text-xs font-semibold">
+                            <span className="inline-flex items-center gap-1.5">
+                              <span className="tabular-nums">{dept.students_count || 0}</span>
+                              {isAr ? 'طالب' : 'Students'}
+                            </span>
+                            <span aria-hidden="true">·</span>
+                            <span className="inline-flex items-center gap-1.5">
+                              <span className="tabular-nums">{dept.subjects_count || 0}</span>
+                              {isAr ? 'مادة' : 'Subjects'}
                             </span>
                           </div>
-                        )}
 
-                        <div className="flex items-center justify-between gap-4 text-xs font-semibold">
-                          <span className="bg-secondary text-secondary-foreground inline-flex items-center gap-1.5 rounded-full px-3 py-1">
-                            <Users className="text-primary size-4 shrink-0" />
-                            <span className="tabular-nums">{dept.students_count || 0}</span> {locale === 'ar' ? 'طالب' : 'Students'}
-                          </span>
-
-                          <span className="bg-secondary text-secondary-foreground inline-flex items-center gap-1.5 rounded-full px-3 py-1">
-                            <BookOpen className="text-primary size-4 shrink-0" />
-                            <span className="tabular-nums">{dept.subjects_count || 0}</span> {locale === 'ar' ? 'مادة' : 'Subjects'}
-                          </span>
+                          <Link
+                            href="/contact"
+                            className="text-accent hover:text-primary inline-flex items-center gap-1.5 text-sm font-bold transition-colors"
+                          >
+                            {isAr ? 'استفسر عن التكلفة والتسجيل' : 'Inquire & apply'}
+                            <Arrow className="size-4 shrink-0" aria-hidden="true" />
+                          </Link>
                         </div>
-
-                        <Link
-                          href="/contact"
-                          className="border-border text-primary hover:border-primary/30 hover:bg-primary/5 mt-5 flex items-center justify-center gap-1.5 rounded-lg border py-3 text-xs font-semibold transition-colors"
-                        >
-                          <span>{locale === 'ar' ? 'استفسر عن التكلفة والتسجيل' : 'Inquire & Apply'}</span>
-                          <Arrow className="size-4 shrink-0" />
-                        </Link>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </section>
 
-          {/* ─── Contact CTA at end ─── */}
           <Contact />
           <CtaBanner />
         </main>

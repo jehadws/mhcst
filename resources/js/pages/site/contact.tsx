@@ -25,7 +25,6 @@ export default function PublicContactPage({ faqs = [] }: Props) {
   const { t, locale } = useSite();
   const settings = useSiteSettings();
   const isRtl = locale === 'ar';
-  const Arrow = isRtl ? ArrowRight : ArrowRight;
 
   const contactPhone = settings.contact_phone || '+218 91 234 5678';
   const contactEmail = settings.contact_email || 'info@mhcst.ly';
@@ -78,10 +77,10 @@ export default function PublicContactPage({ faqs = [] }: Props) {
           <section className="py-16 sm:py-20">
             <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:px-8">
               <div className="space-y-6 lg:col-span-5">
-                <div className="border-border overflow-hidden border">
+                <div className="border-border overflow-hidden rounded-2xl border">
                   <img
-                    src="https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1200&auto=format&fit=crop"
-                    alt={isRtl ? 'مبنى المعهد' : 'Institute building'}
+                    src="/images/college-medicine.webp"
+                    alt={isRtl ? 'مبنى الكلية' : 'College building'}
                     className="aspect-[4/3] w-full object-cover"
                   />
                 </div>
@@ -93,7 +92,7 @@ export default function PublicContactPage({ faqs = [] }: Props) {
                       href={card.href}
                       target={card.external ? '_blank' : undefined}
                       rel={card.external ? 'noopener noreferrer' : undefined}
-                      className="border-border bg-card hover:border-primary/30 flex items-start gap-4 border p-4 transition-colors"
+                      className="border-border bg-card hover:border-primary/30 flex items-start gap-4 rounded-lg border p-4 shadow-sm transition-colors"
                     >
                       <div className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-full">
                         <card.icon className="size-4" />
@@ -109,8 +108,8 @@ export default function PublicContactPage({ faqs = [] }: Props) {
                 </div>
               </div>
 
-              <div className="border-border bg-card border p-6 sm:p-8 lg:col-span-7">
-                <h2 className="font-serif text-2xl font-bold">{t.enroll.title}</h2>
+              <div className="border-border bg-card rounded-2xl border p-6 shadow-md sm:p-8 lg:col-span-7">
+                <h2 className="font-display text-primary text-2xl leading-snug font-extrabold">{t.enroll.title}</h2>
                 <p className="text-muted-foreground mt-2 text-sm">{t.enroll.subtitle}</p>
 
                 <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -131,11 +130,11 @@ export default function PublicContactPage({ faqs = [] }: Props) {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="bg-hero-accent text-hero-accent-foreground hover:bg-hero-accent/90 inline-flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-sm font-bold transition-colors disabled:opacity-50"
+                    className="bg-hero-accent text-hero-accent-foreground hover:bg-hero-accent/90 inline-flex w-full items-center justify-center gap-2 rounded-lg py-3.5 text-sm font-bold shadow-md transition-colors disabled:opacity-50"
                   >
                     <Send className="size-4" />
                     {submitting ? t.enroll.submitting : t.enroll.submit}
-                    <Arrow className={`size-4 ${isRtl ? 'rotate-180' : ''}`} />
+                    <ArrowRight className={`size-4 ${isRtl ? 'rotate-180' : ''}`} />
                   </button>
                 </form>
               </div>
@@ -145,14 +144,14 @@ export default function PublicContactPage({ faqs = [] }: Props) {
           <section className="bg-secondary border-border border-t py-16 sm:py-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="mb-8 text-center">
-                <p className="text-primary inline-flex items-center gap-1.5 text-xs font-bold tracking-[0.2em] uppercase">
+                <p className="text-primary inline-flex items-center gap-1.5 text-xs font-bold tracking-widest uppercase">
                   <MapPin className="size-3.5" />
                   {isRtl ? 'موقعنا' : 'Our location'}
                 </p>
-                <h2 className="text-foreground mt-3 font-serif text-2xl font-bold">{isRtl ? 'تجدنا هنا' : 'Find us here'}</h2>
+                <h2 className="font-display text-primary mt-3 text-2xl leading-snug font-extrabold">{isRtl ? 'تجدنا هنا' : 'Find us here'}</h2>
                 <p className="text-muted-foreground mt-2 text-sm">{address}</p>
               </div>
-              <div className="border-border overflow-hidden border">
+              <div className="border-border overflow-hidden rounded-2xl border">
                 <iframe
                   src="https://www.openstreetmap.org/export/embed.html?bbox=13.1,32.8,13.3,32.95&layer=mapnik&marker=32.8872,13.1913"
                   width="100%"

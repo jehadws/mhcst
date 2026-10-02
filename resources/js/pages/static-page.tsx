@@ -1,31 +1,27 @@
-import Editor from "@/components/editor";
-import { BreadcrumbItem } from "@/types";
-import { Breadcrumbs } from "@/components/breadcrumbs";
-import { SeoHead } from "@/components/seo-head";
-import { SiteHeader } from "@/components/site/site-header";
+import Editor from '@/components/editor';
+import { SeoHead } from '@/components/seo-head';
+import { FloatingButtons } from '@/components/site/floating-buttons';
+import { PageHero } from '@/components/site/page-hero';
+import { SiteFooter } from '@/components/site/site-footer';
+import { SiteHeader } from '@/components/site/site-header';
+import { useSite } from '@/context/site-context';
 
-export default function StaticPage({ title, content }: { title: string, content: string }) {
-  const breadcrumbs: BreadcrumbItem[] = [
-    {
-      title: 'الصفحة الرئيسية',
-      href: '/',
-    },
-    {
-      title,
-      href: '/',
-    },
-  ];
+export default function StaticPage({ title, content }: { title: string; content: string }) {
+  const { t } = useSite();
+
   return (
-   <>
+    <>
       <SeoHead title={title} />
-      <div className="min-h-screen bg-gray-50 pb-16">
+      <div className="flex min-h-screen flex-col bg-background">
         <SiteHeader />
-        <nav className="container mx-auto py-4  px-4 md:px-16 text-sm text-gray-600">
-          <Breadcrumbs breadcrumbs={breadcrumbs} />
-        </nav>
-        <div className="container mx-auto px-4 md:px-16 py-10">
-          <Editor content={content || ""} editable={false} onChange={()=>{}} />
-        </div>
+        <main className="flex-1">
+          <PageHero title={title} crumbs={[{ label: t.nav.home, href: '/' }, { label: title, href: '/' }]} />
+          <article className="prose prose-headings:font-display text-foreground mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
+            <Editor content={content || ''} editable={false} onChange={() => {}} />
+          </article>
+        </main>
+        <SiteFooter />
+        <FloatingButtons />
       </div>
     </>
   );
