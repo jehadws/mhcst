@@ -115,7 +115,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                     {option.icon && <option.icon className="me-2 h-4 w-4 text-muted-foreground" />}
                     <span>{option.label}</span>
                     {facets?.get(option.value) && (
-                      <span className="ms-auto flex h-4 w-4 items-center justify-center font-mono text-xs">
+                      <span className="ms-auto flex h-4 w-4 items-center justify-center tabular-nums text-xs">
                         {facets.get(option.value)}
                       </span>
                     )}
