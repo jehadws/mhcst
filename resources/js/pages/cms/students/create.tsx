@@ -30,6 +30,7 @@ export default function StudentCreate({ levels }: { levels: CmsLevel[] }) {
         address: '',
         create_user_account: false,
         password: '',
+        password_confirmation: '',
     });
 
     const submit = (e: React.FormEvent) => {
@@ -47,8 +48,8 @@ export default function StudentCreate({ levels }: { levels: CmsLevel[] }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.students.addTitle} />
             <div className="max-w-2xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-6">{c.students.addHeading}</h1>
-                <form onSubmit={submit} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border">
+                <h1 className="font-display text-3xl font-extrabold leading-snug mb-6">{c.students.addHeading}</h1>
+                <form onSubmit={submit} className="space-y-5 bg-card p-6 rounded-xl border">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <Label htmlFor="student_no">{c.students.studentNo}</Label>
@@ -57,7 +58,7 @@ export default function StudentCreate({ levels }: { levels: CmsLevel[] }) {
                                 value={data.student_no}
                                 onChange={(e) => setData('student_no', e.target.value)}
                             />
-                            {errors.student_no && <p className="text-xs text-rose-500 mt-1">{errors.student_no}</p>}
+                            {errors.student_no && <p className="text-xs text-destructive mt-1">{errors.student_no}</p>}
                         </div>
 
                         <div>
@@ -68,7 +69,7 @@ export default function StudentCreate({ levels }: { levels: CmsLevel[] }) {
                                 onChange={(e) => setData('name', e.target.value)}
                                 placeholder={c.students.fullNamePlaceholder}
                             />
-                            {errors.name && <p className="text-xs text-rose-500 mt-1">{errors.name}</p>}
+                            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
                         </div>
                     </div>
 
@@ -81,7 +82,7 @@ export default function StudentCreate({ levels }: { levels: CmsLevel[] }) {
                                 value={data.email}
                                 onChange={(e) => setData('email', e.target.value)}
                             />
-                            {errors.email && <p className="text-xs text-rose-500 mt-1">{errors.email}</p>}
+                            {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
                         </div>
 
                         <div>
@@ -175,15 +176,28 @@ export default function StudentCreate({ levels }: { levels: CmsLevel[] }) {
                         </div>
 
                         {data.create_user_account && (
-                            <div>
-                                <Label htmlFor="password">{c.students.accountPassword}</Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    value={data.password}
-                                    onChange={(e) => setData('password', e.target.value)}
-                                    placeholder="••••••••"
-                                />
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <Label htmlFor="password">{c.students.accountPassword}</Label>
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        value={data.password}
+                                        onChange={(e) => setData('password', e.target.value)}
+                                        placeholder="••••••••"
+                                    />
+                                    {errors.password && <p className="text-xs text-destructive mt-1">{errors.password}</p>}
+                                </div>
+                                <div>
+                                    <Label htmlFor="password_confirmation">{c.students.confirmPassword}</Label>
+                                    <Input
+                                        id="password_confirmation"
+                                        type="password"
+                                        value={data.password_confirmation}
+                                        onChange={(e) => setData('password_confirmation', e.target.value)}
+                                        placeholder="••••••••"
+                                    />
+                                </div>
                             </div>
                         )}
                     </div>

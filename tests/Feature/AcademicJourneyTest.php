@@ -301,6 +301,7 @@ describe('5. Student — admin creates a student with user account', function ()
             'student_no' => '2026-0001',
             'email' => 'omar-s8@example.com',
             'password' => 'Student123!',
+            'password_confirmation' => 'Student123!',
             'create_user_account' => true,
             'level_id' => $this->level->id,
             'status' => 'active',

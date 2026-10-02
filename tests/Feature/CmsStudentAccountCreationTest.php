@@ -26,6 +26,7 @@ function studentStorePayload(CmsLevel $level, string $email): array
         'status' => 'active',
         'create_user_account' => true,
         'password' => 'secret1234',
+        'password_confirmation' => 'secret1234',
     ];
 }
 
@@ -77,4 +78,60 @@ test('failure after user creation rolls back cleanly leaving no orphan user', fu
     expect(User::where('email', 'rolled.back@example.com')->exists())->toBeFalse()
         ->and(CmsStudent::where('student_no', '2026-0100')->exists())->toBeFalse()
         ->and(DB::table('model_has_roles')->count())->toBe($roleAssignmentsBefore);
+});
+
+test('account creation requires email and password instead of silently skipping', function () {
+    $admin = createAdminUser();
+    $level = createLevelForStudents();
+
+    $response = $this->actingAs($admin)->post('/cms/students', [
+        'student_no' => '2026-0102',
+        'name' => 'Missing Credentials',
+        'level_id' => $level->id,
+        'enrollment_date' => now()->format('Y-m-d'),
+        'status' => 'active',
+        'create_user_account' => true,
+    ]);
+
+    $response->assertInvalid(['email', 'password']);
+    expect(CmsStudent::where('student_no', '2026-0102')->exists())->toBeFalse();
+});
+
+test('password confirmation mismatch is rejected', function () {
+    $admin = createAdminUser();
+    $level = createLevelForStudents();
+
+    $response = $this->actingAs($admin)->post('/cms/students', [
+        'student_no' => '2026-0103',
+        'name' => 'Mismatch Student',
+        'email' => 'mismatch@example.com',
+        'level_id' => $level->id,
+        'enrollment_date' => now()->format('Y-m-d'),
+        'status' => 'active',
+        'create_user_account' => true,
+        'password' => 'secret1234',
+        'password_confirmation' => 'different123',
+    ]);
+
+    $response->assertInvalid('password');
+    expect(CmsStudent::where('student_no', '2026-0103')->exists())->toBeFalse();
+});
+
+test('a profile without a login account needs no password', function () {
+    $admin = createAdminUser();
+    $level = createLevelForStudents();
+
+    $response = $this->actingAs($admin)->post('/cms/students', [
+        'student_no' => '2026-0104',
+        'name' => 'No Account Student',
+        'level_id' => $level->id,
+        'enrollment_date' => now()->format('Y-m-d'),
+        'status' => 'active',
+    ]);
+
+    $response->assertRedirect(route('cms.students.index'));
+
+    $student = CmsStudent::where('student_no', '2026-0104')->first();
+    expect($student)->not->toBeNull()
+        ->and($student->user_id)->toBeNull();
 });

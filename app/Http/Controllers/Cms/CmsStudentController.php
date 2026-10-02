@@ -70,15 +70,16 @@ class CmsStudentController extends Controller
         $this->cmsAuth->ensureCanManage(auth()->user());
 
         $data = $request->validated();
-        $createUser = $data['create_user_account'] ?? false;
+        $createUser = (bool) ($data['create_user_account'] ?? false);
+        $password = $data['password'] ?? null;
         unset($data['create_user_account'], $data['password']);
 
-        if ($createUser && ! empty($request->email) && ! empty($request->password)) {
-            DB::transaction(function () use ($data, $request) {
+        if ($createUser) {
+            DB::transaction(function () use ($data, $password) {
                 $user = User::create([
                     'name' => $data['name'],
-                    'email' => $request->email,
-                    'password' => Hash::make($request->password),
+                    'email' => $data['email'],
+                    'password' => Hash::make($password),
                 ]);
                 Role::firstOrCreate(['name' => UserRole::Student->value, 'guard_name' => 'web']);
                 $user->assignRole(UserRole::Student->value);
@@ -110,6 +111,8 @@ class CmsStudentController extends Controller
 
     public function edit(CmsStudent $student): Response
     {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
         return Inertia::render('cms/students/edit', [
             'student' => $student->load(['level', 'user']),
             'levels' => CmsLevel::with('department')->get(),

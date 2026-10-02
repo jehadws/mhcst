@@ -68,6 +68,7 @@ export const cmsEn = {
     headLabel: 'Department head (teacher)',
     selectHead: '-- Select department head --',
     description: 'Department description',
+    image: 'Department image',
     levelsCount: 'Levels / sections',
     subjectsCount: 'Subjects',
     studentsCount: 'Students',
@@ -181,6 +182,7 @@ export const cmsEn = {
     academicYear: 'Academic year',
     createAccount: 'Create system login for student',
     accountPassword: 'Account password',
+    confirmPassword: 'Confirm password',
   },
   enrollments: {
     title: 'Academic Enrollments',
@@ -413,6 +415,8 @@ export const cmsEn = {
     blockedClosed: 'Subject registration is currently closed. Please check back later.',
     blockedNoTerm: 'The current academic term is not configured yet — registration will open once administration sets it up.',
     blockedInactive: 'Only active students can register for subjects. Please contact administration.',
+    seatsRemaining: 'Seats remaining: {count}',
+    seatsFull: 'Full',
     empty: 'No subjects are available for registration right now.',
   },
   myStudies: {
@@ -477,6 +481,7 @@ export const cmsEn = {
       summer: 'Summer semester',
     },
     studentStatus: {
+      pending: 'Pending',
       active: 'Active',
       suspended: 'Suspended',
       graduated: 'Graduated',
@@ -581,6 +586,7 @@ export const cmsAr = {
     headLabel: 'رئيس القسم (أستاذ)',
     selectHead: '-- اختر أستاذ القسم --',
     description: 'وصف القسم',
+    image: 'صورة القسم',
     levelsCount: 'عدد الفصول/الصفوف',
     subjectsCount: 'عدد المواد الدراسية',
     studentsCount: 'عدد الطلاب',
@@ -694,6 +700,7 @@ export const cmsAr = {
     academicYear: 'العام',
     createAccount: 'إنشاء حساب دخول للنظام للطالب',
     accountPassword: 'كلمة مرور الحساب',
+    confirmPassword: 'تأكيد كلمة المرور',
   },
   enrollments: {
     title: 'تسجيل الطلاب في المواد',
@@ -926,6 +933,8 @@ export const cmsAr = {
     blockedClosed: 'تسجيل المواد مغلق حالياً. يُرجى المحاولة لاحقاً.',
     blockedNoTerm: 'لم يُحدد الفصل الأكاديمي الحالي بعد — سيُفتح التسجيل بعد إعداده من الإدارة.',
     blockedInactive: 'التسجيل متاح للطلاب النشطين فقط. يُرجى التواصل مع الإدارة.',
+    seatsRemaining: 'المقاعد المتبقية: {count}',
+    seatsFull: 'مكتملة',
     empty: 'لا توجد مواد متاحة للتسجيل حالياً.',
   },
   myStudies: {
@@ -990,6 +999,7 @@ export const cmsAr = {
       summer: 'الفصل الصيفي',
     },
     studentStatus: {
+      pending: 'قيد الموافقة',
       active: 'مستمر',
       suspended: 'موقف',
       graduated: 'خريج',

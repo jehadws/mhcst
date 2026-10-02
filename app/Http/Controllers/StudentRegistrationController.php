@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
 use App\Http\Requests\RegisterStudentRequest;
+use App\Mail\StudentRegistrationPendingMail;
+use App\Mail\StudentWelcomeMail;
 use App\Models\CmsDepartment;
 use App\Models\CmsStudent;
 use App\Models\SiteSetting;
@@ -13,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -27,6 +30,9 @@ class StudentRegistrationController extends Controller
     {
         $departments = CmsDepartment::query()
             ->whereNull('deleted_at')
+            ->whereHas('levels', function ($query) {
+                $query->whereNull('deleted_at');
+            })
             ->orderBy('name')
             ->with(['levels' => function ($query) {
                 $query->whereNull('deleted_at')->orderBy('year')->orderBy('section');
@@ -53,7 +59,9 @@ class StudentRegistrationController extends Controller
      *
      * Creates the user + CmsStudent profile in a single transaction.
      * The student is created with status `pending`; an admin must approve
-     * before the student is considered active. No enrollments are created here.
+     * before the student can pick subjects. No enrollments are created here.
+     * Notification emails are queued after the transaction commits, so a mail
+     * outage can never roll back the account.
      */
     public function store(RegisterStudentRequest $request): RedirectResponse
     {
@@ -90,10 +98,10 @@ class StudentRegistrationController extends Controller
             event(new Registered($user));
 
             Auth::login($user);
-
-            $this->notifyAdmin($data['name'], $data['email']);
-            $this->notifyStudent($data['name'], $data['email']);
         });
+
+        $this->notifyAdmin($data['name'], $data['email']);
+        $this->notifyStudent($data['name'], $data['email']);
 
         return to_route('dashboard');
     }
@@ -106,18 +114,12 @@ class StudentRegistrationController extends Controller
         $adminEmail = SiteSetting::where('key', 'contact_email')->value('value') ?: 'info@mhcst.ly';
 
         try {
-            Mail::raw(
-                "A new student registration is pending approval.\n\n".
-                "Name:  {$studentName}\n".
-                "Email: {$studentEmail}\n\n".
-                'Please log in to the CMS to review and approve or reject this registration.',
-                function ($message) use ($adminEmail, $studentName): void {
-                    $message->to($adminEmail)
-                        ->subject("New Student Registration Pending: {$studentName}");
-                }
-            );
-        } catch (\Throwable) {
-            // Silence mail errors in development / unconfigured SMTP
+            Mail::to($adminEmail)->send(new StudentRegistrationPendingMail($studentName, $studentEmail));
+        } catch (\Throwable $exception) {
+            Log::warning('student registration admin notice failed', [
+                'email' => $adminEmail,
+                'error' => $exception->getMessage(),
+            ]);
         }
     }
 
@@ -127,18 +129,12 @@ class StudentRegistrationController extends Controller
     private function notifyStudent(string $studentName, string $studentEmail): void
     {
         try {
-            Mail::raw(
-                "مرحباً {$studentName}،\n\n".
-                "تم استلام طلب تسجيلك بنجاح. سيقوم فريقنا بمراجعة طلبك والرد عليك في أقرب وقت.\n\n".
-                "بمجرد الموافقة على طلبك، ستتمكن من اختيار المواد الدراسية الخاصة بك.\n\n".
-                'شكراً لتسجيلك.',
-                function ($message) use ($studentEmail, $studentName): void {
-                    $message->to($studentEmail, $studentName)
-                        ->subject('تم استلام طلب التسجيل – مركز مهكست التدريبي');
-                }
-            );
-        } catch (\Throwable) {
-            // Silence mail errors in development / unconfigured SMTP
+            Mail::to($studentEmail, $studentName)->send(new StudentWelcomeMail($studentName));
+        } catch (\Throwable $exception) {
+            Log::warning('student registration welcome mail failed', [
+                'email' => $studentEmail,
+                'error' => $exception->getMessage(),
+            ]);
         }
     }
 }

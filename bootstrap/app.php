@@ -5,6 +5,7 @@ use App\Http\Middleware\EnsureCmsAccess;
 use App\Http\Middleware\EnsureCmsManage;
 use App\Http\Middleware\EnsureDashboardAccess;
 use App\Http\Middleware\EnsureHasDashboardRole;
+use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Console\Scheduling\Schedule;
@@ -33,6 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             SetLocale::class,
+            EnsureUserIsActive::class,
         ]);
 
         $middleware->alias([

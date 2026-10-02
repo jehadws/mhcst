@@ -1,6 +1,8 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Mail\StudentRegistrationPendingMail;
+use App\Mail\StudentWelcomeMail;
 use App\Models\CmsDepartment;
 use App\Models\CmsLevel;
 use App\Models\CmsStudent;
@@ -81,6 +83,10 @@ test('happy path creates user, student role, and pending cms student in one tran
     expect($student->enrollments()->count())->toBe(0);
 
     Event::assertDispatched(Registered::class);
+
+    // Notification emails are queued after the transaction commits
+    Mail::assertQueued(StudentWelcomeMail::class);
+    Mail::assertQueued(StudentRegistrationPendingMail::class);
 });
 
 test('registration logs the user in after successful signup', function () {

@@ -8,7 +8,10 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -71,6 +74,16 @@ class AppServiceProvider extends ServiceProvider
                 ->causedBy($event->user)
                 ->withProperties(['ip' => request()?->ip()])
                 ->log('auth.password_reset');
+        });
+
+        // Queued jobs (notification emails today) must never fail silently:
+        // log every exhausted attempt so admins can spot delivery problems.
+        Queue::failing(function (JobFailed $event): void {
+            Log::error('queue.job_failed', [
+                'job' => $event->job->resolveName(),
+                'queue' => $event->job->getQueue(),
+                'error' => $event->exception->getMessage(),
+            ]);
         });
     }
 }

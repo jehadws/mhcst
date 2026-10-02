@@ -16,6 +16,7 @@ interface RegistrationSubject {
     name: string;
     credits: number;
     has_lab: boolean;
+    seats_remaining: number | null;
 }
 
 interface RegistrationEntry {
@@ -54,6 +55,10 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
         if (!canSubmit) {
             return;
         }
+        const subject = subjects.find((s) => s.id === id);
+        if (subject?.seats_remaining === 0) {
+            return;
+        }
         setSelected((current) => (current.includes(id) ? current.filter((s) => s !== id) : [...current, id]));
     };
 
@@ -87,11 +92,11 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
         const label = enrollmentStatusLabel(c, status);
         switch (status) {
             case 'pending':
-                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">{label}</span>;
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-warning/10 text-warning">{label}</span>;
             case 'active':
-                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">{label}</span>;
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-success/10 text-success">{label}</span>;
             default:
-                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">{label}</span>;
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground">{label}</span>;
         }
     };
 
@@ -103,15 +108,15 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={reg.title} />
-            <div className="space-y-6 px-4 py-6">
-                <div>
-                    <h1 className="text-2xl font-semibold tracking-tight">{reg.title}</h1>
-                    <p className="text-sm text-muted-foreground mt-1">{reg.subtitle}</p>
+            <div className="space-y-6 px-6 py-6">
+                <div className="flex flex-col gap-2">
+                    <h1 className="font-display text-3xl font-extrabold leading-snug tracking-tight">{reg.title}</h1>
+                    <p className="text-sm text-muted-foreground">{reg.subtitle}</p>
                 </div>
 
                 {blockedMessage && (
-                    <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
-                        <Info className="w-4 h-4 mt-0.5 shrink-0" />
+                    <div className="flex items-start gap-3 rounded-xl border border-warning/20 bg-warning/10 p-4 text-sm text-warning">
+                        <Info className="w-4 h-4 mt-1 shrink-0" />
                         <p>{blockedMessage}</p>
                     </div>
                 )}
@@ -131,22 +136,24 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {subjects.length === 0 ? (
-                                <p className="text-sm text-muted-foreground py-8 text-center">{reg.empty}</p>
+                                <p className="text-sm text-muted-foreground py-10 text-center">{reg.empty}</p>
                             ) : (
                                 <div className="space-y-2">
                                     {subjects.map((subject) => {
                                         const checked = selected.includes(subject.id);
+                                        const isFull = subject.seats_remaining === 0;
+                                        const selectable = canSubmit && !isFull;
 
                                         return (
                                             <label
                                                 key={subject.id}
                                                 className={`flex items-center gap-3 rounded-xl border p-3 text-sm transition-colors ${
                                                     checked ? 'border-primary bg-primary/5' : 'bg-background hover:bg-muted/50'
-                                                } ${canSubmit ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
+                                                } ${selectable ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
                                             >
                                                 <Checkbox
                                                     checked={checked}
-                                                    disabled={!canSubmit}
+                                                    disabled={!selectable}
                                                     onCheckedChange={() => toggle(subject.id)}
                                                 />
                                                 <span className="flex-1 min-w-0">
@@ -154,10 +161,19 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
                                                     <span className="text-muted-foreground ms-2">({subject.code})</span>
                                                 </span>
                                                 {subject.has_lab && (
-                                                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300">
+                                                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-info/10 text-info">
                                                         {reg.lab}
                                                     </span>
                                                 )}
+                                                {isFull ? (
+                                                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive whitespace-nowrap">
+                                                        {reg.seatsFull}
+                                                    </span>
+                                                ) : subject.seats_remaining !== null ? (
+                                                    <span className="text-muted-foreground whitespace-nowrap text-xs">
+                                                        {reg.seatsRemaining.replace('{count}', String(subject.seats_remaining))}
+                                                    </span>
+                                                ) : null}
                                                 <span className="text-muted-foreground whitespace-nowrap">
                                                     {subject.credits} {reg.credits}
                                                 </span>
@@ -191,7 +207,7 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
                         </CardHeader>
                         <CardContent className="space-y-2">
                             {registrations.length === 0 ? (
-                                <p className="text-sm text-muted-foreground py-8 text-center">{c.common.noRecords}</p>
+                                <p className="text-sm text-muted-foreground py-10 text-center">{c.common.noRecords}</p>
                             ) : (
                                 registrations.map((entry) => (
                                     <div key={entry.id} className="flex items-center justify-between gap-3 rounded-xl border p-3 text-sm">

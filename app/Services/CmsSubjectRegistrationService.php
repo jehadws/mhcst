@@ -6,8 +6,10 @@ use App\Models\CmsAuditLog;
 use App\Models\CmsEnrollment;
 use App\Models\CmsStudent;
 use App\Models\CmsSubject;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class CmsSubjectRegistrationService
@@ -22,6 +24,7 @@ class CmsSubjectRegistrationService
 
     public function __construct(
         private CmsAcademicSettingsService $academicSettings,
+        private CmsEnrollmentCapacityService $capacity,
         private RegistrationStatusNotifier $registrationNotifier,
     ) {}
 
@@ -128,6 +131,20 @@ class CmsSubjectRegistrationService
                     'subject_ids' => "You are already registered for {$subject->code}.",
                 ]);
             }
+
+            // Pending picks do not consume seats, but a full section can only
+            // shrink — picking into it would create a guaranteed rejection.
+            $level = $student->level;
+
+            if ($level !== null) {
+                $remaining = $this->capacity->seatsRemaining($level, (int) $subject->id, $academicYear, $semester);
+
+                if ($remaining !== null && $remaining <= 0) {
+                    throw ValidationException::withMessages([
+                        'subject_ids' => "مادة {$subject->code} ({$subject->name}): الشعبة مكتملة العدد حالياً. يمكنك اختيار مادة أخرى أو التواصل مع إدارة الكلية.",
+                    ]);
+                }
+            }
         }
 
         $registered = 0;
@@ -153,15 +170,26 @@ class CmsSubjectRegistrationService
                         'enrollment_date' => now(),
                     ]);
                 } else {
-                    CmsEnrollment::create([
-                        'student_id' => $student->id,
-                        'subject_id' => $subject->id,
-                        'academic_year' => $academicYear,
-                        'semester' => $semester,
-                        'enrollment_date' => now(),
-                        'status' => 'pending',
-                        'source' => 'self',
-                    ]);
+                    try {
+                        CmsEnrollment::create([
+                            'student_id' => $student->id,
+                            'subject_id' => $subject->id,
+                            'academic_year' => $academicYear,
+                            'semester' => $semester,
+                            'enrollment_date' => now(),
+                            'status' => 'pending',
+                            'source' => 'self',
+                        ]);
+                    } catch (QueryException $exception) {
+                        // A concurrent identical submission wins the unique index.
+                        if (CmsEnrollmentCapacityService::isDuplicateEnrollmentViolation($exception)) {
+                            throw ValidationException::withMessages([
+                                'subject_ids' => "أنت مسجل بالفعل في مادة {$subject->code} لنفس الفصل الدراسي.",
+                            ]);
+                        }
+
+                        throw $exception;
+                    }
                 }
 
                 $registered++;
@@ -192,39 +220,73 @@ class CmsSubjectRegistrationService
     /**
      * Approve pending self-registered enrollments in bulk. Only rows that are
      * currently `pending` are flipped to `active`; anything already handled is
-     * left untouched. Each flipped registration notifies the student by email.
-     * Returns the number of enrollments approved.
+     * left untouched. Each row is capacity-checked under the level row lock
+     * inside one transaction, so approval can never overflow a section —
+     * over-capacity rows stay `pending` and are reported as skipped. Each
+     * approved registration notifies the student by email after the commit.
      *
      * @param  list<int>  $enrollmentIds
+     * @return array{approved: int, skipped: list<string>}
      */
-    public function approveRegistrations(array $enrollmentIds): int
+    public function approveRegistrations(array $enrollmentIds): array
     {
         $enrollmentIds = array_values(array_unique(array_map('intval', $enrollmentIds)));
 
         if ($enrollmentIds === []) {
-            return 0;
+            return ['approved' => 0, 'skipped' => []];
         }
 
         $flipped = CmsEnrollment::query()
             ->whereIn('id', $enrollmentIds)
             ->where('status', 'pending')
-            ->with(['student', 'subject'])
+            ->with(['student.level', 'subject'])
             ->get();
 
         if ($flipped->isEmpty()) {
-            return 0;
+            return ['approved' => 0, 'skipped' => []];
         }
 
-        CmsEnrollment::query()
-            ->whereIn('id', $flipped->pluck('id'))
-            ->update(['status' => 'active']);
+        $approved = collect();
+        $skipped = [];
 
-        $flipped->each(function (CmsEnrollment $enrollment): void {
-            $enrollment->status = 'active';
-            $this->registrationNotifier->notifyApproved($enrollment);
+        DB::transaction(function () use ($flipped, $approved, &$skipped): void {
+            foreach ($flipped as $enrollment) {
+                $level = $enrollment->student?->level;
+
+                try {
+                    if ($level !== null) {
+                        $this->capacity->assertSeatAvailable(
+                            $level,
+                            (int) $enrollment->subject_id,
+                            (string) $enrollment->academic_year,
+                            (string) $enrollment->semester,
+                        );
+                    }
+                } catch (ValidationException) {
+                    // Approval can never overflow a section: leave the pick
+                    // pending and report it to the admin.
+                    $skipped[] = $enrollment->subject?->code ?? (string) $enrollment->subject_id;
+
+                    continue;
+                }
+
+                $enrollment->update(['status' => 'active']);
+                $approved->push($enrollment);
+            }
         });
 
-        return $flipped->count();
+        foreach ($approved as $enrollment) {
+            try {
+                $this->registrationNotifier->notifyApproved($enrollment);
+            } catch (\Throwable $exception) {
+                Log::warning('registration approval notification failed', [
+                    'enrollment_id' => $enrollment->id,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
+        }
+
+        return ['approved' => $approved->count(), 'skipped' => $skipped];
     }
 
     /**

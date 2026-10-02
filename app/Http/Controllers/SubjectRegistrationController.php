@@ -6,6 +6,7 @@ use App\Models\CmsEnrollment;
 use App\Models\CmsStudent;
 use App\Models\CmsSubject;
 use App\Services\CmsAcademicSettingsService;
+use App\Services\CmsEnrollmentCapacityService;
 use App\Services\CmsSubjectRegistrationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -41,6 +42,7 @@ class SubjectRegistrationController extends Controller
         Request $request,
         CmsSubjectRegistrationService $service,
         CmsAcademicSettingsService $academicSettings,
+        CmsEnrollmentCapacityService $capacity,
     ): Response {
         $student = CmsStudent::query()
             ->where('user_id', $request->user()->id)
@@ -48,8 +50,10 @@ class SubjectRegistrationController extends Controller
 
         $term = $academicSettings->currentTerm();
 
+        $termConfigured = $term['academic_year'] !== null && $term['semester'] !== null;
+
         $registrations = collect();
-        if ($term['academic_year'] !== null && $term['semester'] !== null) {
+        if ($termConfigured) {
             $registrations = CmsEnrollment::query()
                 ->where('student_id', $student->id)
                 ->where('academic_year', $term['academic_year'])
@@ -67,6 +71,9 @@ class SubjectRegistrationController extends Controller
                     'name' => $subject->name,
                     'credits' => $subject->credits,
                     'has_lab' => $subject->has_lab,
+                    'seats_remaining' => $student->level !== null && $termConfigured
+                        ? $capacity->seatsRemaining($student->level, $subject->id, (string) $term['academic_year'], (string) $term['semester'])
+                        : null,
                 ])
                 ->values(),
             'registrations' => $registrations

@@ -22,7 +22,7 @@ class StoreEnrollmentRequest extends FormRequest
             'subject_id' => ['required', Rule::exists('cms_subjects', 'id')->whereNull('deleted_at')],
             'academic_year' => ['required', 'string', 'max:20'],
             'semester' => ['required', 'in:first,second,summer'],
-            'status' => ['required', 'in:active,dropped,completed'],
+            'status' => ['required', 'in:pending,active,dropped,completed'],
         ];
     }
 
@@ -50,13 +50,13 @@ class StoreEnrollmentRequest extends FormRequest
                 ->exists();
 
             if ($duplicate) {
-                $validator->errors()->add('student_id', 'This student is already enrolled in this subject for the selected term.');
+                $validator->errors()->add('student_id', 'This student is already enrolled in this subject for the selected term. — هذا الطالب مسجل بالفعل في هذه المادة لنفس الفصل الدراسي.');
             }
 
             $student = CmsStudent::with('level')->find($studentId);
 
             if ($student && $student->status !== 'active') {
-                $validator->errors()->add('student_id', 'Only active students can be enrolled.');
+                $validator->errors()->add('student_id', 'Only active students can be enrolled. — لا يمكن تسجيل الطلاب غير النشطين.');
             }
 
             if ($student?->level && $this->input('status') === 'active') {
@@ -73,7 +73,7 @@ class StoreEnrollmentRequest extends FormRequest
                     ->count();
 
                 if ($enrolledInSection >= $student->level->capacity) {
-                    $validator->errors()->add('subject_id', 'This section has reached maximum capacity for this subject.');
+                    $validator->errors()->add('subject_id', 'This section has reached maximum capacity for this subject. — هذه الشعبة مكتملة العدد لهذه المادة.');
                 }
             }
         });

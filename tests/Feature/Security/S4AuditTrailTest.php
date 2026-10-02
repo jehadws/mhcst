@@ -122,6 +122,7 @@ test('passwords never appear in any cms audit log json column', function () {
         'status' => 'active',
         'create_user_account' => true,
         'password' => $secretPassword,
+        'password_confirmation' => $secretPassword,
         'user' => [
             'password' => $secretPassword,
         ],
