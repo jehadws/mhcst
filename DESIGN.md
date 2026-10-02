@@ -260,6 +260,28 @@ Permitted ONLY via semantic aliases (from §2.1–§2.7):
 Exception for brand-preservation (use sparingly, and document why):
 - A third-party brand color (WhatsApp green, Facebook blue, X/Twitter black) may be written as an inline `bg-[oklch(...)]` ONLY when you must match the brand's canonical hue and using a semantic token would mislead (e.g. our `--success` is a slightly-different green than WhatsApp brand green; if we used `--success` on the WhatsApp button it would visually "read as MHCST success" not "read as WhatsApp chat"). Write a code comment beside every such inline OKLCH explaining the brand-preservation reason.
 
+### 2.12 Photo overlay opacity (Deliberate rule, 2026-09-30)
+
+One knob governs **every** alpha painted over photography on the marketing
+site. Defined in `resources/css/app.css` `:root`:
+
+```css
+--photo-overlay: 0.25; /* range 0–1, design cap 0.30 */
+```
+
+| Utility class | What it does | Used by |
+|---------------|--------------|---------|
+| `.photo-scrim` | Flat `--hero`-colored scrim over a photo | available for full-bleed photo washes (none on the site today) |
+| `.photo-gradient` | Bottom-weighted `--hero` gradient (100% / 80% / 55% of the knob) | Hero slides, DepartmentsShowcase cards |
+| `.photo-veil` | Element `opacity` for a photo used as a faint texture | About panel, CtaBanner, PageHero |
+
+Rules:
+- ❌ Never hardcode an overlay alpha over a photo (`bg-hero/70`, `opacity-15`,
+  `bg-black/40` scrims). Components reference one of the three classes only.
+- ✅ Tune globally by editing `--photo-overlay`; keep it ≤ `0.30`.
+- Not covered by the knob (UI chrome, not photo washes): badge chips such as
+  the news-card play button, glass nav surfaces, and dialog backdrops.
+
 ---
 
 ## 3. Spacing (8dp Base Rhythm)
@@ -316,6 +338,7 @@ compact utility sections get the smaller tiers.
 | `section-md` | `py-20` | 80px  | Standard feature sections, contact, departments showcase, footer, blog/news section |
 | `section-lg` | `py-28` | 112px | Primary sections: Departments Showcase, Application Steps, Scholarships, About, Accreditation, Partnerships, Features Grid, Testimonials, Why Us, Blog Posts section, Hero bands — all major content sections |
 | `section-xl` | `py-32` | 128px | Hero page-bottom spacing, premium showcase only — *not* default for marketing sections |
+| `section-content` | `py-10 sm:py-14 lg:py-[70px]` | 40→56→70px | **Added 2026-10-02.** Content sections that carry tall interactive media panels (accordion grids, carousels, ledgers) on the post-reduction home page: About, Departments Showcase, Application Steps, Accreditation. The three-step ramp keeps mobile compact while landing at 70px on desktop — deliberately between `section-sm` (80) minus footer breathing and `section-lg` (112) which the slimmer post-2026-10 home no longer needs everywhere. Sections using this tier MUST alternate their band (see §11.1) since 70px is tighter than the old 112px rhythm. |
 
 **Default drift corrected (2026-09-30):**
 
@@ -593,7 +616,7 @@ Total files audited and restyled: 19.
 | KPI delta up (enrollment/attendance up arrows) | ❌ `text-emerald-600 dark:text-emerald-400` | ✅ `text-success` | dashboard/index.tsx |
 | KPI delta down (absent arrows) | ❌ `text-red-600 dark:text-red-400` | ✅ `text-destructive` | dashboard/index.tsx |
 | Recharts dashboard stopColors | ❌ `COLORS.emerald` hardcoded hexes in JS | ✅ `var(--color-success)` via CSS vars in JS COLORS object | dashboard/index.tsx |
-| Floating WhatsApp green | ❌ `bg-emerald-500 shadow-emerald-500/30` = product emerald class reused for brand identity | ✅ Brand-preserving inline OKLCH: `bg-[oklch(0.68_0.20_145)] hover:bg-[oklch(0.62_0.19_145)]` + `shadow-xl` tier. Why: our product `--success` is a *different* green than WhatsApp brand — mixing them would read as "product success action" rather than "WhatsApp chat". Brand-preservation exception per §2.11 | FloatingButtons |
+| Floating WhatsApp green | ❌ `bg-emerald-500 shadow-emerald-500/30` = product emerald class reused for brand identity | ✅ **Updated (2026-09-30, after restyle, per product direction): brand navy + gold** — `bg-hero text-accent` + `shadow-xl`. The interim brand-preserving WhatsApp-green inline OKLCH (`bg-[oklch(0.68_0.20_145)]`) is retired; the FAB now reads as MHCST chrome (navy in both themes, gold MessageCircle icon), not as WhatsApp brand green. §2.11's third-party-brand-exception rule still stands for future cases. | FloatingButtons |
 | Partnership tiles / About bullets / Accreditation labels using `text-primary` for body label text | ❌ `text-primary` on bullets, partnership tile names, accreditation body labels → too much brand color on neutral copy, body text visually read as links instead of labels | ✅ `text-foreground` for body labels; keep `text-primary` for actual links + emphasized headings only | About, Partnerships, Accreditation |
 | ApplicationSteps big decorative 1./2./3. display numerals | ❌ `text-secondary` (surface token abused as "faint gray text") | ✅ `text-primary/20` (20% transparent brand color = decorative wash that keeps hue coherence, and `--secondary` stays for its intended use: soft section bands) | ApplicationSteps |
 
@@ -691,5 +714,150 @@ For every file you edit, tick each row only after you visually verified the outp
 - [ ] Every `<h1>` and `<h2>` page/section title visually compared to §8.6 deliberate pattern for the 17 marketing homescreen files.
 - [ ] RTL Arabic pass: switch locale to `ar`, confirm `tabular-nums` still aligns, confirm `gap-1.5` still looks uncrowded for Arabic descenders.
 - [ ] Light + dark theme pass: switch theme to `.dark`, confirm shadows tinted navy correctly (centralized, no per-component overrides needed), confirm delta `text-success` / `text-destructive` still have ≥4.5:1 contrast.
+
+---
+
+## 11. Home Page Anatomy — Anti-Slop Redesign Wave (2026-10-02)
+
+Context: the home page was slimmed down (legacy blog-posts-section, stats bar, page-hero,
+features grid, testimonials, scholarships, partnerships removed from the home route) and
+Hero, Departments Showcase, Why Us, About, News and CTA Banner were rebuilt in an
+editorial/panel design language. Two sections still carried the templated
+"centered header + 3-card grid" AI fingerprint — **ApplicationSteps** and **Accreditation** —
+and were redesigned this wave. This section records the resulting page anatomy and the
+deliberate patterns future home-page work must follow.
+
+### 11.1 Current section inventory (DOM order, `welcome.tsx`)
+
+| # | Section (component) | Band | Section padding | Structural pattern |
+|---|---------------------|------|-----------------|--------------------|
+| 1 | Hero | `bg-hero` full-bleed | `min-h-[max(420px,60svh)] sm:min-h-screen` | Slide carousel; bottom-anchored title; tab-strip nav on `md+`, dots + hazard stripe on mobile |
+| 2 | DepartmentsShowcase | `bg-muted` | `section-content` | Split header (title start / accent CTA end) + edge-bleed carousel of DepartmentCards + prev/next icon buttons |
+| 3 | WhyUs | `bg-background` wrapping a `bg-hero` rounded panel | panel wrapper `py-[10px] sm:py-[42px]` | Full-width navy panel: centered header, glass tile list + offset photo with tilted accent shapes, highlights footer strip |
+| 4 | ApplicationSteps | `bg-background` | `section-content` | **Editorial rail + staircase ledger** (see §11.2): sticky header rail, numbered steps indent progressively in reading direction |
+| 5 | About (campus) | `bg-background` | `section-content` | Split header + navy stats panel + accordion expanding image grid |
+| 6 | FixedVideoSection | full-bleed media | `h-[80svh]` (60svh mobile) | Fixed-attachment campus video, custom play/captions controls |
+| 7 | Accreditation | `bg-muted` | `section-content` | **Asymmetric header + hairline register panel** (see §11.2) |
+| 8 | NewsCarousel | `bg-background` | `py-20` (`section-md`) | Split header + center-mode carousel of tall image cards + prev/next |
+| 9 | CtaBanner | `bg-background` | `pb-28` only | Card panel: eyebrow + accent dash, title, description, primary button end-aligned |
+
+Band rhythm rule: consecutive `bg-background` sections must differ structurally (panel /
+split / ledger), and `bg-muted` or full-bleed media bands must separate long background
+runs — this is what replaced the old uniform "white section after white section" look.
+
+### 11.2 New deliberate patterns (required for future home-page sections)
+
+1. **Editorial split header — two approved forms.** The centered header is no longer the
+   default for home sections. Use one of:
+   - **Rail form** (ApplicationSteps): header column with eyebrow + accent dash
+     (`text-sm font-bold text-accent` + `h-0.5 w-8 bg-accent rounded-full`), display title
+     with accent word, description `max-w-md`, CTA button — column is `lg:sticky lg:top-24`
+     beside the content. Same voice as CtaBanner's eyebrow + dash.
+   - **Register form** (Accreditation): title start-aligned (`max-w-2xl`) with the
+     description end-aligned on the opposite side, bottom edges aligned via
+     `flex flex-wrap items-end justify-between` (About/DepartmentsShowcase header DNA).
+2. **Staircase ledger.** Ordered lists of 3–5 steps render as full-width rows separated by
+   `border-t border-border` hairlines, with progressive indent in the reading direction
+   (`lg:ps-12`, `lg:ps-24`; mirrored automatically in RTL via logical properties). Rows
+   carry a ghost ordinal + title + description; no icons, no card boxes.
+3. **Ghost ordinals.** `font-display text-primary/20 font-extrabold tabular-nums` numerals
+   (`01`, `02`, … via `String(n).padStart(2, '0')`), sized `text-5xl sm:text-6xl` in
+   ledgers, `text-3xl` in register cells. Interactive rows transition the ordinal to
+   `text-accent` on hover (`duration-300`, §6 easing).
+4. **Hairline register panel.** A group of peer items (accreditation bodies, legal lists)
+   renders as ONE panel — `bg-border` parent + `gap-px` grid of `bg-card` cells inside
+   `rounded-2xl border border-border overflow-hidden` — not sibling boxed cards. Same
+   trick already allowed for Features Grid in §5. Cells are start-aligned text, no icons.
+5. **Name + qualifier typesetting.** Institutional names carrying an em-dash qualifier
+   ("Ministry — Directorate") split at the em-dash: the name is `font-display text-lg
+   font-bold`, the qualifier is a muted `text-sm` second line. Never render the whole
+   string at one weight.
+6. **Easing.** All section-level transitions use `cubic-bezier(.22,1,.36,1)` (§6) via the
+   `ease-[cubic-bezier(.22,1,.36,1)]` utility, `motion-reduce:transition-none` alongside.
+
+### 11.3 Anti-slop removals (this wave)
+
+| Removed pattern | Why it was slop | Replacement |
+|-----------------|-----------------|-------------|
+| Centered title → 3 equal icon cards → centered button (ApplicationSteps) | The canonical AI landing-page section: perfectly symmetric, three equal columns, decorative icon chips | Sticky rail header + staircase ledger (§11.2.1/2) |
+| 3 centered circular-icon tiles (Accreditation) | Same symmetric template; icon circles repeated what the name already says | Register panel with typeset names (§11.2.4/5) |
+| Lucide chips `ClipboardCheck`/`FileText`/`Send` in navy squares | Decorative icons that duplicated the ordinal already shown | Typographic ordinals `01/02/03` |
+| Centered `max-w-3xl text-center` header on both sections | Every neighboring section already uses start-aligned split headers; centered headers only survive on genuinely symmetric sections (WhyUs panel) | Rail / register header forms |
+
+### 11.4 Slop-gate checklist for any NEW home section
+
+- [ ] No "centered header + symmetric N-column card grid" as the section's entire structure.
+- [ ] Header anatomy differs from the immediately neighboring sections (alternate rail /
+      register / panel forms); no two adjacent sections with identical headers.
+- [ ] The section declares exactly one band: `bg-background`, `bg-muted`, a `bg-hero`
+      panel, or full-bleed media — and the band rhythm of §11.1 still holds after insertion.
+- [ ] All numerals: `font-display` + `tabular-nums` + `text-primary/20` (accent on
+      interaction) per §2.9/§8.5.
+- [ ] Icons only where they carry information (controls, nav); never as decoration in
+      card corners.
+- [ ] Verified in both locales (AR RTL / EN LTR), both themes, and at 375px width.
+
+---
+
+## 12. Public Pages Wave (2026-10-02)
+
+Second anti-slop wave: all remaining public marketing pages brought under the §11
+language. Per-page inventory and the new rules introduced by it.
+
+### 12.1 Page inventory after the wave
+
+| Page (`pages/site/…`) | Pattern now |
+|-----------------------|-------------|
+| `about.tsx` | PageHero → pillars as gap-px register (§11.2.4) → values split w/ image + accent icon squares → milestones as hairline timeline strip → Testimonials → CtaBanner |
+| `departments.tsx` | PageHero → split header with live count → **academic register rows** (§12.2) incl. level chips + head/counts meta → Contact → CtaBanner |
+| `teachers.tsx` | PageHero → split header with count → **faculty directory ledger** (§12.2), alternating `sm:ps-14` row stagger → CtaBanner |
+| `faq.tsx` | PageHero → Faq accordion → CtaBanner (unchanged — already on-system) |
+| `blog/index.tsx` | PageHero → category chips + FeaturedNewsCard + NewsCard grid + pagination (unchanged) |
+| `blog/show.tsx` | PageHero → prose article; media frame `rounded-3xl` → `rounded-2xl` |
+| `contact.tsx` | PageHero → 5/7 split (image + contact cards / form card) → map section → Faq → CtaBanner (token pass, structure kept) |
+| `verify-certificate.tsx` | PageHero → search card → result/not-found cards (token pass; `font-serif`→`font-display`, raw `emerald-*`→`success`) |
+| `student/portal.tsx` | PageHero → search card → status-badged result cards (token pass; status badges = `success/info/warning/destructive`) |
+| `student/register.tsx` | **New page** (controller rendered a missing component): PageHero → grouped fieldset form (personal / placement / password) with department→level dependent selects + honeypot |
+| `static-page.tsx` | **Rebuilt**: was raw `gray-*` + `md:px-16` gutters + no footer → now PageHero + prose article + SiteFooter + FloatingButtons |
+
+### 12.2 Rules introduced by this wave
+
+1. **PageHero is the only public page header.** No page may hand-roll a centered navy
+   hero band (the departments/teachers pattern before this wave). PageHero carries
+   breadcrumb, title, description, accent dash.
+2. **Directory/register rows for people and departments.** Lists of teachers or academic
+   departments render as full-width `border-t border-b` ledger rows with ghost ordinals
+   (`01…`), name + role/description, and meta (chips, counts, links) end-aligned — never
+   3-col boxed icon cards. Optional alternating row indent (`sm:ps-14` on odd rows) adds
+   ledger rhythm without boxes.
+3. **Semantic data belongs in register rows.** Counts, department heads, level chips are
+   part of the row's meta column — surfacing data (e.g. department `levels` chips) beats
+   hiding it inside card bodies.
+4. **Status colors are semantic only.** Enrollment/academic status badges map:
+   completed → `success`, active/confirmed → `info`, pending → `warning`,
+   cancelled/dropped → `destructive`. Raw `emerald/blue/amber/indigo-*` are banned (§2.11).
+5. **Public forms use auth-style field treatment inside marketing cards.** `AuthField` /
+   `AuthPasswordField` components, fields grouped in bordered `fieldset`s with
+   `font-display` legends, the whole form in a `rounded-2xl border bg-card shadow-md`
+   card, submit = marketing CTA (`rounded-lg shadow-md`). Dependent selects disable with
+   an explanatory placeholder ("pick a department first").
+6. **Local imagery only.** Public pages use `/images/*.webp` assets — no external
+   Unsplash/CDN images in layout-critical positions.
+7. **Legal/static pages get the full chrome.** CMS-driven content pages (terms, privacy)
+   render inside PageHero + prose + SiteFooter like any other page.
+
+### 12.3 Slop removed this wave
+
+| Removed | Where | Replacement |
+|---------|-------|-------------|
+| Centered 3-pillar icon cards | About | gap-px register panel with ghost ordinals |
+| Centered 5-tile milestone grid | About | hairline timeline strip with ghost years |
+| Centered custom navy hero ×2 | Departments, Teachers | PageHero |
+| 3-col boxed icon cards ×2 | Departments, Teachers | register/directory ledger rows |
+| `font-serif` headings ×12 | Teachers, Contact, Verify, Portal | `font-display` per §7.5 |
+| `tracking-[0.2em]` ×2 | Teachers (old), Contact | `tracking-widest` per §1 |
+| `rounded-full` submit, `rounded-3xl` cards ×7 | Contact, Verify, Portal, Blog show | tier-correct radius per §4 |
+| Raw `emerald/blue/amber/indigo-*` | Verify, Portal | semantic status tokens |
+| Raw `gray-*` + missing footer | static-page | system tokens + full chrome |
 
 
