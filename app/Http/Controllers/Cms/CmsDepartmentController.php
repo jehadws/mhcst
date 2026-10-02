@@ -50,7 +50,13 @@ class CmsDepartmentController extends Controller
     {
         $this->cmsAuth->ensureCanManage(auth()->user());
 
-        CmsDepartment::create($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('departments', 'public');
+        }
+
+        CmsDepartment::create($data);
 
         return redirect()->route('cms.departments.index')->with('success', 'Department created successfully.');
     }
@@ -67,7 +73,16 @@ class CmsDepartmentController extends Controller
     {
         $this->cmsAuth->ensureCanManage(auth()->user());
 
-        $department->update($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('departments', 'public');
+        } else {
+            $department->updateImage($data['image'] ?? null, 'image');
+            $data['image'] = $department->image;
+        }
+
+        $department->update($data);
 
         return redirect()->route('cms.departments.index')->with('success', 'Department updated successfully.');
     }

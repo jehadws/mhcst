@@ -95,6 +95,24 @@ test('upload accepts banners folder used by legacy forms', function () {
         ->assertSuccessful();
 });
 
+test('upload accepts departments folder used by the department image uploader', function () {
+    Storage::fake('public');
+
+    $user = createAdminUser();
+    $file = UploadedFile::fake()->image('department.webp');
+
+    $response = $this->actingAs($user)
+        ->post(route('uploads.image'), [
+            'folder' => 'departments',
+            'file' => $file,
+        ])
+        ->assertSuccessful()
+        ->assertJsonStructure(['path', 'url']);
+
+    expect($response->json('path'))->toStartWith('departments/');
+    Storage::disk('public')->assertExists($response->json('path'));
+});
+
 test('upload returns json validation errors for invalid file type', function () {
     Storage::fake('public');
 

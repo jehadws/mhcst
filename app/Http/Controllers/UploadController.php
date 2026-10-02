@@ -19,6 +19,7 @@ class UploadController extends Controller
         'banners',
         'courses',
         'instructors',
+        'departments',
     ];
 
     /** @var list<string> */

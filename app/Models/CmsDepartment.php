@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasAuditable;
+use App\Traits\HasImage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,12 +12,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CmsDepartment extends Model
 {
-    use HasAuditable, SoftDeletes;
+    use HasAuditable, HasImage, SoftDeletes;
+
+    protected string $imageField = 'image';
 
     protected $fillable = [
         'name',
         'head_id',
         'description',
+        'image',
     ];
 
     public function head(): BelongsTo
