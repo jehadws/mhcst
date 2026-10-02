@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { dictionary, type Dictionary, type Locale } from '@/data/i18n'
 
@@ -48,8 +48,9 @@ export function SiteProvider({ children, initialLocale, initialDirection }: Site
         }
     }, [])
 
-    // Locale: sync <html> instantly
-    useEffect(() => {
+    // Locale: sync <html> instantly. Runs in the layout phase so the
+    // direction is committed before child passive effects (embla) measure.
+    useLayoutEffect(() => {
         const html = document.documentElement
         html.lang = locale
         html.dir = locale === 'ar' ? 'rtl' : 'ltr'
