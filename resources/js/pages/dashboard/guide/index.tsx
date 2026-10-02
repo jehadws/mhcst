@@ -10,12 +10,12 @@ import { ArrowRight, BookOpen, CircleHelp, KeyRound, Layers, ListOrdered } from 
 
 function StepList({ steps, numbered = true }: { steps: string[]; numbered?: boolean }) {
     return (
-        <ol className={numbered ? 'list-decimal space-y-3 ps-5 text-sm leading-relaxed' : 'list-none space-y-3 ps-0 text-sm leading-relaxed'}>
+        <ol className={numbered ? 'list-decimal space-y-3 ps-5 text-sm leading-normal' : 'list-none space-y-3 ps-0 text-sm leading-normal'}>
             {steps.map((step, index) => (
                 <li key={step} className="text-foreground/90">
                     {numbered ? step : (
                         <span className="flex gap-2">
-                            <span className="text-primary mt-0.5 shrink-0 font-semibold">•</span>
+                            <span className="text-primary mt-1 shrink-0 font-semibold">•</span>
                             <span>{step}</span>
                         </span>
                     )}
@@ -68,9 +68,9 @@ export default function DashboardGuidePage() {
                 <div className="flex flex-col gap-2">
                     <div className="text-primary flex items-center gap-2">
                         <BookOpen className="size-6" aria-hidden="true" />
-                        <h1 className="text-2xl font-bold tracking-tight">{guide.title}</h1>
+                        <h1 className="font-display text-3xl font-extrabold leading-snug tracking-tight">{guide.title}</h1>
                     </div>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{guide.subtitle}</p>
+                    <p className="text-muted-foreground text-sm leading-normal">{guide.subtitle}</p>
                     {roles.length > 0 && (
                         <div className="flex flex-wrap items-center gap-2 pt-1">
                             <span className="text-muted-foreground text-xs">{locale === 'ar' ? 'دورك:' : 'Your role:'}</span>
@@ -85,14 +85,14 @@ export default function DashboardGuidePage() {
 
                 <Card className="border-primary/30 bg-primary/5">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-lg">
+                        <CardTitle className="flex items-center gap-2">
                             <Layers className="size-5" aria-hidden="true" />
                             {guide.intro.title}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         {guide.intro.paragraphs.map((paragraph) => (
-                            <p key={paragraph} className="text-sm leading-relaxed">
+                            <p key={paragraph} className="text-sm leading-normal">
                                 {paragraph}
                             </p>
                         ))}
@@ -101,21 +101,21 @@ export default function DashboardGuidePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-lg">
+                        <CardTitle className="flex items-center gap-2">
                             <KeyRound className="size-5" aria-hidden="true" />
                             {guide.loginSteps.title}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <StepList steps={guide.loginSteps.steps} />
-                        <p className="text-muted-foreground mt-4 text-xs leading-relaxed">{guide.sidebarNote}</p>
+                        <p className="text-muted-foreground mt-4 text-xs leading-normal">{guide.sidebarNote}</p>
                     </CardContent>
                 </Card>
 
                 {myQuickStarts.map((quickStart) => (
                     <Card key={quickStart.title} className="border-primary/40 shadow-sm">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2 text-lg">
+                            <CardTitle className="flex items-center gap-2">
                                 <ListOrdered className="size-5" aria-hidden="true" />
                                 {quickStart.title}
                             </CardTitle>
@@ -128,7 +128,7 @@ export default function DashboardGuidePage() {
                             {quickStart.tips && quickStart.tips.length > 0 && (
                                 <div className="bg-muted/50 rounded-lg p-3">
                                     <p className="mb-2 text-xs font-medium">{locale === 'ar' ? 'ملاحظة' : 'Note'}</p>
-                                    <ul className="text-muted-foreground space-y-1 text-xs leading-relaxed">
+                                    <ul className="text-muted-foreground space-y-1 text-xs leading-normal">
                                         {quickStart.tips.map((tip) => (
                                             <li key={tip}>{tip}</li>
                                         ))}
@@ -143,7 +143,7 @@ export default function DashboardGuidePage() {
                 {visibleRoleExplanations.length > 0 && (
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-lg">{guide.rolesExplained.title}</CardTitle>
+                            <CardTitle>{guide.rolesExplained.title}</CardTitle>
                             <CardDescription>{guide.rolesExplained.description}</CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -163,14 +163,14 @@ export default function DashboardGuidePage() {
                     {sections.map((section) => (
                         <Card key={section.id}>
                             <CardHeader>
-                                <CardTitle className="text-base">{section.title}</CardTitle>
+                                <CardTitle>{section.title}</CardTitle>
                                 <CardDescription>{section.description}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <StepList steps={section.steps} numbered={section.id === 'college-workflow'} />
                                 {section.tips && section.tips.length > 0 && (
                                     <div className="bg-muted/50 rounded-lg p-3">
-                                        <p className="text-muted-foreground space-y-1 text-xs leading-relaxed">
+                                        <p className="text-muted-foreground space-y-1 text-xs leading-normal">
                                             {section.tips.map((tip) => (
                                                 <span key={tip} className="block">
                                                     {tip}
@@ -188,7 +188,7 @@ export default function DashboardGuidePage() {
                 {showDemo && (
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-lg">{guide.demoTitle}</CardTitle>
+                            <CardTitle>{guide.demoTitle}</CardTitle>
                             <CardDescription>{guide.demoPassword}</CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -203,7 +203,7 @@ export default function DashboardGuidePage() {
                                     <tbody>
                                         {guide.demoAccounts.map((account) => (
                                             <tr key={account.email} className="border-b last:border-0">
-                                                <td className="py-2 pe-4 font-mono text-xs">{account.email}</td>
+                                                <td className="py-2 pe-4 text-xs">{account.email}</td>
                                                 <td className="py-2">{account.role}</td>
                                             </tr>
                                         ))}
@@ -215,7 +215,7 @@ export default function DashboardGuidePage() {
                 )}
 
                 <p className="text-muted-foreground flex items-start gap-2 text-xs">
-                    <CircleHelp className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                    <CircleHelp className="mt-1 size-4 shrink-0" aria-hidden="true" />
                     {locale === 'ar'
                         ? 'ما زلت بحاجة لمساعدة؟ تواصل مع مدير النظام (Admin) في الكلية.'
                         : 'Still stuck? Contact your college Admin — they manage accounts and access.'}

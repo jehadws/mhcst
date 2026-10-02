@@ -91,9 +91,9 @@ export default function LeadsListPage({ leads }: { leads: Lead[] }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={d.entities.lead.plural} />
-            <div className="flex flex-col gap-4 p-4">
-                <div>
-                    <h1 className="text-2xl font-bold">{d.entities.lead.plural}</h1>
+            <div className="flex flex-col gap-6 p-6">
+                <div className="flex flex-col gap-2">
+                    <h1 className="font-display text-3xl font-extrabold leading-snug">{d.entities.lead.plural}</h1>
                     <p className="text-muted-foreground text-sm">{d.entities.lead.description}</p>
                 </div>
                 <DataTable columns={columns} data={leads} />

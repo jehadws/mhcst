@@ -84,21 +84,21 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
         const label = enrollmentStatusLabel(c, status);
         switch (status) {
             case 'pending':
-                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">{label}</span>;
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-warning/10 text-warning">{label}</span>;
             case 'active':
-                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">{label}</span>;
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-success/10 text-success">{label}</span>;
             case 'completed':
-                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">{label}</span>;
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">{label}</span>;
             default:
-                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">{label}</span>;
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-destructive/10 text-destructive">{label}</span>;
         }
     };
 
     const sourceBadge = (source: string) => {
         return source === 'self' ? (
-            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300">{c.enrollments.sourceSelf}</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-info/10 text-info">{c.enrollments.sourceSelf}</span>
         ) : (
-            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">{c.enrollments.sourceAdmin}</span>
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">{c.enrollments.sourceAdmin}</span>
         );
     };
 
@@ -107,9 +107,9 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
             <Head title={c.nav.enrollments} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">{c.enrollments.title}</h1>
-                        <p className="text-sm text-slate-500">{c.enrollments.subtitle}</p>
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.enrollments.title}</h1>
+                        <p className="text-sm text-muted-foreground">{c.enrollments.subtitle}</p>
                     </div>
                     {canManage && (
                         <Button asChild className="gap-2">
@@ -121,7 +121,7 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                 </div>
 
                 <div className="flex gap-3 flex-wrap items-center">
-                    <span className="text-sm font-medium text-slate-500">{c.enrollments.filters}:</span>
+                    <span className="text-sm font-medium text-muted-foreground">{c.enrollments.filters}:</span>
                     <select
                         className="rounded-lg border bg-background px-3 py-2 text-sm"
                         value={filters.subject_id ?? ''}
@@ -157,7 +157,7 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                 </div>
 
                 {canManage && pendingIds.length > 0 && (
-                    <div className="flex items-center justify-between flex-wrap gap-3 rounded-2xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950/40 px-4 py-3">
+                    <div className="flex items-center justify-between flex-wrap gap-3 rounded-xl border border-warning/20 bg-warning/10 px-4 py-3">
                         <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
                             <Checkbox checked={allPendingSelected} onCheckedChange={toggleSelectAllPending} />
                             {c.enrollments.pendingBadge} ({pendingIds.length})
@@ -170,9 +170,9 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                     </div>
                 )}
 
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
                     <table className="w-full text-sm text-right">
-                        <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-b">
+                        <thead className="bg-muted text-muted-foreground border-b">
                             <tr>
                                 {canManage && (
                                     <th className="p-4 w-10">
@@ -193,14 +193,14 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                                 <th className="p-4 font-semibold text-left">{c.common.actions}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tbody className="divide-y divide-border">
                             {enrollments.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={canManage ? 9 : 8} className="p-6 text-center text-slate-500">{c.enrollments.empty}</td>
+                                    <td colSpan={canManage ? 9 : 8} className="px-6 py-10 text-center text-muted-foreground">{c.enrollments.empty}</td>
                                 </tr>
                             ) : (
                                 enrollments.data.map((enr) => (
-                                    <tr key={enr.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                    <tr key={enr.id} className="hover:bg-muted/50">
                                         {canManage && (
                                             <td className="p-4">
                                                 {enr.status === 'pending' && (
@@ -212,8 +212,8 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                                             </td>
                                         )}
                                         <td className="p-4 font-semibold">{enr.student?.name}</td>
-                                        <td className="p-4 font-mono text-xs">{enr.student?.student_no}</td>
-                                        <td className="p-4 font-medium text-indigo-600 dark:text-indigo-400">
+                                        <td className="p-4 text-xs tabular-nums">{enr.student?.student_no}</td>
+                                        <td className="p-4 font-medium">
                                             {enr.subject?.name} ({enr.subject?.code})
                                         </td>
                                         <td className="p-4">{enr.academic_year}</td>
@@ -237,7 +237,7 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                                                                     disabled={busy}
                                                                     onClick={() => approve([enr.id])}
                                                                     title={c.enrollments.approve}
-                                                                    className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
+                                                                    className="text-success hover:text-success/80"
                                                                 >
                                                                     <Check className="w-4 h-4" />
                                                                 </Button>
@@ -247,7 +247,7 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                                                                     disabled={busy}
                                                                     onClick={() => setRejectItem(enr)}
                                                                     title={c.enrollments.reject}
-                                                                    className="text-rose-500 hover:text-rose-600"
+                                                                    className="text-destructive hover:text-destructive/80"
                                                                 >
                                                                     <X className="w-4 h-4" />
                                                                 </Button>
@@ -258,7 +258,7 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                                                                 <Edit className="w-4 h-4" />
                                                             </Link>
                                                         </Button>
-                                                        <Button variant="ghost" size="sm" onClick={() => setDeleteItem(enr)} className="text-rose-500 hover:text-rose-600">
+                                                        <Button variant="ghost" size="sm" onClick={() => setDeleteItem(enr)} className="text-destructive hover:text-destructive/80">
                                                             <Trash2 className="w-4 h-4" />
                                                         </Button>
                                                     </>

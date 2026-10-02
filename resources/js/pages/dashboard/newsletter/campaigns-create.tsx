@@ -36,7 +36,7 @@ export default function NewsletterCampaignCreatePage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.create} />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 p-6">
                 <Card>
                     <CardHeader><CardTitle>{c.create}</CardTitle></CardHeader>
                     <CardContent>
@@ -44,7 +44,7 @@ export default function NewsletterCampaignCreatePage() {
                             <div>
                                 <Label htmlFor="subject">{c.subject} *</Label>
                                 <Input id="subject" value={data.subject} onChange={e => setData('subject', e.target.value)} placeholder={c.subjectPlaceholder} />
-                                {errors.subject && <p className="text-sm text-red-500 mt-1">{errors.subject}</p>}
+                                {errors.subject && <p className="text-sm text-destructive mt-1">{errors.subject}</p>}
                             </div>
 
                             <div>
@@ -52,7 +52,7 @@ export default function NewsletterCampaignCreatePage() {
                                 <div className="rounded-lg border border-input bg-background">
                                     <Editor content={data.content} onChange={(html) => setData('content', html)} />
                                 </div>
-                                {errors.content && <p className="text-sm text-red-500 mt-1">{errors.content}</p>}
+                                {errors.content && <p className="text-sm text-destructive mt-1">{errors.content}</p>}
                                 <p className="text-xs text-muted-foreground mt-1">{c.unsubscribeNote}</p>
                             </div>
 

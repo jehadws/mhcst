@@ -32,8 +32,8 @@ export default function LevelCreate({ departments }: { departments: CmsDepartmen
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.levels.addTitle} />
             <div className="max-w-2xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-6">{c.levels.addHeading}</h1>
-                <form onSubmit={submit} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border">
+                <h1 className="font-display text-3xl font-extrabold leading-snug mb-6">{c.levels.addHeading}</h1>
+                <form onSubmit={submit} className="space-y-5 bg-card p-6 rounded-xl border">
                     <div>
                         <Label htmlFor="department_id">{c.levels.department}</Label>
                         <select
@@ -46,7 +46,7 @@ export default function LevelCreate({ departments }: { departments: CmsDepartmen
                                 <option key={d.id} value={d.id}>{d.name}</option>
                             ))}
                         </select>
-                        {errors.department_id && <p className="text-xs text-rose-500 mt-1">{errors.department_id}</p>}
+                        {errors.department_id && <p className="text-xs text-destructive mt-1">{errors.department_id}</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -60,7 +60,7 @@ export default function LevelCreate({ departments }: { departments: CmsDepartmen
                                 value={data.year}
                                 onChange={(e) => setData('year', e.target.value)}
                             />
-                            {errors.year && <p className="text-xs text-rose-500 mt-1">{errors.year}</p>}
+                            {errors.year && <p className="text-xs text-destructive mt-1">{errors.year}</p>}
                         </div>
 
                         <div>
@@ -70,7 +70,7 @@ export default function LevelCreate({ departments }: { departments: CmsDepartmen
                                 value={data.section}
                                 onChange={(e) => setData('section', e.target.value)}
                             />
-                            {errors.section && <p className="text-xs text-rose-500 mt-1">{errors.section}</p>}
+                            {errors.section && <p className="text-xs text-destructive mt-1">{errors.section}</p>}
                         </div>
                     </div>
 

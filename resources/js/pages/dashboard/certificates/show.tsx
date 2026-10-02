@@ -22,7 +22,7 @@ export default function CertificateDetailsPage({ certificate }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${d.entities.certificate.singular} ${certificate.certificate_number}`} />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <Button variant="outline" onClick={() => router.get(route('dashboard.certificates.list'))}>
                         <ArrowRight className="ms-2 h-4 w-4" /> {d.show.backToList}

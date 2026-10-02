@@ -32,8 +32,8 @@ export default function DepartmentsReport({ departments }: { departments: Depart
             <Head title={c.reports.departments.title} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between flex-wrap gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold">{c.reports.departments.title}</h1>
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.reports.departments.title}</h1>
                         <p className="text-sm text-muted-foreground">{c.reports.departments.subtitle}</p>
                     </div>
                     <Button variant="outline" asChild className="gap-2">
@@ -43,7 +43,7 @@ export default function DepartmentsReport({ departments }: { departments: Depart
                     </Button>
                 </div>
 
-                <div className="bg-card border rounded-2xl overflow-hidden">
+                <div className="bg-card border rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-muted-foreground border-b">
                             <tr>
@@ -58,11 +58,11 @@ export default function DepartmentsReport({ departments }: { departments: Depart
                         <tbody className="divide-y">
                             {departments.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="p-8 text-center text-muted-foreground">{c.common.noRecords}</td>
+                                    <td colSpan={6} className="px-8 py-10 text-center text-muted-foreground">{c.common.noRecords}</td>
                                 </tr>
                             ) : (
                                 departments.map((dept) => (
-                                    <tr key={dept.id} className="hover:bg-muted/30">
+                                    <tr key={dept.id} className="hover:bg-muted/50">
                                         <td className="p-4">
                                             <div className="flex items-center gap-2 font-medium">
                                                 <Building2 className="w-4 h-4 text-primary" />

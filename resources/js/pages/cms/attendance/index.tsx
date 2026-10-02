@@ -76,9 +76,9 @@ export default function AttendanceIndex({
             <Head title={c.attendance.title} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">{c.attendance.title}</h1>
-                        <p className="text-sm text-slate-500">{c.attendance.subtitle}</p>
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.attendance.title}</h1>
+                        <p className="text-sm text-muted-foreground">{c.attendance.subtitle}</p>
                     </div>
                     <div className="flex items-center gap-3">
                         {canManage && (
@@ -96,15 +96,15 @@ export default function AttendanceIndex({
                             </div>
                         )}
                         <Button variant="outline" onClick={markAllPresent}>{c.attendance.markAllPresent}</Button>
-                        <Button onClick={saveAttendance} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700">
+                        <Button onClick={saveAttendance} disabled={saving}>
                             {saving ? c.common.saving : c.attendance.saveSheet}
                         </Button>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border flex flex-wrap items-center gap-4">
+                <div className="bg-card p-4 rounded-xl border flex flex-wrap items-center gap-4">
                     <div>
-                        <label className="text-xs font-semibold text-slate-500 block mb-1">{c.attendance.selectSubject}</label>
+                        <label className="text-xs font-semibold text-muted-foreground block mb-1">{c.attendance.selectSubject}</label>
                         <select
                             className="p-2 rounded-lg border bg-background text-sm min-w-[250px]"
                             value={selectedSubjectId}
@@ -117,7 +117,7 @@ export default function AttendanceIndex({
                     </div>
 
                     <div>
-                        <label className="text-xs font-semibold text-slate-500 block mb-1">{c.attendance.selectDate}</label>
+                        <label className="text-xs font-semibold text-muted-foreground block mb-1">{c.attendance.selectDate}</label>
                         <Input
                             type="date"
                             value={date}
@@ -126,9 +126,9 @@ export default function AttendanceIndex({
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 border rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
                     <table className="w-full text-sm text-right">
-                        <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-b">
+                        <thead className="bg-muted text-muted-foreground border-b">
                             <tr>
                                 <th className="p-4 font-semibold">{c.attendance.studentName}</th>
                                 <th className="p-4 font-semibold">{c.attendance.studentNo}</th>
@@ -136,10 +136,10 @@ export default function AttendanceIndex({
                                 <th className="p-4 font-semibold">{c.attendance.absenceAlerts}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tbody className="divide-y divide-border">
                             {enrollments.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="p-6 text-center text-slate-500">{c.attendance.empty}</td>
+                                    <td colSpan={4} className="px-6 py-10 text-center text-muted-foreground">{c.attendance.empty}</td>
                                 </tr>
                             ) : (
                                 enrollments.map((enr) => {
@@ -147,16 +147,16 @@ export default function AttendanceIndex({
                                     const alertInfo = alerts[enr.id];
 
                                     return (
-                                        <tr key={enr.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                        <tr key={enr.id} className="hover:bg-muted/50">
                                             <td className="p-4 font-semibold">{enr.student?.name}</td>
-                                            <td className="p-4 font-mono text-xs">{enr.student?.student_no}</td>
+                                            <td className="p-4 text-xs tabular-nums">{enr.student?.student_no}</td>
                                             <td className="p-4 text-center">
                                                 <div className="flex items-center justify-center gap-2">
                                                     <button
                                                         type="button"
                                                         onClick={() => setStatus(enr.id, 'present')}
-                                                        className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition ${
-                                                            st === 'present' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 dark:bg-slate-800'
+                                                        className={`px-3 py-1 rounded-sm text-xs font-semibold flex items-center gap-1 transition ${
+                                                            st === 'present' ? 'bg-success text-success-foreground shadow-sm' : 'bg-muted text-muted-foreground'
                                                         }`}
                                                     >
                                                         <CheckCircle className="w-3.5 h-3.5" /> {c.labels.attendanceStatus.present}
@@ -164,8 +164,8 @@ export default function AttendanceIndex({
                                                     <button
                                                         type="button"
                                                         onClick={() => setStatus(enr.id, 'absent')}
-                                                        className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition ${
-                                                            st === 'absent' ? 'bg-rose-600 text-white shadow-sm' : 'bg-slate-100 text-slate-600 dark:bg-slate-800'
+                                                        className={`px-3 py-1 rounded-sm text-xs font-semibold flex items-center gap-1 transition ${
+                                                            st === 'absent' ? 'bg-destructive text-destructive-foreground shadow-sm' : 'bg-muted text-muted-foreground'
                                                         }`}
                                                     >
                                                         <XCircle className="w-3.5 h-3.5" /> {c.labels.attendanceStatus.absent}
@@ -173,8 +173,8 @@ export default function AttendanceIndex({
                                                     <button
                                                         type="button"
                                                         onClick={() => setStatus(enr.id, 'late')}
-                                                        className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition ${
-                                                            st === 'late' ? 'bg-amber-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600 dark:bg-slate-800'
+                                                        className={`px-3 py-1 rounded-sm text-xs font-semibold flex items-center gap-1 transition ${
+                                                            st === 'late' ? 'bg-warning text-warning-foreground shadow-sm' : 'bg-muted text-muted-foreground'
                                                         }`}
                                                     >
                                                         <Clock className="w-3.5 h-3.5" /> {c.labels.attendanceStatus.late}
@@ -183,12 +183,12 @@ export default function AttendanceIndex({
                                             </td>
                                             <td className="p-4">
                                                 {alertInfo ? (
-                                                    <div className="flex items-center gap-1 text-xs text-rose-600 font-semibold bg-rose-50 dark:bg-rose-950/40 p-1.5 rounded-lg">
+                                                    <div className="flex items-center gap-1 text-xs text-destructive font-semibold bg-destructive/10 p-1.5 rounded-sm">
                                                         <AlertCircle className="w-4 h-4 shrink-0" />
                                                         {alertInfo.alert_reasons.join(' ')}
                                                     </div>
                                                 ) : (
-                                                    <span className="text-xs text-slate-400">{c.attendance.ok}</span>
+                                                    <span className="text-xs text-muted-foreground">{c.attendance.ok}</span>
                                                 )}
                                             </td>
                                         </tr>

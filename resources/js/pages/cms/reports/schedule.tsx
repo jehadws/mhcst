@@ -32,11 +32,11 @@ export default function ScheduleReport({
             <Head title={r.pageTitle} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold flex items-center gap-2">
-                            <Calendar className="w-6 h-6 text-violet-600" /> {r.pageTitle}
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-display text-3xl font-extrabold leading-snug flex items-center gap-2">
+                            <Calendar className="w-6 h-6 text-success" /> {r.pageTitle}
                         </h1>
-                        <p className="text-sm text-slate-500">{r.pageSubtitle}</p>
+                        <p className="text-sm text-muted-foreground">{r.pageSubtitle}</p>
                     </div>
                     <Button variant="outline" asChild className="gap-2">
                         <a href={pdfUrl} target="_blank" rel="noopener noreferrer">
@@ -45,7 +45,7 @@ export default function ScheduleReport({
                     </Button>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border flex flex-wrap items-center gap-4">
+                <div className="bg-card p-4 rounded-xl border flex flex-wrap items-center gap-4">
                     <label className="text-sm font-semibold">{r.selectLevel}</label>
                     <select
                         className="max-w-md flex-1 p-2.5 rounded-lg border bg-background text-sm"
@@ -60,9 +60,9 @@ export default function ScheduleReport({
                     </select>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 border rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
                     <table className="w-full text-sm text-right">
-                        <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-b">
+                        <thead className="bg-muted text-muted-foreground border-b">
                             <tr>
                                 <th className="p-4 font-semibold">{c.common.day}</th>
                                 <th className="p-4 font-semibold">{c.common.time}</th>
@@ -71,14 +71,14 @@ export default function ScheduleReport({
                                 <th className="p-4 font-semibold">{c.common.room}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tbody className="divide-y divide-border">
                             {schedules.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="p-6 text-center text-slate-500">{r.empty}</td>
+                                    <td colSpan={5} className="px-6 py-10 text-center text-muted-foreground">{r.empty}</td>
                                 </tr>
                             ) : (
                                 schedules.map((schedule) => (
-                                    <tr key={schedule.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                    <tr key={schedule.id} className="hover:bg-muted/50">
                                         <td className="p-4">{schedule.day}</td>
                                         <td className="p-4">{schedule.start_time} – {schedule.end_time}</td>
                                         <td className="p-4">{schedule.subject?.name}</td>

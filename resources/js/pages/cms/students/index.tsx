@@ -30,13 +30,14 @@ export default function StudentsIndex({ students, levels }: { students: Paginate
         const label = studentStatusLabel(c, status);
         switch (status) {
             case 'active':
-                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">{label}</span>;
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-success/10 text-success">{label}</span>;
+            case 'pending':
             case 'suspended':
-                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">{label}</span>;
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-warning/10 text-warning">{label}</span>;
             case 'graduated':
-                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">{label}</span>;
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary">{label}</span>;
             default:
-                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">{label}</span>;
+                return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-destructive/10 text-destructive">{label}</span>;
         }
     };
 
@@ -45,9 +46,9 @@ export default function StudentsIndex({ students, levels }: { students: Paginate
             <Head title={c.nav.students} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">{c.students.title}</h1>
-                        <p className="text-sm text-slate-500">{c.students.subtitle}</p>
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.students.title}</h1>
+                        <p className="text-sm text-muted-foreground">{c.students.subtitle}</p>
                     </div>
                     {canManage && (
                         <Button asChild className="gap-2">
@@ -59,9 +60,9 @@ export default function StudentsIndex({ students, levels }: { students: Paginate
                 </div>
 
                 {canManage && (
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm">
+                    <div className="rounded-xl border bg-card p-4 shadow-sm">
                         <div className="flex items-center gap-2 mb-1">
-                            <Users className="w-4 h-4 text-indigo-600" />
+                            <Users className="w-4 h-4 text-primary" />
                             <span className="text-sm font-semibold">{c.students.importExport}</span>
                         </div>
                         <CmsImportExport
@@ -73,9 +74,9 @@ export default function StudentsIndex({ students, levels }: { students: Paginate
                     </div>
                 )}
 
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
                     <table className="w-full text-sm text-right">
-                        <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-b">
+                        <thead className="bg-muted text-muted-foreground border-b">
                             <tr>
                                 <th className="p-4 font-semibold">{c.students.studentNo}</th>
                                 <th className="p-4 font-semibold">{c.common.name}</th>
@@ -85,22 +86,22 @@ export default function StudentsIndex({ students, levels }: { students: Paginate
                                 <th className="p-4 font-semibold text-left">{c.common.actions}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tbody className="divide-y divide-border">
                             {students.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="p-6 text-center text-slate-500">{c.students.empty}</td>
+                                    <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">{c.students.empty}</td>
                                 </tr>
                             ) : (
                                 students.data.map((student) => (
-                                    <tr key={student.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
-                                        <td className="p-4 font-mono font-bold text-indigo-600 dark:text-indigo-400">{student.student_no}</td>
+                                    <tr key={student.id} className="hover:bg-muted/50">
+                                        <td className="p-4 font-bold tabular-nums text-primary">{student.student_no}</td>
                                         <td className="p-4 font-semibold">
                                             <div>{student.name}</div>
-                                            <div className="text-xs text-slate-400 font-normal">{student.email}</div>
+                                            <div className="text-xs text-muted-foreground font-normal">{student.email}</div>
                                         </td>
                                         <td className="p-4">
                                             <div>{student.level?.department?.name || '—'}</div>
-                                            <div className="text-xs text-slate-500">
+                                            <div className="text-xs text-muted-foreground">
                                                 {c.students.yearSection
                                                     .replace('{year}', String(student.level?.year ?? ''))
                                                     .replace('{section}', String(student.level?.section ?? ''))}
@@ -122,7 +123,7 @@ export default function StudentsIndex({ students, levels }: { students: Paginate
                                                                 <Edit className="w-4 h-4" />
                                                             </Link>
                                                         </Button>
-                                                        <Button variant="ghost" size="sm" onClick={() => setDeleteItem(student)} className="text-rose-500 hover:text-rose-600">
+                                                        <Button variant="ghost" size="sm" onClick={() => setDeleteItem(student)} className="text-destructive hover:text-destructive/80">
                                                             <Trash2 className="w-4 h-4" />
                                                         </Button>
                                                     </>

@@ -36,8 +36,8 @@ export default function NewsletterCampaignsPage() {
     const statusBadge = (status: NewsletterCampaign['status']) => {
         const map = {
             draft: <Badge variant="secondary">{c.draftStatus}</Badge>,
-            sending: <Badge className="bg-amber-500">{c.sendingStatus}</Badge>,
-            sent: <Badge className="bg-emerald-500">{c.sentStatus}</Badge>,
+            sending: <Badge className="bg-warning text-warning-foreground">{c.sendingStatus}</Badge>,
+            sent: <Badge className="bg-success text-success-foreground">{c.sentStatus}</Badge>,
             cancelled: <Badge variant="destructive">{c.cancelledStatus}</Badge>,
         };
         return map[status];
@@ -101,7 +101,7 @@ export default function NewsletterCampaignsPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={d.entities.newsletterCampaign.plural} />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 p-6">
                 <DataTable
                     columns={columns}
                     data={campaigns.data}

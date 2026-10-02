@@ -44,8 +44,8 @@ export default function StudentEdit({ student, levels }: { student: CmsStudent; 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${c.students.editTitle} ${student.name}`} />
             <div className="max-w-2xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-6">{c.students.editHeading}</h1>
-                <form onSubmit={submit} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border">
+                <h1 className="font-display text-3xl font-extrabold leading-snug mb-6">{c.students.editHeading}</h1>
+                <form onSubmit={submit} className="space-y-5 bg-card p-6 rounded-xl border">
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <Label htmlFor="student_no">{c.students.studentNo}</Label>
@@ -112,6 +112,7 @@ export default function StudentEdit({ student, levels }: { student: CmsStudent; 
                                 value={data.status}
                                 onChange={(e) => setData('status', e.target.value as typeof data.status)}
                             >
+                                <option value="pending">{c.labels.studentStatus.pending}</option>
                                 <option value="active">{c.labels.studentStatus.active}</option>
                                 <option value="suspended">{c.labels.studentStatus.suspended}</option>
                                 <option value="graduated">{c.labels.studentStatus.graduated}</option>

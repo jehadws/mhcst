@@ -30,14 +30,14 @@ export default function AttendanceReport({
             <Head title={c.reports.attendance.pageTitle} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">{c.reports.attendance.pageTitle}</h1>
-                        <p className="text-sm text-slate-500">{c.reports.attendance.pageSubtitle}</p>
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.reports.attendance.pageTitle}</h1>
+                        <p className="text-sm text-muted-foreground">{c.reports.attendance.pageSubtitle}</p>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border flex items-center gap-4">
-                    <label className="text-xs font-semibold text-slate-500">{c.reports.attendance.selectSubject}</label>
+                <div className="bg-card p-4 rounded-xl border flex items-center gap-4">
+                    <label className="text-xs font-semibold text-muted-foreground">{c.reports.attendance.selectSubject}</label>
                     <select
                         className="p-2.5 rounded-lg border bg-background text-sm min-w-[250px]"
                         value={filters.subject_id || ''}
@@ -50,9 +50,9 @@ export default function AttendanceReport({
                     </select>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 border rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
                     <table className="w-full text-sm text-right">
-                        <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-b">
+                        <thead className="bg-muted text-muted-foreground border-b">
                             <tr>
                                 <th className="p-4 font-semibold">{c.attendance.studentName}</th>
                                 <th className="p-4 font-semibold">{c.common.subject}</th>
@@ -61,10 +61,10 @@ export default function AttendanceReport({
                                 <th className="p-4 font-semibold text-center">{c.reports.attendance.attendanceRate}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tbody className="divide-y divide-border">
                             {enrollments.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="p-6 text-center text-slate-500">{c.reports.attendance.empty}</td>
+                                    <td colSpan={5} className="px-6 py-10 text-center text-muted-foreground">{c.reports.attendance.empty}</td>
                                 </tr>
                             ) : (
                                 enrollments.map((enr) => {
@@ -75,12 +75,12 @@ export default function AttendanceReport({
                                     const rate = total > 0 ? Math.round((present / total) * 100) : 100;
 
                                     return (
-                                        <tr key={enr.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                        <tr key={enr.id} className="hover:bg-muted/50">
                                             <td className="p-4 font-semibold">{enr.student?.name}</td>
                                             <td className="p-4">{enr.subject?.name}</td>
-                                            <td className="p-4 text-center text-emerald-600 font-semibold">{present} {c.reports.attendance.daysUnit}</td>
-                                            <td className="p-4 text-center text-rose-600 font-semibold">{absent} {c.reports.attendance.daysUnit}</td>
-                                            <td className="p-4 text-center font-bold">{rate}%</td>
+                                            <td className="p-4 text-center text-success font-semibold tabular-nums">{present} {c.reports.attendance.daysUnit}</td>
+                                            <td className="p-4 text-center text-destructive font-semibold tabular-nums">{absent} {c.reports.attendance.daysUnit}</td>
+                                            <td className="p-4 text-center font-bold tabular-nums">{rate}%</td>
                                         </tr>
                                     );
                                 })

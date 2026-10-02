@@ -22,12 +22,12 @@ export default function StudentShow({ student }: { student: CmsStudent }) {
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-2xl">
+                        <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-2xl">
                             {student.name.charAt(0)}
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold">{student.name}</h1>
-                            <p className="text-sm text-slate-500 font-mono">
+                            <h1 className="font-display text-3xl font-extrabold leading-snug">{student.name}</h1>
+                            <p className="text-sm text-muted-foreground tabular-nums">
                                 {c.student.studentNoLabel.replace('{studentNo}', student.student_no)} | {student.level?.department?.name}
                             </p>
                         </div>
@@ -56,15 +56,15 @@ export default function StudentShow({ student }: { student: CmsStudent }) {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <Card className="border">
                         <CardHeader>
-                            <CardTitle className="text-lg font-bold">{c.student.personalInfo}</CardTitle>
+                            <CardTitle>{c.student.personalInfo}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3 text-sm">
                             <div className="flex justify-between py-1 border-b">
-                                <span className="text-slate-500">{c.student.department}</span>
+                                <span className="text-muted-foreground">{c.student.department}</span>
                                 <span className="font-semibold">{student.level?.department?.name}</span>
                             </div>
                             <div className="flex justify-between py-1 border-b">
-                                <span className="text-slate-500">{c.student.yearSection}</span>
+                                <span className="text-muted-foreground">{c.student.yearSection}</span>
                                 <span className="font-semibold">
                                     {c.student.yearSectionValue
                                         .replace('{year}', String(student.level?.year ?? ''))
@@ -72,21 +72,21 @@ export default function StudentShow({ student }: { student: CmsStudent }) {
                                 </span>
                             </div>
                             <div className="flex justify-between py-1 border-b">
-                                <span className="text-slate-500">{c.common.email}:</span>
+                                <span className="text-muted-foreground">{c.common.email}:</span>
                                 <span className="font-semibold">{student.email || '—'}</span>
                             </div>
                             <div className="flex justify-between py-1 border-b">
-                                <span className="text-slate-500">{c.common.phone}:</span>
+                                <span className="text-muted-foreground">{c.common.phone}:</span>
                                 <span className="font-semibold">{student.phone || '—'}</span>
                             </div>
                             <div className="flex justify-between py-1 border-b">
-                                <span className="text-slate-500">{c.students.gender}:</span>
+                                <span className="text-muted-foreground">{c.students.gender}:</span>
                                 <span className="font-semibold">
                                     {student.gender === 'male' ? c.labels.gender.male : c.labels.gender.female}
                                 </span>
                             </div>
                             <div className="flex justify-between py-1 border-b">
-                                <span className="text-slate-500">{c.students.enrollmentDate}:</span>
+                                <span className="text-muted-foreground">{c.students.enrollmentDate}:</span>
                                 <span className="font-semibold">{student.enrollment_date}</span>
                             </div>
                         </CardContent>
@@ -94,31 +94,31 @@ export default function StudentShow({ student }: { student: CmsStudent }) {
 
                     <Card className="md:col-span-2 border">
                         <CardHeader>
-                            <CardTitle className="text-lg font-bold flex items-center gap-2">
-                                <Award className="w-5 h-5 text-indigo-600" /> {c.student.coursesAndGrades}
+                            <CardTitle className="flex items-center gap-2">
+                                <Award className="w-5 h-5 text-primary" /> {c.student.coursesAndGrades}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             {!student.enrollments || student.enrollments.length === 0 ? (
-                                <p className="text-sm text-slate-500 py-6 text-center">{c.students.noEnrollments}</p>
+                                <p className="text-sm text-muted-foreground py-6 text-center">{c.students.noEnrollments}</p>
                             ) : (
                                 <div className="space-y-4">
                                     {student.enrollments.map((enr) => (
-                                        <div key={enr.id} className="p-4 rounded-xl border bg-slate-50 dark:bg-slate-900 flex items-center justify-between">
+                                        <div key={enr.id} className="p-4 rounded-xl border bg-muted/50 flex items-center justify-between">
                                             <div>
                                                 <div className="font-bold text-sm">{enr.subject?.name} ({enr.subject?.code})</div>
-                                                <div className="text-xs text-slate-500">
+                                                <div className="text-xs text-muted-foreground">
                                                     {c.students.credits}: {enr.subject?.credits} | {c.students.academicYear}: {enr.academic_year} ({semesterLabel(c, enr.semester)})
                                                 </div>
                                             </div>
                                             <div className="text-left">
                                                 {enr.grade ? (
                                                     <div>
-                                                        <span className="text-xl font-bold text-indigo-600">{enr.grade.total ?? '—'}</span>
-                                                        <span className="ms-2 px-2 py-0.5 rounded text-xs font-bold bg-indigo-100 text-indigo-800">{enr.grade.grade_letter}</span>
+                                                        <span className="font-display text-xl font-extrabold leading-tight tabular-nums">{enr.grade.total ?? '—'}</span>
+                                                        <span className="ms-2 px-2 py-0.5 rounded-full text-xs font-bold bg-primary/10 text-primary">{enr.grade.grade_letter}</span>
                                                     </div>
                                                 ) : (
-                                                    <span className="text-xs text-slate-400">{c.students.notGraded}</span>
+                                                    <span className="text-xs text-muted-foreground">{c.students.notGraded}</span>
                                                 )}
                                             </div>
                                         </div>

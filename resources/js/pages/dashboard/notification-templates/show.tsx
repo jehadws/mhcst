@@ -16,7 +16,7 @@ export default function ShowNotificationTemplate({ template }: { template: Notif
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={template.name} />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 max-w-3xl">
+            <div className="flex h-full flex-1 flex-col gap-6 p-6 max-w-3xl">
                 <div className="flex items-center justify-between">
                     <Button variant="outline" onClick={() => router.get(route('dashboard.notification-templates.list'))}>
                         <ArrowRight className="ms-2 h-4 w-4" /> العودة للقائمة
@@ -34,7 +34,7 @@ export default function ShowNotificationTemplate({ template }: { template: Notif
                     <CardContent className="space-y-4 text-sm">
                         <div>
                             <p className="text-muted-foreground mb-1">حدث التشغيل</p>
-                            <p className="font-mono">{template.trigger_event}</p>
+                            <p className="tabular-nums">{template.trigger_event}</p>
                         </div>
                         {template.subject && (
                             <div>

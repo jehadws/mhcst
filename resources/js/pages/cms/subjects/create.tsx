@@ -37,8 +37,8 @@ export default function SubjectCreate({ departments }: { departments: CmsDepartm
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.subjects.addTitle} />
             <div className="max-w-2xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-6">{c.subjects.addHeading}</h1>
-                <form onSubmit={submit} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border">
+                <h1 className="font-display text-3xl font-extrabold leading-snug mb-6">{c.subjects.addHeading}</h1>
+                <form onSubmit={submit} className="space-y-5 bg-card p-6 rounded-xl border">
                     <div>
                         <Label htmlFor="department_id">{c.levels.department}</Label>
                         <select
@@ -62,7 +62,7 @@ export default function SubjectCreate({ departments }: { departments: CmsDepartm
                                 onChange={(e) => setData('code', e.target.value)}
                                 placeholder="CS101"
                             />
-                            {errors.code && <p className="text-xs text-rose-500 mt-1">{errors.code}</p>}
+                            {errors.code && <p className="text-xs text-destructive mt-1">{errors.code}</p>}
                         </div>
 
                         <div>
@@ -73,7 +73,7 @@ export default function SubjectCreate({ departments }: { departments: CmsDepartm
                                 onChange={(e) => setData('name', e.target.value)}
                                 placeholder={c.subjects.namePlaceholder}
                             />
-                            {errors.name && <p className="text-xs text-rose-500 mt-1">{errors.name}</p>}
+                            {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
                         </div>
                     </div>
 

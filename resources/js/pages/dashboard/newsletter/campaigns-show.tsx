@@ -34,8 +34,8 @@ export default function NewsletterCampaignShowPage() {
     const statusBadge = () => {
         const map = {
             draft: <Badge variant="secondary">{c.draftStatus}</Badge>,
-            sending: <Badge className="bg-amber-500">{c.sendingStatus}</Badge>,
-            sent: <Badge className="bg-emerald-500">{c.sentStatus}</Badge>,
+            sending: <Badge className="bg-warning text-warning-foreground">{c.sendingStatus}</Badge>,
+            sent: <Badge className="bg-success text-success-foreground">{c.sentStatus}</Badge>,
             cancelled: <Badge variant="destructive">{c.cancelledStatus}</Badge>,
         };
         return map[campaign.status];
@@ -50,7 +50,7 @@ export default function NewsletterCampaignShowPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={campaign.subject} />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 p-6">
                 <div className="flex items-center justify-between gap-2">
                     <Button variant="ghost" onClick={() => router.get(route('dashboard.newsletter.campaigns.list'))}>
                         <ArrowLeft className="h-4 w-4" /> {c.back}
@@ -71,14 +71,14 @@ export default function NewsletterCampaignShowPage() {
 
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                        <CardTitle className="text-xl">{campaign.subject}</CardTitle>
+                        <CardTitle>{campaign.subject}</CardTitle>
                         {statusBadge()}
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="grid grid-cols-3 gap-4">
                             {stats.map((stat) => (
                                 <div key={stat.label} className="rounded-lg border p-4 text-center">
-                                    <div className="text-2xl font-bold">{stat.value}</div>
+                                    <div className="font-display text-3xl font-extrabold leading-snug tabular-nums">{stat.value}</div>
                                     <div className="text-sm text-muted-foreground">{stat.label}</div>
                                 </div>
                             ))}

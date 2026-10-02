@@ -54,8 +54,8 @@ export default function CmsSettingsIndex({
             <Head title={c.settings.title} />
             <div className="max-w-2xl mx-auto p-6 space-y-6">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">{c.settings.title}</h1>
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.settings.title}</h1>
                         <p className="text-sm text-muted-foreground">{c.settings.subtitle}</p>
                     </div>
                     <Badge variant={settings.is_locked ? 'destructive' : 'secondary'} className="gap-1">
@@ -65,8 +65,8 @@ export default function CmsSettingsIndex({
                 </div>
 
                 <form onSubmit={submit} className="space-y-6">
-                    <section className="space-y-4 bg-card border rounded-2xl p-6">
-                        <h2 className="font-semibold">{c.settings.calendarSection}</h2>
+                    <section className="space-y-4 bg-card border rounded-xl p-6">
+                        <h2 className="font-display text-2xl font-extrabold leading-snug">{c.settings.calendarSection}</h2>
                         <div>
                             <Label htmlFor="academic_year">{c.settings.academicYear}</Label>
                             <Input id="academic_year" value={data.academic_year} onChange={(e) => setData('academic_year', e.target.value)} className="mt-1" placeholder="2025-2026" />
@@ -83,8 +83,8 @@ export default function CmsSettingsIndex({
                         </div>
                     </section>
 
-                    <section className="space-y-4 bg-card border rounded-2xl p-6">
-                        <h2 className="font-semibold">{c.settings.registrationSection}</h2>
+                    <section className="space-y-4 bg-card border rounded-xl p-6">
+                        <h2 className="font-display text-2xl font-extrabold leading-snug">{c.settings.registrationSection}</h2>
                         <div>
                             <Label htmlFor="current_semester">{c.settings.currentSemester}</Label>
                             <select
@@ -112,15 +112,15 @@ export default function CmsSettingsIndex({
                         </div>
                         <p className="text-xs text-muted-foreground">{c.settings.subjectRegistrationOpenHint}</p>
                         {data.subject_registration_open && (!data.academic_year.trim() || !data.current_semester) && (
-                            <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
-                                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                            <div className="flex items-start gap-2 rounded-xl border border-warning/20 bg-warning/10 p-3 text-sm text-warning">
+                                <AlertTriangle className="h-4 w-4 shrink-0 mt-1" />
                                 <p>{c.settings.registrationIncomplete}</p>
                             </div>
                         )}
                     </section>
 
-                    <section className="space-y-4 bg-card border rounded-2xl p-6">
-                        <h2 className="font-semibold">{c.settings.gradesSection}</h2>
+                    <section className="space-y-4 bg-card border rounded-xl p-6">
+                        <h2 className="font-display text-2xl font-extrabold leading-snug">{c.settings.gradesSection}</h2>
                         <div>
                             <Label htmlFor="grade_entry_deadline">{c.settings.deadline}</Label>
                             <Input id="grade_entry_deadline" type="date" value={data.grade_entry_deadline} onChange={(e) => setData('grade_entry_deadline', e.target.value)} className="mt-1" />
@@ -132,8 +132,8 @@ export default function CmsSettingsIndex({
                         </div>
                     </section>
 
-                    <section className="space-y-4 bg-card border rounded-2xl p-6">
-                        <h2 className="font-semibold">{c.settings.attendanceSection}</h2>
+                    <section className="space-y-4 bg-card border rounded-xl p-6">
+                        <h2 className="font-display text-2xl font-extrabold leading-snug">{c.settings.attendanceSection}</h2>
                         <div className="grid gap-4 sm:grid-cols-2">
                             <div>
                                 <Label htmlFor="consecutive_absence_threshold">{c.settings.consecutiveAbsenceThreshold}</Label>

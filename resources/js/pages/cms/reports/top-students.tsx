@@ -18,17 +18,17 @@ export default function TopStudentsReport({ topStudents }: { topStudents: any[] 
             <Head title={c.reports.topStudents.pageTitle} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold flex items-center gap-2">
-                            <Trophy className="w-6 h-6 text-amber-500" /> {c.reports.topStudents.pageTitle}
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-display text-3xl font-extrabold leading-snug flex items-center gap-2">
+                            <Trophy className="w-6 h-6 text-warning" /> {c.reports.topStudents.pageTitle}
                         </h1>
-                        <p className="text-sm text-slate-500">{c.reports.topStudents.pageSubtitle}</p>
+                        <p className="text-sm text-muted-foreground">{c.reports.topStudents.pageSubtitle}</p>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 border rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
                     <table className="w-full text-sm text-right">
-                        <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-b">
+                        <thead className="bg-muted text-muted-foreground border-b">
                             <tr>
                                 <th className="p-4 font-semibold w-16 text-center">{c.reports.topStudents.rank}</th>
                                 <th className="p-4 font-semibold">{c.reports.topStudents.studentName}</th>
@@ -37,31 +37,29 @@ export default function TopStudentsReport({ topStudents }: { topStudents: any[] 
                                 <th className="p-4 font-semibold text-center">{c.reports.topStudents.gpa}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tbody className="divide-y divide-border">
                             {topStudents.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="p-6 text-center text-slate-500">{c.reports.topStudents.empty}</td>
+                                    <td colSpan={5} className="px-6 py-10 text-center text-muted-foreground">{c.reports.topStudents.empty}</td>
                                 </tr>
                             ) : (
                                 topStudents.map((s, idx) => (
-                                    <tr key={s.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                    <tr key={s.id} className="hover:bg-muted/50">
                                         <td className="p-4 text-center font-bold">
                                             <span className={`w-7 h-7 rounded-full inline-flex items-center justify-center text-xs font-bold ${
-                                                idx === 0 ? 'bg-amber-400 text-amber-950' :
-                                                idx === 1 ? 'bg-slate-300 text-slate-900' :
-                                                idx === 2 ? 'bg-amber-700 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                                                idx === 0 ? 'bg-warning text-warning-foreground' : 'bg-muted text-muted-foreground'
                                             }`}>
                                                 {idx + 1}
                                             </span>
                                         </td>
                                         <td className="p-4 font-bold text-base">{s.name}</td>
-                                        <td className="p-4 font-mono text-xs text-slate-500">{s.student_no}</td>
+                                        <td className="p-4 text-xs text-muted-foreground tabular-nums">{s.student_no}</td>
                                         <td className="p-4">
                                             {s.level?.department?.name} ({c.students.yearSection
                                                 .replace('{year}', String(s.level?.year ?? ''))
                                                 .replace('{section}', String(s.level?.section ?? ''))})
                                         </td>
-                                        <td className="p-4 text-center font-bold text-indigo-600 text-base">{s.gpa_average}%</td>
+                                        <td className="p-4 text-center font-bold text-base tabular-nums">{s.gpa_average}%</td>
                                     </tr>
                                 ))
                             )}

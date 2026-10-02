@@ -20,9 +20,9 @@ export default function EnrollmentShow({ enrollment }: { enrollment: CmsEnrollme
             <Head title={c.enrollments.showTitle.replace('{name}', enrollment.student?.name ?? '')} />
             <div className="max-w-3xl mx-auto p-6 space-y-6">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">{enrollment.student?.name}</h1>
-                        <p className="text-sm text-slate-500">{enrollment.subject?.name} ({enrollment.subject?.code})</p>
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-display text-3xl font-extrabold leading-snug">{enrollment.student?.name}</h1>
+                        <p className="text-sm text-muted-foreground">{enrollment.subject?.name} ({enrollment.subject?.code})</p>
                     </div>
                     <Button asChild variant="outline" className="gap-2">
                         <Link href={`/cms/enrollments/${enrollment.id}/edit`}>
@@ -31,31 +31,31 @@ export default function EnrollmentShow({ enrollment }: { enrollment: CmsEnrollme
                     </Button>
                 </div>
 
-                <dl className="bg-white dark:bg-slate-900 border rounded-2xl divide-y text-sm">
+                <dl className="bg-card border rounded-xl divide-y text-sm">
                     <div className="flex justify-between p-4">
-                        <dt className="text-slate-500">{c.enrollments.studentNo}</dt>
-                        <dd className="font-semibold font-mono">{enrollment.student?.student_no}</dd>
+                        <dt className="text-muted-foreground">{c.enrollments.studentNo}</dt>
+                        <dd className="font-semibold tabular-nums">{enrollment.student?.student_no}</dd>
                     </div>
                     <div className="flex justify-between p-4">
-                        <dt className="text-slate-500">{c.common.department}</dt>
+                        <dt className="text-muted-foreground">{c.common.department}</dt>
                         <dd className="font-semibold">{enrollment.student?.level?.department?.name ?? '—'}</dd>
                     </div>
                     <div className="flex justify-between p-4">
-                        <dt className="text-slate-500">{c.enrollments.yearSemester}</dt>
+                        <dt className="text-muted-foreground">{c.enrollments.yearSemester}</dt>
                         <dd className="font-semibold">{enrollment.academic_year} — {semesterLabel(c, enrollment.semester)}</dd>
                     </div>
                     <div className="flex justify-between p-4">
-                        <dt className="text-slate-500">{c.common.status}</dt>
+                        <dt className="text-muted-foreground">{c.common.status}</dt>
                         <dd className="font-semibold">{enrollmentStatusLabel(c, enrollment.status)}</dd>
                     </div>
                     {enrollment.grade && (
                         <div className="flex justify-between p-4">
-                            <dt className="text-slate-500">{c.common.grade}</dt>
+                            <dt className="text-muted-foreground">{c.common.grade}</dt>
                             <dd className="font-semibold">{enrollment.grade.total ?? '—'}</dd>
                         </div>
                     )}
                     <div className="flex justify-between p-4">
-                        <dt className="text-slate-500">{c.enrollments.attendanceRecords}</dt>
+                        <dt className="text-muted-foreground">{c.enrollments.attendanceRecords}</dt>
                         <dd className="font-semibold">{enrollment.attendance?.length ?? 0}</dd>
                     </div>
                 </dl>

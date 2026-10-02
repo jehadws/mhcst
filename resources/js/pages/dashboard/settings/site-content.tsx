@@ -62,7 +62,7 @@ export default function EditSiteContentPage() {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`${d.siteContent.edit.replace('{title}', content.title)}`} />
 
-      <div className="bg-background flex h-full min-h-screen flex-1 flex-col gap-4 p-4">
+      <div className="bg-background flex h-full min-h-screen flex-1 flex-col gap-6 p-6">
         <FormHeader
           title={`${d.siteContent.edit.replace('{title}', content.title)}`}
           description={d.siteContent.description}

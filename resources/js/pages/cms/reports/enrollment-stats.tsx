@@ -33,16 +33,16 @@ export default function EnrollmentStatsReport({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={r.pageTitle} />
             <div className="flex flex-col gap-6 p-6">
-                <div>
-                    <h1 className="text-2xl font-bold flex items-center gap-2">
-                        <BarChart3 className="w-6 h-6 text-emerald-600" /> {r.pageTitle}
+                <div className="flex flex-col gap-2">
+                    <h1 className="font-display text-3xl font-extrabold leading-snug flex items-center gap-2">
+                        <BarChart3 className="w-6 h-6 text-primary" /> {r.pageTitle}
                     </h1>
-                    <p className="text-sm text-slate-500">{r.pageSubtitle}</p>
+                    <p className="text-sm text-muted-foreground">{r.pageSubtitle}</p>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 border rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
                     <table className="w-full text-sm text-right">
-                        <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-b">
+                        <thead className="bg-muted text-muted-foreground border-b">
                             <tr>
                                 <th className="p-4 font-semibold">{c.common.department}</th>
                                 <th className="p-4 font-semibold text-center">{r.activeStudents}</th>
@@ -51,14 +51,14 @@ export default function EnrollmentStatsReport({
                                 <th className="p-4 font-semibold text-center">{r.completed}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tbody className="divide-y divide-border">
                             {departments.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="p-6 text-center text-slate-500">{r.empty}</td>
+                                    <td colSpan={5} className="px-6 py-10 text-center text-muted-foreground">{r.empty}</td>
                                 </tr>
                             ) : (
                                 departments.map((dept) => (
-                                    <tr key={dept.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                    <tr key={dept.id} className="hover:bg-muted/50">
                                         <td className="p-4 font-semibold">{dept.name}</td>
                                         <td className="p-4 text-center">{dept.active_students}</td>
                                         <td className="p-4 text-center">{dept.active_enrollments}</td>
@@ -72,13 +72,13 @@ export default function EnrollmentStatsReport({
                 </div>
 
                 {monthly.length > 0 && (
-                    <div className="bg-white dark:bg-slate-900 border rounded-2xl p-6 shadow-sm">
-                        <h2 className="font-bold mb-4">{r.monthlyTrend}</h2>
+                    <div className="bg-card border rounded-xl p-6 shadow-sm">
+                        <h2 className="font-display text-2xl font-extrabold leading-snug mb-4">{r.monthlyTrend}</h2>
                         <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-4">
                             {monthly.map((row) => (
                                 <div key={row.month} className="rounded-xl border p-3 text-center">
                                     <div className="text-xs text-muted-foreground">{row.month}</div>
-                                    <div className="text-lg font-bold">{row.total}</div>
+                                    <div className="font-display text-lg font-extrabold leading-tight tabular-nums">{row.total}</div>
                                 </div>
                             ))}
                         </div>

@@ -193,7 +193,7 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
                                         type="button"
                                         variant="ghost"
                                         size="icon"
-                                        className="mt-0.5 shrink-0 text-destructive"
+                                        className="mt-1 shrink-0 text-destructive"
                                         onClick={() => removeSocialLink(platform)}
                                     >
                                         <X className="h-4 w-4" />
@@ -213,7 +213,7 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
                             value={getFieldValue(field)}
                             onChange={e => handleValueChange(field.key, e.target.value)}
                             rows={6}
-                            className="mt-2 font-mono text-sm"
+                            className="mt-2 text-sm"
                             dir="ltr"
                         />
                         {error && <p className="text-sm text-destructive mt-1">{error}</p>}
@@ -261,7 +261,7 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
                 <div className="border-b">
                     <div className="flex items-center justify-between py-4 px-4">
                         <div>
-                            <h1 className="text-xl font-semibold">{d.siteSettings.title}</h1>
+                            <h1 className="font-display text-3xl font-extrabold leading-snug">{d.siteSettings.title}</h1>
                             <p className="text-sm text-muted-foreground">{d.siteSettings.description}</p>
                         </div>
                         <Button disabled={processing} type="submit">

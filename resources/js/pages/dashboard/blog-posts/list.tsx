@@ -65,7 +65,7 @@ export default function BlogPostsListPage() {
             header: d.columns.status,
             cell: ({ row }) => {
                 const status = row.getValue('status') as string;
-                return <Badge className={status === 'published' ? 'bg-green-500' : 'bg-gray-500'}>{d.status[status as keyof typeof d.status]}</Badge>;
+                return <Badge className={status === 'published' ? 'bg-success text-success-foreground' : 'bg-muted text-muted-foreground'}>{d.status[status as keyof typeof d.status]}</Badge>;
             },
         },
         {
@@ -105,7 +105,7 @@ export default function BlogPostsListPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={d.entities.blogPost.plural} />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 p-6">
                 <DataTable
                     columns={columns}
                     data={posts.data}

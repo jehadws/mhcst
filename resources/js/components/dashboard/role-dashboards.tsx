@@ -46,12 +46,12 @@ export function TeacherDashboardView({
 
   return (
     <>
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold tracking-tight">{ar ? `مرحباً، ${teacherProfile.name}` : `Welcome, ${teacherProfile.name}`}</h1>
+      <div className="flex flex-col gap-2">
+        <h1 className="font-display text-3xl font-extrabold leading-snug tracking-tight">{ar ? `مرحباً، ${teacherProfile.name}` : `Welcome, ${teacherProfile.name}`}</h1>
         <p className="text-muted-foreground text-sm">{teacherProfile.specialization ?? (ar ? 'لوحة المعلم' : 'Teacher Dashboard')}</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: ar ? 'محاضرات اليوم' : "Today's Classes", value: stats.today_classes_count, icon: Calendar },
           { label: ar ? 'المواد التي أدرّسها' : 'My Subjects', value: stats.classes_count, icon: BookOpen },
@@ -60,9 +60,9 @@ export function TeacherDashboardView({
         ].map((card) => (
           <Card key={card.label}>
             <CardContent className="flex items-center justify-between p-5">
-              <div>
+              <div className="space-y-2">
                 <p className="text-muted-foreground text-sm">{card.label}</p>
-                <p className="text-2xl font-bold">{card.value}</p>
+                <p className="font-display text-3xl font-extrabold leading-snug tabular-nums">{card.value}</p>
               </div>
               <card.icon className="text-primary h-8 w-8 opacity-80" />
             </CardContent>
@@ -70,14 +70,14 @@ export function TeacherDashboardView({
         ))}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>{ar ? 'جدول اليوم' : "Today's Schedule"}</CardTitle>
           </CardHeader>
           <CardContent>
             {todaySchedules.length === 0 ? (
-              <p className="text-muted-foreground py-6 text-center text-sm">{ar ? 'لا توجد محاضرات اليوم' : 'No classes today'}</p>
+              <p className="text-muted-foreground py-10 text-center text-sm">{ar ? 'لا توجد محاضرات اليوم' : 'No classes today'}</p>
             ) : (
               <ul className="space-y-3">
                 {todaySchedules.map((s) => (
@@ -166,7 +166,7 @@ export function StudentDashboardView({
 
       <StudentQuickLinks locale={locale} />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: ar ? 'المواد المسجّلة' : 'Enrolled Subjects', value: stats?.enrolled_subjects ?? 0 },
           { label: ar ? 'المعدل' : 'GPA', value: stats?.gpa ?? '—' },
@@ -176,13 +176,13 @@ export function StudentDashboardView({
           <Card key={card.label}>
             <CardContent className="p-5">
               <p className="text-muted-foreground text-sm">{card.label}</p>
-              <p className="text-2xl font-bold">{card.value}</p>
+              <p className="font-display text-3xl font-extrabold leading-snug tabular-nums">{card.value}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader className="flex-row items-center justify-between space-y-0">
             <CardTitle>{ar ? 'جدول اليوم' : "Today's Schedule"}</CardTitle>
@@ -200,7 +200,7 @@ export function StudentDashboardView({
           </CardHeader>
           <CardContent>
             {recentGrades.length === 0 ? (
-              <p className="text-muted-foreground py-6 text-center text-sm">{ar ? 'لا توجد درجات بعد' : 'No grades yet'}</p>
+              <p className="text-muted-foreground py-10 text-center text-sm">{ar ? 'لا توجد درجات بعد' : 'No grades yet'}</p>
             ) : (
               <ul className="space-y-2">
                 {recentGrades.map((g, i) => (
@@ -231,12 +231,12 @@ export function ContentDashboardView({
 
   return (
     <>
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">{ar ? 'لوحة المحتوى' : 'Content Dashboard'}</h1>
+      <div className="flex flex-col gap-2">
+        <h1 className="font-display text-3xl font-extrabold leading-snug">{ar ? 'لوحة المحتوى' : 'Content Dashboard'}</h1>
         <p className="text-muted-foreground text-sm">{ar ? 'إدارة الأخبار والمحتوى العام للموقع' : 'Manage site content and publications'}</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { label: ar ? 'المقالات' : 'Blog Posts', value: stats.blog_posts_count, href: '/dashboard/blog-posts/list' },
           { label: ar ? 'منشور' : 'Published', value: stats.published_posts_count, href: '/dashboard/blog-posts/list' },
@@ -247,7 +247,7 @@ export function ContentDashboardView({
             <Link href={card.href}>
               <CardContent className="p-5">
                 <p className="text-muted-foreground text-sm">{card.label}</p>
-                <p className="text-2xl font-bold">{card.value}</p>
+                <p className="font-display text-3xl font-extrabold leading-snug tabular-nums">{card.value}</p>
               </CardContent>
             </Link>
           </Card>

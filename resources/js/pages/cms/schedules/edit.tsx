@@ -60,15 +60,15 @@ export default function ScheduleEdit({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.schedules.editTitle} />
             <div className="max-w-2xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-6">{c.schedules.editHeading}</h1>
+                <h1 className="font-display text-3xl font-extrabold leading-snug mb-6">{c.schedules.editHeading}</h1>
 
                 {errors.conflict && (
-                    <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-semibold">
+                    <div className="mb-6 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-semibold">
                         {c.schedules.conflictWarning.replace('{message}', errors.conflict)}
                     </div>
                 )}
 
-                <form onSubmit={submit} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border">
+                <form onSubmit={submit} className="space-y-5 bg-card p-6 rounded-xl border">
                     <div>
                         <Label htmlFor="subject_id">{c.schedules.subject}</Label>
                         <select

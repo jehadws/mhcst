@@ -46,11 +46,11 @@ export function PendingApprovalBanner({ locale }: { locale: string }) {
   const c = cmsBilingual(locale);
 
   return (
-    <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
-      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+    <div className="flex items-start gap-3 rounded-xl border border-warning/20 bg-warning/10 p-4 text-sm text-warning">
+      <AlertTriangle className="mt-1 h-4 w-4 shrink-0" />
       <div>
         <p className="font-medium">{c.myStudies.pendingApproval}</p>
-        <p className="mt-0.5 opacity-90">{c.myStudies.pendingApprovalHint}</p>
+        <p className="mt-1 opacity-90">{c.myStudies.pendingApprovalHint}</p>
       </div>
     </div>
   );
@@ -70,8 +70,8 @@ export function StudentProfileHeader({ locale, student, transcriptUrl }: { local
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">{student.name}</h1>
-        <p className="text-muted-foreground font-mono text-sm">
+        <h1 className="font-display text-3xl font-extrabold leading-snug tracking-tight">{student.name}</h1>
+        <p className="text-muted-foreground tabular-nums text-sm">
           {student.student_no}
           {student.department ? ` · ${student.department}` : ''}
           {yearSection ? ` · ${yearSection}` : ''}
@@ -117,7 +117,7 @@ export function StudentScheduleList({ sessions, locale, emptyLabel }: { sessions
   const c = cmsBilingual(locale);
 
   if (sessions.length === 0) {
-    return <p className="text-muted-foreground py-6 text-center text-sm">{emptyLabel ?? c.myStudies.noClasses}</p>;
+    return <p className="text-muted-foreground py-10 text-center text-sm">{emptyLabel ?? c.myStudies.noClasses}</p>;
   }
 
   return (

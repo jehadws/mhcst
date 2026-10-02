@@ -49,7 +49,7 @@ export default function NewsletterListPage() {
         {
             accessorKey: 'is_active',
             header: d.columns.status,
-            cell: ({ row }) => row.getValue('is_active') ? <Badge className="bg-emerald-500">{d.status.active}</Badge> : <Badge variant="secondary">{d.status.inactive}</Badge>,
+            cell: ({ row }) => row.getValue('is_active') ? <Badge className="bg-success text-success-foreground">{d.status.active}</Badge> : <Badge variant="secondary">{d.status.inactive}</Badge>,
         },
         {
             accessorKey: 'subscribed_at',
@@ -89,7 +89,7 @@ export default function NewsletterListPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={d.entities.newsletterSubscriber.plural} />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 p-6">
                 <DataTable
                     columns={columns}
                     data={subscribers.data}

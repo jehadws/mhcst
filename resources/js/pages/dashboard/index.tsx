@@ -384,7 +384,7 @@ export default function Dashboard() {
                     <tbody>
                       {recentStudents.map((student) => (
                         <tr key={student.id} className="border-b last:border-0 hover:bg-muted/40">
-                          <td className="px-3 py-3 font-mono text-xs font-semibold">{student.student_no}</td>
+                          <td className="px-3 py-3 text-xs font-semibold tabular-nums">{student.student_no}</td>
                           <td className="px-3 py-3 font-medium">
                             <Link href={route('cms.students.show', student.id)} className="hover:underline">
                               {student.name}

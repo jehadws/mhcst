@@ -119,24 +119,24 @@ export default function GradesIndex({
             <Head title={c.nav.grades} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">{c.gradesPage.title}</h1>
-                        <p className="text-sm text-slate-500">{c.gradesPage.subtitle}</p>
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.gradesPage.title}</h1>
+                        <p className="text-sm text-muted-foreground">{c.gradesPage.subtitle}</p>
                     </div>
                     {enrollments.length > 0 && (
-                        <Button onClick={saveAllGrades} disabled={saving || inputsDisabled} className="bg-emerald-600 hover:bg-emerald-700">
+                        <Button onClick={saveAllGrades} disabled={saving || inputsDisabled}>
                             {saving ? c.common.saving : c.gradesPage.saveAll}
                         </Button>
                     )}
                 </div>
 
                 {gradesLocked && (
-                    <div className={`p-4 rounded-xl border text-sm font-medium ${canEditGrades ? 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-950/30 dark:border-amber-800 dark:text-amber-200' : 'bg-rose-50 border-rose-200 text-rose-800 dark:bg-rose-950/30 dark:border-rose-800 dark:text-rose-200'}`}>
+                    <div className={`p-4 rounded-xl border text-sm font-medium ${canEditGrades ? 'bg-warning/10 border-warning/20 text-warning' : 'bg-destructive/10 border-destructive/20 text-destructive'}`}>
                         {canEditGrades ? c.grades.lockedForTeachers : c.grades.lockedContactAdmin}
                     </div>
                 )}
 
-                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border flex items-center gap-4">
+                <div className="bg-card p-4 rounded-xl border flex items-center gap-4">
                     <label className="text-sm font-semibold whitespace-nowrap">{c.gradesPage.selectSubject}</label>
                     <select
                         className="w-full max-w-md p-2.5 rounded-lg border bg-background text-sm"
@@ -152,7 +152,7 @@ export default function GradesIndex({
                 </div>
 
                 {canManage && (
-                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-sm">
+                    <div className="rounded-xl border bg-card p-4 shadow-sm">
                         <div className="text-sm font-semibold mb-1">{c.gradesPage.importExport}</div>
                         <CmsImportExport
                             importEndpoint="/cms/grades/import"
@@ -163,9 +163,9 @@ export default function GradesIndex({
                     </div>
                 )}
 
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
                     <table className="w-full text-sm text-right">
-                        <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-b text-xs">
+                        <thead className="bg-muted text-muted-foreground border-b text-xs">
                             <tr>
                                 <th className="p-3">{c.gradesPage.studentName}</th>
                                 <th className="p-3">{c.gradesPage.studentNo}</th>
@@ -178,10 +178,10 @@ export default function GradesIndex({
                                 <th className="p-3 text-center">{c.gradesPage.letterGrade}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tbody className="divide-y divide-border">
                             {enrollments.length === 0 ? (
                                 <tr>
-                                    <td colSpan={9} className="p-6 text-center text-slate-500">{c.gradesPage.empty}</td>
+                                    <td colSpan={9} className="px-6 py-10 text-center text-muted-foreground">{c.gradesPage.empty}</td>
                                 </tr>
                             ) : (
                                 enrollments.map((enr) => {
@@ -190,9 +190,9 @@ export default function GradesIndex({
                                     const lettr = calcLetter(tot);
 
                                     return (
-                                        <tr key={enr.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                                        <tr key={enr.id} className="hover:bg-muted/50">
                                             <td className="p-3 font-semibold">{enr.student?.name}</td>
-                                            <td className="p-3 font-mono text-xs text-slate-500">{enr.student?.student_no}</td>
+                                            <td className="p-3 text-xs text-muted-foreground tabular-nums">{enr.student?.student_no}</td>
                                             <td className="p-2 text-center">
                                                 <Input
                                                     type="number"
@@ -248,11 +248,11 @@ export default function GradesIndex({
                                                     onChange={(e) => handleInputChange(enr.id, 'participation', e.target.value)}
                                                 />
                                             </td>
-                                            <td className="p-3 text-center font-bold text-indigo-600 dark:text-indigo-400 text-base">
+                                            <td className="p-3 text-center font-bold text-base tabular-nums">
                                                 {tot}
                                             </td>
                                             <td className="p-3 text-center">
-                                                <span className="px-2.5 py-1 rounded text-xs font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
+                                                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary">
                                                     {lettr}
                                                 </span>
                                             </td>

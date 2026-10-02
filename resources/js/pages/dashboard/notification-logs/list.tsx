@@ -59,9 +59,9 @@ export default function NotificationLogsListPage({ logs }: { logs: NotificationL
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={d.notificationLogs.title} />
-            <div className="flex flex-col gap-4 p-4">
-                <div>
-                    <h1 className="text-2xl font-bold">{d.notificationLogs.title}</h1>
+            <div className="flex flex-col gap-6 p-6">
+                <div className="flex flex-col gap-2">
+                    <h1 className="font-display text-3xl font-extrabold leading-snug">{d.notificationLogs.title}</h1>
                     <p className="text-muted-foreground text-sm">{d.notificationLogs.description}</p>
                 </div>
                 <DataTable columns={columns} data={logs} />

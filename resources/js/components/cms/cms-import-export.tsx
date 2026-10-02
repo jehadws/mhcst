@@ -49,14 +49,14 @@ export default function CmsImportExport({
             {(flash.success || (flash.import_errors && flash.import_errors.length > 0)) && (
                 <div className="space-y-2">
                     {flash.success && (
-                        <div className="rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-sm px-4 py-2.5 dark:bg-emerald-950/40 dark:border-emerald-900 dark:text-emerald-300">
+                        <div className="rounded-xl border border-success/20 bg-success/10 text-success text-sm px-4 py-2.5">
                             {flash.success}
                         </div>
                     )}
                     {flash.import_errors && flash.import_errors.length > 0 && (
-                        <div className="rounded-xl border border-amber-200 bg-amber-50 text-amber-800 text-sm px-4 py-2.5 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-300">
+                        <div className="rounded-xl border border-warning/20 bg-warning/10 text-warning text-sm px-4 py-2.5">
                             <div className="font-bold mb-1">ملاحظات الاستيراد ({flash.import_errors.length}):</div>
-                            <ul className="list-disc pr-5 space-y-0.5">
+                            <ul className="list-disc pr-5 space-y-1">
                                 {flash.import_errors.map((error, i) => (
                                     <li key={i}>{error}</li>
                                 ))}

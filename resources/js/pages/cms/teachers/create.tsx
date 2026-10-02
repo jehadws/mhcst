@@ -37,8 +37,8 @@ export default function TeacherCreate() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.teachers.addTitle} />
             <div className="max-w-2xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-6">{c.teachers.addHeading}</h1>
-                <form onSubmit={submit} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border">
+                <h1 className="font-display text-3xl font-extrabold leading-snug mb-6">{c.teachers.addHeading}</h1>
+                <form onSubmit={submit} className="space-y-5 bg-card p-6 rounded-xl border">
                     <div>
                         <Label htmlFor="name">{c.teachers.fullName}</Label>
                         <Input
@@ -47,7 +47,7 @@ export default function TeacherCreate() {
                             onChange={(e) => setData('name', e.target.value)}
                             placeholder={c.teachers.fullNamePlaceholder}
                         />
-                        {errors.name && <p className="text-xs text-rose-500 mt-1">{errors.name}</p>}
+                        {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -59,7 +59,7 @@ export default function TeacherCreate() {
                                 value={data.email}
                                 onChange={(e) => setData('email', e.target.value)}
                             />
-                            {errors.email && <p className="text-xs text-rose-500 mt-1">{errors.email}</p>}
+                            {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
                         </div>
 
                         <div>

@@ -30,9 +30,9 @@ export default function SubjectsIndex({ subjects, departments }: { subjects: Pag
             <Head title={c.nav.subjects} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">{c.subjects.title}</h1>
-                        <p className="text-sm text-slate-500">{c.subjects.subtitle}</p>
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.subjects.title}</h1>
+                        <p className="text-sm text-muted-foreground">{c.subjects.subtitle}</p>
                     </div>
                     <Button asChild className="gap-2">
                         <Link href="/cms/subjects/create">
@@ -41,9 +41,9 @@ export default function SubjectsIndex({ subjects, departments }: { subjects: Pag
                     </Button>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+                <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
                     <table className="w-full text-sm text-right">
-                        <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 border-b">
+                        <thead className="bg-muted text-muted-foreground border-b">
                             <tr>
                                 <th className="p-4 font-semibold">{c.subjects.code}</th>
                                 <th className="p-4 font-semibold">{c.subjects.name}</th>
@@ -54,24 +54,24 @@ export default function SubjectsIndex({ subjects, departments }: { subjects: Pag
                                 <th className="p-4 font-semibold text-left">{c.common.actions}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tbody className="divide-y divide-border">
                             {subjects.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="p-6 text-center text-slate-500">{c.subjects.empty}</td>
+                                    <td colSpan={7} className="px-6 py-10 text-center text-muted-foreground">{c.subjects.empty}</td>
                                 </tr>
                             ) : (
                                 subjects.data.map((subj) => (
-                                    <tr key={subj.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
-                                        <td className="p-4 font-mono font-bold text-indigo-600 dark:text-indigo-400">{subj.code}</td>
+                                    <tr key={subj.id} className="hover:bg-muted/50">
+                                        <td className="p-4 font-bold tabular-nums">{subj.code}</td>
                                         <td className="p-4 font-semibold">{subj.name}</td>
                                         <td className="p-4">{subj.department?.name || '—'}</td>
                                         <td className="p-4">{subj.credits} {c.subjects.creditsUnit}</td>
                                         <td className="p-4">{semesterLabel(c, subj.semester)}</td>
                                         <td className="p-4">
                                             {subj.has_lab ? (
-                                                <span className="px-2 py-0.5 rounded text-xs bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-semibold">{c.subjects.lab}</span>
+                                                <span className="px-2 py-0.5 rounded-full text-xs bg-info/10 text-info font-semibold">{c.subjects.lab}</span>
                                             ) : (
-                                                <span className="text-xs text-slate-400">{c.subjects.theoretical}</span>
+                                                <span className="text-xs text-muted-foreground">{c.subjects.theoretical}</span>
                                             )}
                                         </td>
                                         <td className="p-4 text-left">
@@ -81,7 +81,7 @@ export default function SubjectsIndex({ subjects, departments }: { subjects: Pag
                                                         <Edit className="w-4 h-4" />
                                                     </Link>
                                                 </Button>
-                                                <Button variant="ghost" size="sm" onClick={() => setDeleteItem(subj)} className="text-rose-500 hover:text-rose-600">
+                                                <Button variant="ghost" size="sm" onClick={() => setDeleteItem(subj)} className="text-destructive hover:text-destructive/80">
                                                     <Trash2 className="w-4 h-4" />
                                                 </Button>
                                             </div>

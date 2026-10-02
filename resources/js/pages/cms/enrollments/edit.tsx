@@ -40,9 +40,9 @@ export default function EnrollmentEdit({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.enrollments.editTitle} />
             <div className="max-w-2xl mx-auto p-6">
-                <h1 className="text-2xl font-bold mb-6">{c.enrollments.editHeading}</h1>
+                <h1 className="font-display text-3xl font-extrabold leading-snug mb-6">{c.enrollments.editHeading}</h1>
 
-                <form onSubmit={submit} className="space-y-5 bg-white dark:bg-slate-900 p-6 rounded-2xl border">
+                <form onSubmit={submit} className="space-y-5 bg-card p-6 rounded-xl border">
                     <div>
                         <Label htmlFor="student_id">{c.enrollments.student}</Label>
                         <select
@@ -104,6 +104,7 @@ export default function EnrollmentEdit({
                             value={data.status}
                             onChange={(e) => setData('status', e.target.value as typeof data.status)}
                         >
+                            <option value="pending">{c.labels.enrollmentStatus.pending}</option>
                             <option value="active">{c.labels.enrollmentStatus.active}</option>
                             <option value="dropped">{c.labels.enrollmentStatus.dropped}</option>
                             <option value="completed">{c.labels.enrollmentStatus.completed}</option>

@@ -17,7 +17,7 @@ export default function EditTestimonial({ testimonial }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="تعديل رأي" />
-      <div className="flex h-full flex-1 flex-col gap-4 p-4">
+      <div className="flex h-full flex-1 flex-col gap-6 p-6">
         <TestimonialForm testimonial={testimonial} />
       </div>
     </AppLayout>

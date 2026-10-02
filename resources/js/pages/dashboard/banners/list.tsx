@@ -63,7 +63,7 @@ export default function BannersListPage() {
             accessorKey: "is_active",
             header: d.columns.isActive,
             cell: ({ row }) => (
-                <Badge className={row.getValue("is_active") ? "bg-green-500" : "bg-gray-500"}>
+                <Badge className={row.getValue("is_active") ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"}>
                     {row.getValue("is_active") ? d.status.active : d.status.inactive}
                 </Badge>
             ),
@@ -89,7 +89,7 @@ export default function BannersListPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={d.entities.banner.plural} />
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
+            <div className="flex h-full flex-1 flex-col gap-6 p-6">
                 <DataTable
                     columns={columns}
                     data={banners}

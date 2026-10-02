@@ -38,8 +38,8 @@ export default function AuditLogsIndex({
             <Head title={c.audit.title} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center justify-between flex-wrap gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold">{c.audit.title}</h1>
+                    <div className="flex flex-col gap-2">
+                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.audit.title}</h1>
                         <p className="text-sm text-muted-foreground">{c.audit.subtitle}</p>
                     </div>
                     <Button variant="outline" asChild>
@@ -72,9 +72,9 @@ export default function AuditLogsIndex({
                     </select>
                 </div>
 
-                <div className="bg-card border rounded-2xl overflow-hidden">
+                <div className="bg-card border rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
-                        <thead className="bg-muted/50 text-muted-foreground border-b">
+                        <thead className="bg-muted text-muted-foreground border-b">
                             <tr>
                                 <th className="p-4 text-start font-semibold">{c.audit.date}</th>
                                 <th className="p-4 text-start font-semibold">{c.audit.user}</th>
@@ -86,13 +86,13 @@ export default function AuditLogsIndex({
                         <tbody className="divide-y">
                             {logs.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                                    <td colSpan={5} className="px-8 py-10 text-center text-muted-foreground">
                                         {c.audit.empty}
                                     </td>
                                 </tr>
                             ) : (
                                 logs.data.map((log) => (
-                                    <tr key={log.id} className="hover:bg-muted/30">
+                                    <tr key={log.id} className="hover:bg-muted/50">
                                         <td className="p-4 text-xs whitespace-nowrap">
                                             {new Date(log.created_at).toLocaleString()}
                                         </td>
@@ -100,7 +100,7 @@ export default function AuditLogsIndex({
                                         <td className="p-4">
                                             <Badge variant="outline">{log.action.toUpperCase()}</Badge>
                                         </td>
-                                        <td className="p-4 font-mono text-xs">
+                                        <td className="p-4 text-xs tabular-nums">
                                             {log.entity_type}
                                             {log.entity_id ? ` #${log.entity_id}` : ''}
                                         </td>
