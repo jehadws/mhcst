@@ -12,9 +12,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useSite } from '@/context/site-context';
 import { toast } from 'sonner';
+import { ShieldAlert } from 'lucide-react';
 
-export default function Password() {
-    const { t } = useSite();
+export default function Password({ mustChangePassword = false }: { mustChangePassword?: boolean }) {
+    const { t, locale } = useSite();
     const s = t.dashboard.settings.password;
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
@@ -57,6 +58,17 @@ export default function Password() {
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall title={s.heading} description={s.description} />
+
+                    {mustChangePassword && (
+                        <div className="flex items-start gap-3 rounded-xl border border-warning/20 bg-warning/10 p-4 text-sm text-warning">
+                            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
+                            <p className="font-medium">
+                                {locale === 'ar'
+                                    ? 'للمتابعة يجب تغيير كلمة المرور المؤقتة التي تصلك. اختر كلمة مرور جديدة ثم احفظ.'
+                                    : 'You must replace the temporary password before continuing. Choose a new password and save.'}
+                            </p>
+                        </div>
+                    )}
 
                     <form onSubmit={updatePassword} className="space-y-6">
                         <div className="grid gap-2">
