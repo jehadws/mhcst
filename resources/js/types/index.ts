@@ -1,8 +1,11 @@
 import { LucideIcon } from 'lucide-react';
+import type { WaFollowup } from './cms';
 
 export interface Auth {
     user: User | null;
     roles: string[];
+    /** Admission state for Student-role users; null for everyone else. */
+    student?: { admitted: boolean; application_status: string | null } | null;
 }
 
 export interface BreadcrumbItem {
@@ -35,7 +38,11 @@ export interface SharedData {
     locale: string;
     direction: 'ltr' | 'rtl';
     siteSettings: SiteSettings;
-    flash: { success?: string | null; import_errors?: string[] | null };
+    flash: {
+        success?: string | null;
+        import_errors?: string[] | null;
+        wa_followups?: WaFollowup[] | null;
+    };
     [key: string]: unknown;
 }
 
@@ -48,122 +55,6 @@ export interface User {
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
-}
-
-export interface Category {
-    id: number;
-    name_ar: string;
-    name_en?: string;
-    slug: string;
-    parent_id?: number | null;
-    icon?: string;
-    sort_order: number;
-}
-
-export interface Instructor {
-    id: number;
-    name: string;
-    bio_ar?: string;
-    bio_en?: string;
-    email?: string;
-    phone?: string;
-    specialization?: string;
-    years_experience?: number;
-    social_links?: string | Record<string, string>;
-    photo?: string;
-    is_active: boolean;
-    courses_count?: number;
-    pivot?: {
-        is_lead?: boolean | number;
-    };
-}
-
-export interface CourseCurriculum {
-    id: number;
-    course_id?: number;
-    section_title_ar: string;
-    section_title_en?: string;
-    lessons: Array<{
-        title_ar?: string;
-        title_en?: string;
-        duration_minutes?: number;
-        is_free?: boolean;
-    }>;
-    sort_order?: number;
-}
-
-export interface CourseAttachment {
-    id: number;
-    course_id?: number;
-    title_ar: string;
-    title_en?: string;
-    file_path: string;
-    file_type?: string;
-    file_size_bytes?: number;
-    download_url?: string;
-}
-
-export interface Course {
-    id: number;
-    category_id?: number;
-    title_ar: string;
-    title_en?: string;
-    slug: string;
-    description_ar?: string;
-    description_en?: string;
-    level: 'beginner' | 'intermediate' | 'advanced';
-    duration_hours?: number;
-    location_type?: 'onsite' | 'online' | 'hybrid';
-    venue?: string;
-    start_date?: string;
-    end_date?: string;
-    capacity?: number;
-    price: number;
-    status: 'draft' | 'published' | 'archived';
-    category?: Category;
-    instructors?: Instructor[];
-    cover_image?: string;
-    curriculums?: CourseCurriculum[];
-    attachments?: CourseAttachment[];
-    created_by?: number;
-    created_at?: string;
-    updated_at?: string;
-    enrollments_count?: number;
-}
-
-export interface Student {
-    id: number;
-    full_name: string;
-    email?: string;
-    phone: string;
-    city?: string;
-    enrollments_count?: number;
-    enrollments?: Enrollment[];
-}
-
-export interface Enrollment {
-    id: number;
-    course_id?: number;
-    student_id?: number;
-    course?: Course;
-    student?: Student;
-    full_name: string;
-    email: string;
-    phone: string;
-    status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
-    payment_status: 'unpaid' | 'partial' | 'paid';
-    amount_due: number;
-    amount_paid: number;
-    source: string;
-    notes?: string;
-    created_at: string;
-    status_history?: Array<{
-        id: number;
-        old_status: string;
-        new_status: string;
-        created_at: string;
-        changed_by?: { name: string };
-    }>;
 }
 
 export interface Lead {
@@ -255,15 +146,6 @@ export interface PaginatedData<T> {
     links: { url: string | null; label: string; active: boolean }[];
 }
 
-export interface Certificate {
-    id: number;
-    certificate_number: string;
-    file_path: string;
-    issued_at: string;
-    course?: Course;
-    student?: Student;
-}
-
 export interface SiteSetting {
     id: number;
     key: string;
@@ -346,32 +228,8 @@ export interface NewsletterCampaign {
     sender?: { id: number; name: string };
 }
 
-export interface DashboardStats {
-    students_count: number;
-    students_delta?: number | null;
-    courses_count: number;
-    total_courses: number;
-    enrollments_this_month: number;
-    enrollments_delta?: number | null;
-    pending_enrollments: number;
-    total_revenue: number;
-    revenue_this_month: number;
-    revenue_delta?: number | null;
-    new_leads: number;
-}
-
-export interface ChartPoint {
-    month: string;
-    value: number;
-}
-
 export interface StatusCount {
     status: string;
-    count: number;
-}
-
-export interface TopCourse {
-    title: string;
     count: number;
 }
 

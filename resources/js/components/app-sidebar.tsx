@@ -11,6 +11,7 @@ import {
   BookOpen,
   Briefcase,
   CalendarDays,
+  CalendarRange,
   ClipboardList,
   FileSpreadsheet,
   FileText,
@@ -32,11 +33,13 @@ import {
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
-  const { t, isRTL } = useSite();
+  const { t, isRTL, locale } = useSite();
   const c = t.cms;
   const sidebar = t.dashboard.sidebar;
   const roles = usePage<SharedData>().props.auth.roles ?? [];
   const cmsCapabilities = usePage<SharedData>().props.cmsCapabilities ?? { canManage: false, isTeacher: false };
+  const studentState = usePage<SharedData>().props.auth.student ?? null;
+  const ar = locale === 'ar';
 
   const teacherNavItems = [
     { title: c.nav.grades, url: '/cms/grades', icon: Award },
@@ -47,6 +50,7 @@ export function AppSidebar() {
   ];
 
   const adminNavItems = [
+    { title: c.nav.applications, url: '/cms/applications', icon: FileText },
     { title: c.nav.departments, url: '/cms/departments', icon: Presentation },
     { title: c.nav.levels, url: '/cms/levels', icon: Tag },
     { title: c.nav.teachers, url: '/cms/teachers', icon: UserCheck },
@@ -90,10 +94,19 @@ export function AppSidebar() {
 
         {canAccessCms(roles) && <NavMain label={c.title} items={cmsCapabilities.isTeacher ? teacherNavItems : adminNavItems} />}
 
-        {canAccessStudent(roles) && (
+        {/* Pending applicants: only the "طلبي" status page is theirs. */}
+        {canAccessStudent(roles) && studentState?.application_status && studentState.application_status !== 'accepted' && (
+          <NavMain
+            label={ar ? 'القبول' : 'Admission'}
+            items={[{ title: ar ? 'طلبي' : 'My application', url: '/student/application', icon: FileText }]}
+          />
+        )}
+
+        {canAccessStudent(roles) && (studentState?.admitted || !studentState?.application_status) && (
           <NavMain
             label={c.myStudies.title}
             items={[
+              { title: c.myTerm.title, url: '/dashboard/my-term', icon: CalendarRange },
               { title: c.myStudies.courses, url: '/dashboard/my-courses', icon: BookOpen },
               { title: c.myStudies.schedule, url: '/dashboard/my-schedule', icon: CalendarDays },
               { title: c.myStudies.grades, url: '/dashboard/my-grades', icon: Award },
@@ -124,7 +137,6 @@ export function AppSidebar() {
               { title: sidebar.items.banners, url: '/dashboard/banners/list', icon: Image },
               { title: sidebar.items.testimonials, url: '/dashboard/testimonials/list', icon: Star },
               { title: sidebar.items.faqs, url: '/dashboard/faqs/list', icon: HelpCircle },
-              { title: sidebar.items.certificates, url: '/dashboard/certificates/list', icon: Award },
             ]}
           />
         )}

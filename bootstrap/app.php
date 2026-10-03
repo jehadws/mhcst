@@ -5,6 +5,8 @@ use App\Http\Middleware\EnsureCmsAccess;
 use App\Http\Middleware\EnsureCmsManage;
 use App\Http\Middleware\EnsureDashboardAccess;
 use App\Http\Middleware\EnsureHasDashboardRole;
+use App\Http\Middleware\EnsurePasswordChanged;
+use App\Http\Middleware\EnsureStudentAdmitted;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetLocale;
@@ -25,6 +27,13 @@ return Application::configure(basePath: dirname(__DIR__))
             ->everyMinute()
             ->withoutOverlapping();
 
+        // Prune abandoned per-session registration drafts (CmsApplication).
+        $schedule->command('model:prune')->daily();
+
+        // Deadline reminders (registration / add-drop / grade entry), deduped
+        // per recipient by the notifications log.
+        $schedule->command('cms:send-deadline-reminders')->dailyAt('08:00');
+
         // Keep public/site.webmanifest, robots.txt and browserconfig.xml fresh
         // so they are served as static files instead of hitting PHP.
         $schedule->command('seo:generate-static')->daily();
@@ -35,6 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
             SetLocale::class,
             EnsureUserIsActive::class,
+            EnsurePasswordChanged::class,
         ]);
 
         $middleware->alias([
@@ -43,6 +53,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'cms.audit' => CmsAuditLogMiddleware::class,
             'dashboard.access' => EnsureDashboardAccess::class,
             'dashboard.role' => EnsureHasDashboardRole::class,
+            'student.admitted' => EnsureStudentAdmitted::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

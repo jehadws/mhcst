@@ -99,6 +99,7 @@ export interface CmsEnrollment {
   enrollment_date: string;
   status: 'pending' | 'active' | 'dropped' | 'completed' | 'withdrawn';
   source: 'admin' | 'self';
+  withdrawn_reason?: string | null;
   student?: CmsStudent;
   subject?: CmsSubject;
   grade?: CmsGrade | null;
@@ -120,4 +121,55 @@ export interface CmsSchedule {
   subject?: CmsSubject;
   teacher?: CmsTeacher;
   level?: CmsLevel;
+}
+
+export interface WorkbenchOverCapacityRow {
+  level_year: number;
+  level_section: string;
+  subject: string;
+  term: string;
+  enrolled: number;
+  capacity: number;
+}
+
+export interface WorkbenchDeadline {
+  key: 'registration_ends_at' | 'add_drop_deadline' | 'grade_entry_deadline';
+  date: string | null;
+  days_remaining: number | null;
+  passed: boolean;
+}
+
+export interface WorkbenchStudentRow {
+  id: number;
+  name: string;
+  student_no: string;
+  level: string | null;
+}
+
+export interface Workbench {
+  applications_submitted: number;
+  applications_under_review: number;
+  pending_enrollments: number;
+  over_capacity_count: number;
+  over_capacity: WorkbenchOverCapacityRow[];
+  students_without_enrollment_count: number;
+  students_without_enrollment: WorkbenchStudentRow[];
+  term: { academic_year: string | null; semester: string | null };
+  deadlines: WorkbenchDeadline[];
+}
+
+export interface StudentSearchResult {
+  id: number;
+  name: string;
+  student_no: string;
+  phone: string | null;
+  status: string;
+  level: { year: number; section: string; department: string | null } | null;
+}
+
+export interface WaFollowup {
+  name: string;
+  phone: string | null;
+  message: string;
+  link: string | null;
 }
