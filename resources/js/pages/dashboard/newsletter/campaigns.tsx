@@ -108,6 +108,9 @@ export default function NewsletterCampaignsPage() {
                     title={d.entities.newsletterCampaign.plural}
                     description={d.entities.newsletterCampaign.description}
                     searchFields={['subject']}
+                    pageCount={campaigns.last_page}
+                    currentPage={campaigns.current_page}
+                    onPageChange={(page) => router.get(`${window.location.pathname}?page=${page}`)}
                     onRefresh={() => router.reload()}
                     onAddNew={() => router.get(route('dashboard.newsletter.campaigns.create'))}
                 />

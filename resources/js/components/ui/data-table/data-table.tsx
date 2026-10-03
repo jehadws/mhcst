@@ -43,6 +43,11 @@ interface DataTableProps<TData, TValue> {
         action: (selectedRows: TData[]) => void
     }[]
     initialPageSize?: number
+    /** Server-driven pagination: pass the paginator's page count and receive
+     * 1-based page selections. Without these props the table pages client-side. */
+    pageCount?: number
+    currentPage?: number
+    onPageChange?: (page: number) => void
     onAddNew?: () => void
     onRefresh?: () => void
 }
@@ -56,21 +61,38 @@ export function DataTable<TData, TValue>({
     filterableColumns = [],
     bulkActions = [],
     initialPageSize = 10,
+    pageCount,
+    currentPage,
+    onPageChange,
     onAddNew,
     onRefresh,
 }: DataTableProps<TData, TValue>) {
     const { t } = useSite()
+    const serverPaginated = typeof onPageChange === 'function'
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
     const [globalFilter, setGlobalFilter] = React.useState('')
+    const [pagination, setPagination] = React.useState({
+        pageIndex: Math.max(0, (currentPage ?? 1) - 1),
+        pageSize: initialPageSize,
+    })
 
     const table = useReactTable({
         data,
         columns,
+        manualPagination: serverPaginated || undefined,
+        pageCount: serverPaginated ? pageCount : undefined,
+        onPaginationChange: serverPaginated
+            ? (updater) => {
+                  const next = typeof updater === 'function' ? updater(pagination) : updater
+                  setPagination(next)
+                  if (next.pageIndex !== pagination.pageIndex) onPageChange!(next.pageIndex + 1)
+              }
+            : undefined,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
+        getPaginationRowModel: serverPaginated ? undefined : getPaginationRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
         onColumnFiltersChange: setColumnFilters,
@@ -86,7 +108,7 @@ export function DataTable<TData, TValue>({
                 return val != null && String(val).toLowerCase().includes(q)
             })
         },
-        initialState: {
+        initialState: serverPaginated ? undefined : {
             pagination: {
                 pageSize: initialPageSize,
             },
@@ -97,6 +119,7 @@ export function DataTable<TData, TValue>({
             columnVisibility,
             rowSelection,
             globalFilter,
+            ...(serverPaginated ? { pagination } : {}),
         },
     })
 

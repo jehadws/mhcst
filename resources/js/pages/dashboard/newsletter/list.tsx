@@ -97,6 +97,9 @@ export default function NewsletterListPage() {
                     description={d.entities.newsletterSubscriber.description}
                     searchFields={['email', 'name']}
                     bulkActions={bulkActions}
+                    pageCount={subscribers.last_page}
+                    currentPage={subscribers.current_page}
+                    onPageChange={(page) => router.get(`${window.location.pathname}?page=${page}`)}
                     onRefresh={() => router.reload()}
                 />
                 <ConfirmationDialog

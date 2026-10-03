@@ -113,6 +113,9 @@ export default function BlogPostsListPage() {
                     description={d.entities.blogPost.description}
                     searchFields={['title']}
                     bulkActions={bulkActions}
+                    pageCount={posts.last_page}
+                    currentPage={posts.current_page}
+                    onPageChange={(page) => router.get(`${window.location.pathname}?page=${page}`)}
                     onAddNew={() => router.get(route('dashboard.blog-posts.create'))}
                     onRefresh={() => router.reload()}
                 />

@@ -114,6 +114,9 @@ export default function TestimonialsListPage() {
                     description={d.entities.testimonial.description}
                     searchFields={['name', 'quote']}
                     bulkActions={bulkActions}
+                    pageCount={testimonials.last_page}
+                    currentPage={testimonials.current_page}
+                    onPageChange={(page) => router.get(`${window.location.pathname}?page=${page}`)}
                     onAddNew={() => router.get(route('dashboard.testimonials.create'))}
                     onRefresh={() => router.reload()}
                 />
