@@ -11,19 +11,32 @@ class GradeLockService
 {
     public function isLocked(): bool
     {
+        return $this->lockMessage() !== null;
+    }
+
+    /**
+     * The translated user-facing reason grade entry is currently locked,
+     * or null when entry is open.
+     */
+    public function lockMessage(): ?string
+    {
         if (SiteSetting::get('cms.grades_locked') === '1') {
-            return true;
+            return __('cms.grades.locked');
         }
 
         $deadline = SiteSetting::get('cms.grade_entry_deadline');
 
         if (! $deadline) {
-            return false;
+            return null;
         }
 
-        return CarbonImmutable::now()->startOfDay()->gt(
-            CarbonImmutable::parse($deadline)->endOfDay()
-        );
+        if (CarbonImmutable::now()->startOfDay()->gt(CarbonImmutable::parse($deadline)->endOfDay())) {
+            return __('cms.grades.lockedUntil', [
+                'date' => CarbonImmutable::parse($deadline)->locale(app()->getLocale())->isoFormat('LL'),
+            ]);
+        }
+
+        return null;
     }
 
     public function canEditGrades(?User $user): bool

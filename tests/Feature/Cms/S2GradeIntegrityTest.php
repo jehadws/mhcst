@@ -247,6 +247,7 @@ it('blocks grade import when the grade lock is enabled', function () {
     $mockLock = Mockery::mock(GradeLockService::class);
     $mockLock->shouldReceive('isLocked')->andReturn(true);
     $mockLock->shouldReceive('canEditGrades')->atLeast()->once()->andReturn(false);
+    $mockLock->shouldReceive('lockMessage')->andReturn('Grade entry is locked. Contact an administrator to unlock.');
     $this->app->instance(GradeLockService::class, $mockLock);
 
     [$department, $level] = s2_createDepartmentLevel();
