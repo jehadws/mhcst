@@ -22,6 +22,7 @@ class CmsSchedule extends Model
         'type',
         'academic_year',
         'semester',
+        'term_id',
     ];
 
     public function subject(): BelongsTo
@@ -37,6 +38,11 @@ class CmsSchedule extends Model
     public function level(): BelongsTo
     {
         return $this->belongsTo(CmsLevel::class, 'level_id');
+    }
+
+    public function term(): BelongsTo
+    {
+        return $this->belongsTo(CmsTerm::class, 'term_id');
     }
 
     protected function casts(): array

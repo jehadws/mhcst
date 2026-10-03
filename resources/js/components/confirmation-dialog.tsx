@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { AlertTriangle, Info, CheckCircle, XCircle, HelpCircle } from "lucide-react"
+import { ReactNode } from "react"
 
 export type ConfirmationVariant = "default" | "destructive" | "warning" | "info" | "success"
 
@@ -22,6 +23,7 @@ export interface ConfirmationDialogProps {
   cancelText?: string
   variant?: ConfirmationVariant
   loading?: boolean
+  children?: ReactNode
 }
 
 const variantConfig = {
@@ -62,6 +64,7 @@ export default function ConfirmationDialog({
   cancelText = "Cancel",
   variant = "default",
   loading = false,
+  children,
 }: ConfirmationDialogProps) {
   const config = variantConfig[variant]
   const Icon = config.icon
@@ -84,6 +87,8 @@ export default function ConfirmationDialog({
           </div>
           {description && <DialogDescription className="text-left mt-2">{description}</DialogDescription>}
         </DialogHeader>
+
+        {children}
 
         <DialogFooter className="flex-col sm:flex-row gap-2">
           <Button type="button" variant="outline" onClick={onClose} disabled={loading} className="flex-1">

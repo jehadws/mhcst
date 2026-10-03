@@ -22,7 +22,8 @@ class StoreEnrollmentRequest extends FormRequest
             'subject_id' => ['required', Rule::exists('cms_subjects', 'id')->whereNull('deleted_at')],
             'academic_year' => ['required', 'string', 'max:20'],
             'semester' => ['required', 'in:first,second,summer'],
-            'status' => ['required', 'in:pending,active,dropped,completed'],
+            'status' => ['required', 'in:pending,active,dropped,withdrawn,completed'],
+            'withdrawn_reason' => ['nullable', 'string', 'max:500'],
         ];
     }
 

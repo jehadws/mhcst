@@ -35,6 +35,43 @@ class SubjectRegistrationController extends Controller
     }
 
     /**
+     * Pre-submit dry-run for the confirmation dialog: the exact problems
+     * register() would raise for this selection, computed live so stale seat
+     * counts cannot hide a guaranteed rejection.
+     */
+    public function preview(Request $request, CmsSubjectRegistrationService $service)
+    {
+        $student = CmsStudent::query()
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+
+        $subjectIds = array_values(array_filter(array_map(intval(...), (array) ($request->query('subject_ids') ?? []))));
+
+        return response()->json([
+            'problems' => $service->evaluate($student, $subjectIds),
+        ]);
+    }
+
+    /**
+     * Student self-service drop of one of their own picks inside the add/drop
+     * window; the service enforces status and deadline rules.
+     */
+    public function drop(Request $request, CmsSubjectRegistrationService $service)
+    {
+        $student = CmsStudent::query()
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+
+        $enrollment = CmsEnrollment::query()
+            ->where('student_id', $student->id)
+            ->findOrFail((int) $request->route('enrollment'));
+
+        $service->dropRegistration($student, $enrollment);
+
+        return back()->with('success', 'The subject was dropped.');
+    }
+
+    /**
      * Student self-service registration page: available subjects for the
      * current term, this term's picks with their status, and the window state.
      */

@@ -5,9 +5,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import ConfirmationDialog from '@/components/confirmation-dialog';
 import AppLayout from '@/layouts/app-layout';
 import { enrollmentStatusLabel, semesterLabel } from '@/lib/cms-helpers';
-import { BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
-import { BookOpen, CalendarCheck, Clock3, Info } from 'lucide-react';
+import { BreadcrumbItem, SharedData } from '@/types';
+import { Head, router, usePage } from '@inertiajs/react';
+import { AlertTriangle, BookOpen, CalendarCheck, CalendarX2, Clock3, Info } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 interface RegistrationSubject {
@@ -26,21 +26,37 @@ interface RegistrationEntry {
     subject: RegistrationSubject | null;
 }
 
+interface RegistrationWindow {
+    open: boolean;
+    reason: string | null;
+    starts_at: string | null;
+    ends_at: string | null;
+    add_drop_deadline: string | null;
+    self_drop_open: boolean;
+    student_active: boolean;
+}
+
 interface SubjectRegistrationProps {
     subjects: RegistrationSubject[];
     registrations: RegistrationEntry[];
     term: { academic_year: string | null; semester: string | null };
-    registration_window: { open: boolean; student_active: boolean };
+    registration_window: RegistrationWindow;
 }
 
 export default function SubjectRegistration({ subjects, registrations, term, registration_window: registrationWindow }: SubjectRegistrationProps) {
     const { t } = useSite();
     const c = t.cms;
     const reg = c.registration;
+    const { flash } = usePage<SharedData>().props;
+    const errors = usePage<SharedData>().props.errors as Record<string, string | string[]>;
 
     const [selected, setSelected] = useState<number[]>([]);
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const [problems, setProblems] = useState<string[]>([]);
+    const [checking, setChecking] = useState(false);
     const [busy, setBusy] = useState(false);
+    const [dropTarget, setDropTarget] = useState<RegistrationEntry | null>(null);
+    const [dropping, setDropping] = useState(false);
 
     const termConfigured = term.academic_year !== null && term.semester !== null;
     const canSubmit = registrationWindow.open && registrationWindow.student_active && termConfigured;
@@ -62,8 +78,30 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
         setSelected((current) => (current.includes(id) ? current.filter((s) => s !== id) : [...current, id]));
     };
 
+    // Before submit, the server dry-runs the exact registration rules and
+    // reports every subject that would be rejected — seat counts on this page
+    // can be stale by the time the student confirms.
+    const openConfirmation = () => {
+        if (selected.length === 0 || busy || checking) {
+            return;
+        }
+        setChecking(true);
+        setProblems([]);
+
+        fetch(route('dashboard.subject-registration.preview', { subject_ids: selected }), {
+            headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        })
+            .then((response) => (response.ok ? response.json() : Promise.reject(new Error('preview failed'))))
+            .then((data: { problems: string[] }) => setProblems(data.problems ?? []))
+            .catch(() => setProblems([]))
+            .finally(() => {
+                setChecking(false);
+                setConfirmOpen(true);
+            });
+    };
+
     const submitRegistration = () => {
-        if (selected.length === 0 || busy) {
+        if (selected.length === 0 || problems.length > 0 || busy) {
             return;
         }
         setBusy(true);
@@ -75,18 +113,41 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
                     setSelected([]);
                     setConfirmOpen(false);
                 },
+                onError: () => setConfirmOpen(false),
                 onFinish: () => setBusy(false),
             },
         );
     };
 
-    const blockedMessage = !registrationWindow.open
-        ? reg.blockedClosed
-        : !registrationWindow.student_active
-            ? reg.blockedInactive
-            : !termConfigured
-                ? reg.blockedNoTerm
-                : null;
+    const dropRegistration = () => {
+        if (!dropTarget || dropping) {
+            return;
+        }
+        setDropping(true);
+        router.post(
+            route('dashboard.subject-registration.drop', { enrollment: dropTarget.id }),
+            {},
+            {
+                onSuccess: () => setDropTarget(null),
+                onError: () => setDropTarget(null),
+                onFinish: () => setDropping(false),
+            },
+        );
+    };
+
+    const blockedMessage = !registrationWindow.student_active
+        ? reg.blockedInactive
+        : !termConfigured
+            ? reg.blockedNoTerm
+            : registrationWindow.reason === 'closed_switch'
+                ? reg.blockedClosed
+                : registrationWindow.reason === 'not_started' && registrationWindow.starts_at
+                    ? reg.windowNotStarted.replace('{date}', registrationWindow.starts_at)
+                    : registrationWindow.reason === 'ended' && registrationWindow.ends_at
+                        ? reg.windowEnded.replace('{date}', registrationWindow.ends_at)
+                        : !registrationWindow.open
+                            ? reg.blockedClosed
+                            : null;
 
     const statusBadge = (status: string) => {
         const label = enrollmentStatusLabel(c, status);
@@ -99,6 +160,11 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
                 return <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground">{label}</span>;
         }
     };
+
+    const canDrop = (entry: RegistrationEntry) =>
+        (entry.status === 'pending' || entry.status === 'active') && registrationWindow.self_drop_open;
+
+    const flashErrors = Object.values(errors ?? {}).flat();
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: t.dashboard.sidebar.items.dashboard, href: '/dashboard' },
@@ -114,10 +180,31 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
                     <p className="text-sm text-muted-foreground">{reg.subtitle}</p>
                 </div>
 
+                {flash?.success && (
+                    <div className="rounded-xl border border-success/20 bg-success/10 px-4 py-2.5 text-sm text-success">
+                        {flash.success}
+                    </div>
+                )}
+
+                {flashErrors.length > 0 && (
+                    <div className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-2.5 text-sm text-destructive">
+                        {flashErrors.map((message, index) => (
+                            <p key={index}>{message}</p>
+                        ))}
+                    </div>
+                )}
+
                 {blockedMessage && (
                     <div className="flex items-start gap-3 rounded-xl border border-warning/20 bg-warning/10 p-4 text-sm text-warning">
                         <Info className="w-4 h-4 mt-1 shrink-0" />
                         <p>{blockedMessage}</p>
+                    </div>
+                )}
+
+                {!blockedMessage && registrationWindow.add_drop_deadline && (
+                    <div className="flex items-center gap-2 rounded-xl border border-info/20 bg-info/10 p-3 text-sm text-info">
+                        <Clock3 className="w-4 h-4 shrink-0" />
+                        <p>{reg.deadlineLabel.replace('{date}', registrationWindow.add_drop_deadline)}</p>
                     </div>
                 )}
 
@@ -189,7 +276,7 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
                                         {reg.selectedCount.replace('{count}', String(selected.length))}
                                         {selected.length > 0 && ` • ${reg.selectedCredits.replace('{credits}', String(selectedCredits))}`}
                                     </p>
-                                    <Button disabled={!canSubmit || selected.length === 0} onClick={() => setConfirmOpen(true)}>
+                                    <Button disabled={!canSubmit || selected.length === 0} onClick={openConfirmation}>
                                         <CalendarCheck className="w-4 h-4 me-2" />
                                         {reg.submit}
                                     </Button>
@@ -210,18 +297,39 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
                                 <p className="text-sm text-muted-foreground py-10 text-center">{c.common.noRecords}</p>
                             ) : (
                                 registrations.map((entry) => (
-                                    <div key={entry.id} className="flex items-center justify-between gap-3 rounded-xl border p-3 text-sm">
-                                        <div className="min-w-0">
-                                            <p className="font-medium truncate">
-                                                {entry.subject ? `${entry.subject.name} (${entry.subject.code})` : c.common.notSpecified}
-                                            </p>
-                                            {entry.subject && (
-                                                <p className="text-xs text-muted-foreground">
-                                                    {entry.subject.credits} {reg.credits}
+                                    <div key={entry.id} className="rounded-xl border p-3 text-sm">
+                                        <div className="flex items-center justify-between gap-3">
+                                            <div className="min-w-0">
+                                                <p className="font-medium truncate">
+                                                    {entry.subject ? `${entry.subject.name} (${entry.subject.code})` : c.common.notSpecified}
                                                 </p>
-                                            )}
+                                                {entry.subject && (
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {entry.subject.credits} {reg.credits}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            {statusBadge(entry.status)}
                                         </div>
-                                        {statusBadge(entry.status)}
+                                        {canDrop(entry) && (
+                                            <div className="mt-2 border-t pt-2 text-end">
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="gap-1.5 text-destructive hover:text-destructive"
+                                                    disabled={dropping}
+                                                    onClick={() => setDropTarget(entry)}
+                                                >
+                                                    <CalendarX2 className="w-3.5 h-3.5" />
+                                                    {reg.dropAction}
+                                                </Button>
+                                            </div>
+                                        )}
+                                        {!registrationWindow.self_drop_open && (entry.status === 'pending' || entry.status === 'active') && registrationWindow.add_drop_deadline && (
+                                            <p className="mt-2 border-t pt-2 text-xs text-warning">
+                                                {reg.dropBlocked.replace('{date}', registrationWindow.add_drop_deadline)}
+                                            </p>
+                                        )}
                                     </div>
                                 ))
                             )}
@@ -238,7 +346,40 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
                         .replace('{count}', String(selected.length))
                         .replace('{credits}', String(selectedCredits))}
                     confirmText={reg.submit}
-                    loading={busy}
+                    loading={busy || checking}
+                    variant={problems.length > 0 ? 'destructive' : 'default'}
+                >
+                    {checking ? (
+                        <p className="rounded-xl border bg-muted/40 p-3 text-sm text-muted-foreground">{reg.confirmChecking}</p>
+                    ) : problems.length > 0 ? (
+                        <div className="space-y-2">
+                            <div className="flex items-start gap-2 rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
+                                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                                <p>{reg.confirmProblemsTitle}</p>
+                            </div>
+                            <ul className="list-inside list-disc space-y-1 px-1 text-sm text-destructive">
+                                {problems.map((problem, index) => (
+                                    <li key={index}>{problem}</li>
+                                ))}
+                            </ul>
+                            <p className="text-xs text-muted-foreground">{reg.confirmProblemsHint}</p>
+                        </div>
+                    ) : null}
+                </ConfirmationDialog>
+
+                <ConfirmationDialog
+                    isOpen={!!dropTarget}
+                    onClose={() => setDropTarget(null)}
+                    onConfirm={dropRegistration}
+                    title={reg.dropConfirmTitle}
+                    description={reg.dropConfirmDescription.replace(
+                        '{subject}',
+                        dropTarget?.subject ? `${dropTarget.subject.name} (${dropTarget.subject.code})` : '',
+                    )}
+                    confirmText={reg.dropAction}
+                    cancelText={c.common.cancel}
+                    variant="warning"
+                    loading={dropping}
                 />
             </div>
         </AppLayout>

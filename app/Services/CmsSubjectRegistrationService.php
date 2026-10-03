@@ -30,7 +30,7 @@ class CmsSubjectRegistrationService
 
     /**
      * Subjects the student may self-register: their department's subjects for
-     * the current semester (from the CMS academic settings), excluding subjects
+     * the current term (from the CMS academic settings), excluding subjects
      * they already hold a pending, active, or completed enrollment for.
      *
      * @return Collection<int, CmsSubject>
@@ -38,7 +38,7 @@ class CmsSubjectRegistrationService
     public function availableFor(CmsStudent $student): Collection
     {
         $departmentId = $student->level?->department_id;
-        $semester = $this->academicSettings->currentSemester();
+        $semester = $this->academicSettings->currentTerm()['semester'];
 
         if ($departmentId === null || $semester === null) {
             return collect();
@@ -60,6 +60,99 @@ class CmsSubjectRegistrationService
     }
 
     /**
+     * Dry-run of register(): every reason the given subject selection would
+     * be rejected right now, as user-facing messages. Powers the confirmation
+     * dialog's pre-submit problems list and keeps register() as the single
+     * source of the same rules.
+     *
+     * @param  list<int>  $subjectIds
+     * @return list<string>
+     */
+    public function evaluate(CmsStudent $student, array $subjectIds): array
+    {
+        $problems = [];
+
+        if ($student->status !== 'active') {
+            return ['Only active students can register for subjects.'];
+        }
+
+        if (! $this->academicSettings->registrationWindow()['open']) {
+            $problems[] = 'Subject registration is currently closed.';
+
+            return $problems;
+        }
+
+        $term = $this->academicSettings->currentTerm();
+        $academicYear = $term['academic_year'];
+        $semester = $term['semester'];
+
+        if ($academicYear === null || $semester === null) {
+            $problems[] = 'Subject registration is not available yet — the current academic term is not configured.';
+
+            return $problems;
+        }
+
+        $departmentId = $student->level?->department_id;
+
+        if ($departmentId === null) {
+            $problems[] = 'Your student profile is not linked to a department.';
+
+            return $problems;
+        }
+
+        $subjectIds = array_values(array_unique(array_map('intval', $subjectIds)));
+
+        if ($subjectIds === []) {
+            $problems[] = 'Select at least one subject to register.';
+
+            return $problems;
+        }
+
+        $subjects = CmsSubject::query()->whereIn('id', $subjectIds)->get();
+
+        foreach ($subjects as $subject) {
+            if ((int) $subject->department_id !== (int) $departmentId) {
+                $problems[] = "Subject {$subject->code} does not belong to your department.";
+
+                continue;
+            }
+
+            if ($subject->semester !== $semester) {
+                $problems[] = "Subject {$subject->code} is not offered in the current semester.";
+
+                continue;
+            }
+
+            $blocking = CmsEnrollment::withTrashed()
+                ->where('student_id', $student->id)
+                ->where('subject_id', $subject->id)
+                ->whereNull('deleted_at')
+                ->whereIn('status', self::BLOCKING_STATUSES)
+                ->exists();
+
+            if ($blocking) {
+                $problems[] = "You are already registered for {$subject->code}.";
+
+                continue;
+            }
+
+            // Pending picks do not consume seats, but a full section can only
+            // shrink — picking into it would create a guaranteed rejection.
+            $level = $student->level;
+
+            if ($level !== null) {
+                $remaining = $this->capacity->seatsRemaining($level, (int) $subject->id, (string) $academicYear, (string) $semester);
+
+                if ($remaining !== null && $remaining <= 0) {
+                    $problems[] = "مادة {$subject->code} ({$subject->name}): الشعبة مكتملة العدد حالياً. يمكنك اختيار مادة أخرى أو التواصل مع إدارة الكلية.";
+                }
+            }
+        }
+
+        return $problems;
+    }
+
+    /**
      * Register the student for the given subjects as a self-service pick.
      * Creates pending enrollments for the current term that an admin must
      * approve. Validates every rule before writing anything.
@@ -73,83 +166,24 @@ class CmsSubjectRegistrationService
             abort(403, 'Only active students can register for subjects.');
         }
 
-        if (! $this->academicSettings->subjectRegistrationOpen()) {
+        $problems = $this->evaluate($student, $subjectIds);
+
+        if ($problems !== []) {
             throw ValidationException::withMessages([
-                'subject_ids' => 'Subject registration is currently closed.',
+                'subject_ids' => $problems,
             ]);
         }
 
-        $academicYear = $this->academicSettings->currentAcademicYear();
-        $semester = $this->academicSettings->currentSemester();
-
-        if ($academicYear === null || $semester === null) {
-            throw ValidationException::withMessages([
-                'subject_ids' => 'Subject registration is not available yet — the current academic term is not configured.',
-            ]);
-        }
-
-        $departmentId = $student->level?->department_id;
-
-        if ($departmentId === null) {
-            throw ValidationException::withMessages([
-                'subject_ids' => 'Your student profile is not linked to a department.',
-            ]);
-        }
-
-        $subjectIds = array_values(array_unique(array_map('intval', $subjectIds)));
-
-        if ($subjectIds === []) {
-            throw ValidationException::withMessages([
-                'subject_ids' => 'Select at least one subject to register.',
-            ]);
-        }
+        $term = $this->academicSettings->currentTerm();
+        $academicYear = (string) $term['academic_year'];
+        $semester = (string) $term['semester'];
+        $activeTerm = $this->academicSettings->activeTerm();
 
         $subjects = CmsSubject::query()->whereIn('id', $subjectIds)->get();
 
-        foreach ($subjects as $subject) {
-            if ((int) $subject->department_id !== (int) $departmentId) {
-                throw ValidationException::withMessages([
-                    'subject_ids' => "Subject {$subject->code} does not belong to your department.",
-                ]);
-            }
-
-            if ($subject->semester !== $semester) {
-                throw ValidationException::withMessages([
-                    'subject_ids' => "Subject {$subject->code} is not offered in the current semester.",
-                ]);
-            }
-
-            $blocking = CmsEnrollment::withTrashed()
-                ->where('student_id', $student->id)
-                ->where('subject_id', $subject->id)
-                ->whereNull('deleted_at')
-                ->whereIn('status', self::BLOCKING_STATUSES)
-                ->exists();
-
-            if ($blocking) {
-                throw ValidationException::withMessages([
-                    'subject_ids' => "You are already registered for {$subject->code}.",
-                ]);
-            }
-
-            // Pending picks do not consume seats, but a full section can only
-            // shrink — picking into it would create a guaranteed rejection.
-            $level = $student->level;
-
-            if ($level !== null) {
-                $remaining = $this->capacity->seatsRemaining($level, (int) $subject->id, $academicYear, $semester);
-
-                if ($remaining !== null && $remaining <= 0) {
-                    throw ValidationException::withMessages([
-                        'subject_ids' => "مادة {$subject->code} ({$subject->name}): الشعبة مكتملة العدد حالياً. يمكنك اختيار مادة أخرى أو التواصل مع إدارة الكلية.",
-                    ]);
-                }
-            }
-        }
-
         $registered = 0;
 
-        DB::transaction(function () use ($student, $subjects, $academicYear, $semester, &$registered) {
+        DB::transaction(function () use ($student, $subjects, $academicYear, $semester, $activeTerm, &$registered) {
             foreach ($subjects as $subject) {
                 $existing = CmsEnrollment::withTrashed()
                     ->where('student_id', $student->id)
@@ -167,6 +201,8 @@ class CmsSubjectRegistrationService
                     $existing->update([
                         'status' => 'pending',
                         'source' => 'self',
+                        'term_id' => $activeTerm?->id,
+                        'withdrawn_reason' => null,
                         'enrollment_date' => now(),
                     ]);
                 } else {
@@ -176,6 +212,7 @@ class CmsSubjectRegistrationService
                             'subject_id' => $subject->id,
                             'academic_year' => $academicYear,
                             'semester' => $semester,
+                            'term_id' => $activeTerm?->id,
                             'enrollment_date' => now(),
                             'status' => 'pending',
                             'source' => 'self',
@@ -218,22 +255,60 @@ class CmsSubjectRegistrationService
     }
 
     /**
+     * The student drops one of their own pending/active picks. Allowed while
+     * the term's add/drop deadline has not passed (a term without a deadline
+     * never closes self-drop); afterwards only admins withdraw, with a reason.
+     */
+    public function dropRegistration(CmsStudent $student, CmsEnrollment $enrollment): CmsEnrollment
+    {
+        if (! in_array($enrollment->status, ['pending', 'active'], true)) {
+            throw ValidationException::withMessages([
+                'enrollment' => 'Only pending or active registrations can be dropped.',
+            ]);
+        }
+
+        if (! $this->academicSettings->registrationWindow()['self_drop_open']) {
+            throw ValidationException::withMessages([
+                'enrollment' => 'The add/drop deadline has passed — contact administration to withdraw. — انتهى موعد الإضافة والحذف، يُرجى التواصل مع الإدارة.',
+            ]);
+        }
+
+        $enrollment->update(['status' => 'dropped']);
+
+        // The drop is confirmed to the student by email; best-effort, so a
+        // mail outage never blocks or rolls back the drop itself.
+        try {
+            $this->registrationNotifier->notifyDropped($enrollment->refresh());
+        } catch (\Throwable $exception) {
+            Log::warning('registration drop notification failed', [
+                'enrollment_id' => $enrollment->id,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+
+        return $enrollment->refresh();
+    }
+
+    /**
      * Approve pending self-registered enrollments in bulk. Only rows that are
      * currently `pending` are flipped to `active`; anything already handled is
-     * left untouched. Each row is capacity-checked under the level row lock
-     * inside one transaction, so approval can never overflow a section —
-     * over-capacity rows stay `pending` and are reported as skipped. Each
-     * approved registration notifies the student by email after the commit.
+     * left untouched. The term's dated registration window must be open.
+     * Each row is capacity-checked under the level row lock inside one
+     * transaction, so approval can never overflow a section — over-capacity
+     * rows stay `pending` and are reported as skipped. Each approved
+     * registration notifies the student by email after the commit.
      *
      * @param  list<int>  $enrollmentIds
-     * @return array{approved: int, skipped: list<string>}
+     * @return array{approved: int, skipped: list<string>, approved_enrollments: Collection<int, CmsEnrollment>}
      */
     public function approveRegistrations(array $enrollmentIds): array
     {
+        $this->academicSettings->ensureRegistrationDatesOpen();
+
         $enrollmentIds = array_values(array_unique(array_map('intval', $enrollmentIds)));
 
         if ($enrollmentIds === []) {
-            return ['approved' => 0, 'skipped' => []];
+            return ['approved' => 0, 'skipped' => [], 'approved_enrollments' => collect()];
         }
 
         $flipped = CmsEnrollment::query()
@@ -243,7 +318,7 @@ class CmsSubjectRegistrationService
             ->get();
 
         if ($flipped->isEmpty()) {
-            return ['approved' => 0, 'skipped' => []];
+            return ['approved' => 0, 'skipped' => [], 'approved_enrollments' => collect()];
         }
 
         $approved = collect();
@@ -286,7 +361,66 @@ class CmsSubjectRegistrationService
             }
         }
 
-        return ['approved' => $approved->count(), 'skipped' => $skipped];
+        return ['approved' => $approved->count(), 'skipped' => $skipped, 'approved_enrollments' => $approved];
+    }
+
+    /**
+     * Bulk reject of pending self-registered picks: every row flips to
+     * `withdrawn` with the (preset or free-text) reason the student sees,
+     * and each student is notified by email. Rows that are no longer
+     * `pending` (already approved, dropped, …) are left untouched and
+     * reported as skipped so a stale selection never corrupts state.
+     *
+     * @param  list<int>  $enrollmentIds
+     * @return array{rejected: int, skipped: int, rejected_enrollments: Collection<int, CmsEnrollment>}
+     */
+    public function rejectRegistrations(array $enrollmentIds, ?string $reason = null): array
+    {
+        $enrollmentIds = array_values(array_unique(array_map('intval', $enrollmentIds)));
+
+        if ($enrollmentIds === []) {
+            return ['rejected' => 0, 'skipped' => 0, 'rejected_enrollments' => collect()];
+        }
+
+        $rejected = collect();
+        $skipped = 0;
+
+        DB::transaction(function () use ($enrollmentIds, $reason, $rejected, &$skipped): void {
+            foreach (CmsEnrollment::query()->whereIn('id', $enrollmentIds)->with(['student', 'subject'])->get() as $enrollment) {
+                if ($enrollment->status !== 'pending') {
+                    $skipped++;
+
+                    continue;
+                }
+
+                $enrollment->update(['status' => 'withdrawn', 'withdrawn_reason' => $reason]);
+                $rejected->push($enrollment);
+            }
+        });
+
+        foreach ($rejected as $enrollment) {
+            try {
+                $this->registrationNotifier->notifyRejected($enrollment->refresh());
+            } catch (\Throwable $exception) {
+                Log::warning('registration rejection notification failed', [
+                    'enrollment_id' => $enrollment->id,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
+        }
+
+        return ['rejected' => $rejected->count(), 'skipped' => $skipped, 'rejected_enrollments' => $rejected];
+    }
+
+    /**
+     * Ready-made Arabic WhatsApp follow-up for one enrollment (admin-side),
+     * mirroring the application notifier's contract.
+     *
+     * @return array{link: ?string, message: string}
+     */
+    public function waPayload(CmsEnrollment $enrollment, string $event, ?string $reason = null): array
+    {
+        return $this->registrationNotifier->waPayload($enrollment, $event, $reason);
     }
 
     /**
@@ -294,7 +428,7 @@ class CmsSubjectRegistrationService
      * `withdrawn`, which frees the subject up for re-registration. The
      * student is notified by email so the rejection is not silent.
      */
-    public function rejectRegistration(CmsEnrollment $enrollment): CmsEnrollment
+    public function rejectRegistration(CmsEnrollment $enrollment, ?string $reason = null): CmsEnrollment
     {
         if ($enrollment->status !== 'pending') {
             throw ValidationException::withMessages([
@@ -302,7 +436,28 @@ class CmsSubjectRegistrationService
             ]);
         }
 
-        $enrollment->update(['status' => 'withdrawn']);
+        $enrollment->update(['status' => 'withdrawn', 'withdrawn_reason' => $reason]);
+        $enrollment = $enrollment->refresh();
+
+        $this->registrationNotifier->notifyRejected($enrollment);
+
+        return $enrollment;
+    }
+
+    /**
+     * Admin withdrawal of a pending/active enrollment — the path students
+     * must take once the add/drop deadline has passed. Always carries a
+     * reason so the student sees why the pick was removed.
+     */
+    public function withdrawRegistration(CmsEnrollment $enrollment, string $reason): CmsEnrollment
+    {
+        if (! in_array($enrollment->status, ['pending', 'active'], true)) {
+            throw ValidationException::withMessages([
+                'enrollment' => 'Only pending or active registrations can be withdrawn.',
+            ]);
+        }
+
+        $enrollment->update(['status' => 'withdrawn', 'withdrawn_reason' => $reason]);
         $enrollment = $enrollment->refresh();
 
         $this->registrationNotifier->notifyRejected($enrollment);
