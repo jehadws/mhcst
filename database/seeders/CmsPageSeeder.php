@@ -33,7 +33,10 @@ class CmsPageSeeder extends Seeder
         ];
 
         foreach ($pages as $page) {
-            CmsPage::create(array_merge($page, ['updated_by' => 1]));
+            CmsPage::updateOrCreate(
+                ['key' => $page['key']],
+                array_merge($page, ['updated_by' => 1])
+            );
         }
     }
 }
