@@ -35,10 +35,13 @@ test('a pending student can still reach the dashboard', function () {
     $this->actingAs($user)->get(route('dashboard'))->assertOk();
 });
 
-test('a pending student can open the subject registration page', function () {
+test('a pending student is bounced from subject registration to the application page (phase 2)', function () {
     [$user] = createPendingStudentUser();
 
-    $this->actingAs($user)->get(route('dashboard.subject-registration.index'))->assertOk();
+    // Phase 2 scope: pending applicants see the dashboard and "طلبي" only;
+    // student features open after the application is accepted.
+    $this->actingAs($user)->get(route('dashboard.subject-registration.index'))
+        ->assertRedirect(route('application.status'));
 });
 
 test('a deactivated user is logged out on the next request', function () {

@@ -2,6 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\UserRole;
+use App\Models\CmsApplication;
+use App\Models\CmsStudent;
 use App\Models\SiteSetting;
 use App\Services\CmsAuthorizationService;
 use App\Services\SiteSeoService;
@@ -71,6 +74,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
                 'roles' => $request->user()?->getRoleNames()->values()->all() ?? [],
+                'student' => $this->studentState($request),
             ],
             'cmsCapabilities' => $request->user()
                 ? app(CmsAuthorizationService::class)->capabilities($request->user())
@@ -94,5 +98,32 @@ class HandleInertiaRequests extends Middleware
                 'import_errors' => $request->session()->get('import_errors'),
             ],
         ]);
+    }
+
+    /**
+     * Admission state for the sidebar / shell: Student-role users only.
+     * `admitted` = full student features allowed; `application_status` drives
+     * the "طلبي" nav entry for pending applicants.
+     */
+    private function studentState(Request $request): ?array
+    {
+        $user = $request->user();
+
+        if (! $user || ! $user->hasRole(UserRole::Student->value)) {
+            return null;
+        }
+
+        $student = CmsStudent::query()
+            ->where('user_id', $user->id)
+            ->first(['id', 'status']);
+
+        return [
+            'admitted' => $student !== null && $student->status !== 'pending',
+            'application_status' => CmsApplication::query()
+                ->notDraft()
+                ->where('user_id', $user->id)
+                ->latest()
+                ->value('status'),
+        ];
     }
 }

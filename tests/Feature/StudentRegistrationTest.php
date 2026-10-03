@@ -3,6 +3,7 @@
 use App\Enums\UserRole;
 use App\Mail\StudentRegistrationPendingMail;
 use App\Mail\StudentWelcomeMail;
+use App\Models\CmsApplication;
 use App\Models\CmsDepartment;
 use App\Models\CmsLevel;
 use App\Models\CmsStudent;
@@ -45,7 +46,7 @@ function validRegistrationPayload(int $departmentId, int $levelId, array $overri
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-test('registration page returns 200 with departments and levels', function () {
+test('registration page returns 200 with departments, levels, and admission state', function () {
     Role::firstOrCreate(['name' => UserRole::Student->value, 'guard_name' => 'web']);
     [$department, $level] = createRegistrationDeptAndLevel();
 
@@ -56,10 +57,12 @@ test('registration page returns 200 with departments and levels', function () {
             ->component('site/student/register', false) // page created in 5.4
             ->has('departments', 1)
             ->has('departments.0.levels', 1)
+            ->has('admission')
+            ->where('admission.open', true)
         );
 });
 
-test('happy path creates user, student role, and pending cms student in one transaction', function () {
+test('happy path creates user, role, and submitted application — no student profile yet', function () {
     Mail::fake();
     Event::fake([Registered::class]);
     Role::firstOrCreate(['name' => UserRole::Student->value, 'guard_name' => 'web']);
@@ -67,20 +70,24 @@ test('happy path creates user, student role, and pending cms student in one tran
 
     $response = $this->post(route('student.register.store'), validRegistrationPayload($department->id, $level->id));
 
-    $response->assertRedirect(route('dashboard'));
+    // Applicant lands on the "طلبي" status page right after registering.
+    $response->assertRedirect(route('application.status'));
 
     $user = User::where('email', 'ahmad.ali@test.com')->first();
     expect($user)->not->toBeNull()
         ->and($user->hasRole(UserRole::Student->value))->toBeTrue();
 
-    $student = CmsStudent::where('user_id', $user->id)->first();
-    expect($student)->not->toBeNull()
-        ->and($student->status)->toBe('pending')
-        ->and($student->level_id)->toBe($level->id)
-        ->and($student->student_no)->toMatch('/^\d{4}\d{4}$/'); // {year}{seq:04d}
+    // Applicant ≠ student: cms_students is only created at acceptance.
+    expect(CmsStudent::count())->toBe(0);
 
-    // No enrollments should be created at signup
-    expect($student->enrollments()->count())->toBe(0);
+    $application = CmsApplication::where('user_id', $user->id)->first();
+    expect($application)->not->toBeNull()
+        ->and($application->status)->toBe('submitted')
+        ->and($application->level_id)->toBe($level->id)
+        ->and($application->department_id)->toBe($department->id)
+        ->and($application->submitted_at)->not->toBeNull()
+        ->and($application->form_data['name'])->toBe('Ahmad Ali')
+        ->and($application->form_data['phone'])->toBe('0912345678');
 
     Event::assertDispatched(Registered::class);
 
@@ -141,13 +148,13 @@ test('honeypot filled returns a 422', function () {
     $response->assertInvalid('company');
 });
 
-test('mid-transaction failure rolls back user, student, and role', function () {
+test('mid-transaction failure rolls back user, application, and role', function () {
     Mail::fake();
     Event::fake([Registered::class]);
     Role::firstOrCreate(['name' => UserRole::Student->value, 'guard_name' => 'web']);
     [$department, $level] = createRegistrationDeptAndLevel();
 
-    CmsStudent::creating(function () {
+    CmsApplication::creating(function () {
         throw new RuntimeException('Simulated failure after user created.');
     });
 
