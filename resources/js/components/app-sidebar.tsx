@@ -88,7 +88,7 @@ export function AppSidebar() {
           label={sidebar.overview}
           items={[
             { title: sidebar.items.dashboard, url: '/dashboard', icon: LayoutGrid },
-            { title: sidebar.items.systemGuide, url: '/dashboard/guide', icon: BookOpen },
+            ...(canAccessCmsAdmin(roles) ? [{ title: sidebar.items.systemGuide, url: '/dashboard/guide', icon: BookOpen }] : []),
           ]}
         />
 

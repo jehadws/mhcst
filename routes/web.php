@@ -107,7 +107,9 @@ Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'uns
 
 Route::middleware(['auth', 'dashboard.role'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('dashboard/guide', [DashboardGuideController::class, 'index'])->name('dashboard.guide');
+    Route::get('dashboard/guide', [DashboardGuideController::class, 'index'])
+        ->middleware('dashboard.access:cms_admin')
+        ->name('dashboard.guide');
     // Accepted students only: pending applicants are bounced to their
     // "طلبي" application status page by the student.admitted gate.
     Route::middleware(['student.admitted'])->group(function () {
