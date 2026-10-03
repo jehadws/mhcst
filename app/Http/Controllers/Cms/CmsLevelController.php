@@ -12,6 +12,7 @@ use App\Models\CmsGradeRevision;
 use App\Models\CmsLevel;
 use App\Models\CmsSchedule;
 use App\Models\CmsStudent;
+use App\Models\SiteSetting;
 use App\Services\CmsAuthorizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -72,6 +73,29 @@ class CmsLevelController extends Controller
         $level->update($request->validated());
 
         return redirect()->route('cms.levels.index')->with('success', 'Level updated successfully.');
+    }
+
+    /**
+     * The printable level list: every student of the section (any status, so
+     * the printed sheet matches the registry) with a signature column.
+     */
+    public function studentsPrint(CmsLevel $level)
+    {
+        $this->cmsAuth->ensureCanManage(auth()->user());
+
+        $level->load('department');
+
+        $students = CmsStudent::query()
+            ->where('level_id', $level->id)
+            ->orderBy('student_no')
+            ->get();
+
+        return view('cms.exports.level-students', [
+            'level' => $level,
+            'students' => $students,
+            'instituteNameAr' => SiteSetting::get('site_name_ar', 'كلية المعايير الحديثة للعلوم والتقنية'),
+            'exportedAt' => now(),
+        ]);
     }
 
     public function destroy(CmsLevel $level)

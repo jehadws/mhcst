@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Cms;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreEnrollmentRequest;
+use App\Models\CmsAttendance;
 use App\Models\CmsEnrollment;
+use App\Models\CmsGrade;
+use App\Models\CmsGradeRevision;
 use App\Models\CmsLevel;
 use App\Models\CmsStudent;
 use App\Models\CmsSubject;
@@ -13,6 +16,7 @@ use App\Services\CmsEnrollmentCapacityService;
 use App\Services\CmsSubjectRegistrationService;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -63,7 +67,7 @@ class CmsEnrollmentController extends Controller
 
     public function create(): Response
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsEnrollment::class);
 
         return Inertia::render('cms/enrollments/create', [
             'students' => CmsStudent::get(['id', 'name', 'student_no']),
@@ -74,7 +78,7 @@ class CmsEnrollmentController extends Controller
 
     public function store(StoreEnrollmentRequest $request)
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsEnrollment::class);
 
         $data = $request->validated();
 
@@ -121,7 +125,7 @@ class CmsEnrollmentController extends Controller
 
     public function show(CmsEnrollment $enrollment): Response
     {
-        $this->cmsAuth->ensureTeacherCanViewEnrollment(auth()->user(), $enrollment);
+        $this->authorize('view', $enrollment);
 
         $enrollment->load(['student.level.department', 'subject.department', 'grade', 'attendance']);
 
@@ -132,7 +136,7 @@ class CmsEnrollmentController extends Controller
 
     public function edit(CmsEnrollment $enrollment): Response
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsEnrollment::class);
 
         return Inertia::render('cms/enrollments/edit', [
             'enrollment' => $enrollment,
@@ -143,7 +147,7 @@ class CmsEnrollmentController extends Controller
 
     public function update(StoreEnrollmentRequest $request, CmsEnrollment $enrollment)
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsEnrollment::class);
 
         $enrollment->update($request->validated());
 
@@ -152,7 +156,7 @@ class CmsEnrollmentController extends Controller
 
     public function bulkEnroll(Request $request)
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsEnrollment::class);
 
         $validated = $request->validate([
             'level_id' => ['required', Rule::exists('cms_levels', 'id')->whereNull('deleted_at')],
@@ -217,7 +221,7 @@ class CmsEnrollmentController extends Controller
 
     public function approve(Request $request)
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsEnrollment::class);
 
         $validated = $request->validate([
             'enrollment_ids' => ['required', 'array', 'min:1'],
@@ -234,23 +238,129 @@ class CmsEnrollmentController extends Controller
             $message .= ' لم تُعتمد الطلبات التالية لأن الشعبة مكتملة العدد: '.implode('، ', $result['skipped']).'.';
         }
 
-        return redirect()->route('cms.enrollments.index')->with('success', $message);
+        return redirect()->route('cms.enrollments.index')
+            ->with('success', $message)
+            ->with('wa_followups', $this->waFollowups(
+                $result['approved_enrollments'],
+                'approved'
+            ));
     }
 
-    public function reject(CmsEnrollment $enrollment)
+    /**
+     * Bulk reject with a required reason (preset template or free text) —
+     * the student sees the reason and is emailed; the admin gets ready-made
+     * WhatsApp follow-up links back.
+     */
+    public function bulkReject(Request $request)
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsEnrollment::class);
 
-        $this->subjectRegistration->rejectRegistration($enrollment);
+        $validated = $request->validate([
+            'enrollment_ids' => ['required', 'array', 'min:1'],
+            'enrollment_ids.*' => ['integer', 'exists:cms_enrollments,id'],
+            'reason' => ['required', 'string', 'min:3', 'max:500'],
+        ]);
 
-        return redirect()->route('cms.enrollments.index')->with('success', 'Registration rejected successfully.');
+        $result = $this->subjectRegistration->rejectRegistrations(
+            $validated['enrollment_ids'],
+            $validated['reason'],
+        );
+
+        $message = $result['rejected'] > 0
+            ? "تم رفض {$result['rejected']} طلب تسجيل وإشعار الطلاب بالسبب. — Rejected {$result['rejected']} registrations; the students were notified with the reason."
+            : 'No pending registrations were rejected — they were already handled. — لم يُرفض أي طلب؛ جميع الطلبات المحددة عولجت مسبقاً.';
+
+        if ($result['skipped'] > 0) {
+            $message .= " ({$result['skipped']})";
+        }
+
+        return redirect()->route('cms.enrollments.index')
+            ->with('success', $message)
+            ->with('wa_followups', $this->waFollowups(
+                $result['rejected_enrollments'],
+                'rejected',
+                $validated['reason']
+            ));
+    }
+
+    public function reject(Request $request, CmsEnrollment $enrollment)
+    {
+        $this->authorize('manage', CmsEnrollment::class);
+
+        $validated = $request->validate([
+            'reason' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $this->subjectRegistration->rejectRegistration($enrollment, $validated['reason'] ?? null);
+
+        return redirect()->route('cms.enrollments.index')
+            ->with('success', 'Registration rejected successfully.')
+            ->with('wa_followups', $this->waFollowups(
+                collect([$enrollment->refresh()->load(['student', 'subject'])]),
+                'rejected',
+                $validated['reason'] ?? null
+            ));
+    }
+
+    public function withdraw(Request $request, CmsEnrollment $enrollment)
+    {
+        $this->authorize('manage', CmsEnrollment::class);
+
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'max:500'],
+        ]);
+
+        $this->subjectRegistration->withdrawRegistration($enrollment, $validated['reason']);
+
+        return redirect()->route('cms.enrollments.index')
+            ->with('success', 'Registration withdrawn successfully.')
+            ->with('wa_followups', $this->waFollowups(
+                collect([$enrollment->refresh()->load(['student', 'subject'])]),
+                'rejected',
+                $validated['reason']
+            ));
+    }
+
+    /**
+     * One-tap WhatsApp follow-ups for the students touched by an approval or
+     * a rejection — capped so a huge bulk action can't flood the session.
+     *
+     * @param  Collection<int, CmsEnrollment>  $enrollments
+     * @return list<array{name: string, phone: ?string, message: string, link: ?string}>
+     */
+    private function waFollowups($enrollments, string $event, ?string $reason = null): array
+    {
+        return $enrollments
+            ->take(10)
+            ->map(function (CmsEnrollment $enrollment) use ($event, $reason) {
+                $payload = $this->subjectRegistration->waPayload($enrollment, $event, $reason);
+
+                return [
+                    'name' => $enrollment->student?->name ?? (string) $enrollment->student_id,
+                    'phone' => $enrollment->student?->phone,
+                    'message' => $payload['message'],
+                    'link' => $payload['link'],
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     public function destroy(CmsEnrollment $enrollment)
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsEnrollment::class);
 
+        // Cascade (user-approved Phase 6 cleanup): grades/attendance/revisions
+        // are hard-delete tables with no lifecycle of their own, so leaving
+        // them attached to a soft-deleted enrollment only creates orphans —
+        // the same decision CmsStudentController::destroy already encodes.
         DB::transaction(function () use ($enrollment) {
+            $enrollmentId = $enrollment->id;
+
+            CmsGradeRevision::where('enrollment_id', $enrollmentId)->delete();
+            CmsGrade::where('enrollment_id', $enrollmentId)->delete();
+            CmsAttendance::where('enrollment_id', $enrollmentId)->delete();
+
             $enrollment->delete();
         });
 

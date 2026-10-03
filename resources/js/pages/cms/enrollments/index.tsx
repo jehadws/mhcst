@@ -2,12 +2,14 @@ import AppLayout from '@/layouts/app-layout';
 import { useCms } from '@/hooks/use-cms';
 import { cmsBreadcrumbs, enrollmentStatusLabel, semesterLabel } from '@/lib/cms-helpers';
 import { BreadcrumbItem, PaginatedData } from '@/types';
-import { CmsEnrollment, CmsSubject } from '@/types/cms';
-import { Head, Link, router } from '@inertiajs/react';
+import { CmsEnrollment, CmsSubject, WaFollowup } from '@/types/cms';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Trash2, Eye, Edit, Check, X } from 'lucide-react';
 import ConfirmationDialog from '@/components/confirmation-dialog';
+import ReasonRejectDialog from '@/components/cms/reason-reject-dialog';
+import WaFollowupsPanel from '@/components/cms/wa-followups';
 import { useMemo, useState } from 'react';
 
 interface EnrollmentFilters {
@@ -20,13 +22,14 @@ interface EnrollmentFilters {
 
 export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }: { enrollments: PaginatedData<CmsEnrollment>; subjects: CmsSubject[]; filters?: EnrollmentFilters }) {
     const { c, canManage } = useCms();
+    const { props } = usePage<{ flash?: { wa_followups?: WaFollowup[] | null } }>();
 
     const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [
         { label: c.nav.enrollments, href: '/cms/enrollments' },
     ]);
 
     const [deleteItem, setDeleteItem] = useState<CmsEnrollment | null>(null);
-    const [rejectItem, setRejectItem] = useState<CmsEnrollment | null>(null);
+    const [rejectIds, setRejectIds] = useState<number[]>([]);
     const [selected, setSelected] = useState<number[]>([]);
     const [busy, setBusy] = useState(false);
 
@@ -62,13 +65,22 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
         });
     };
 
-    const handleReject = () => {
-        if (!rejectItem || busy) return;
+    const handleReject = (reason: string) => {
+        if (rejectIds.length === 0 || busy) return;
         setBusy(true);
-        router.post(`/cms/enrollments/${rejectItem.id}/reject`, {}, {
-            onSuccess: () => setRejectItem(null),
-            onFinish: () => setBusy(false),
-        });
+        const bulk = rejectIds.length > 1;
+        router.post(
+            bulk ? '/cms/enrollments/bulk-reject' : `/cms/enrollments/${rejectIds[0]}/reject`,
+            bulk ? { enrollment_ids: rejectIds, reason } : { reason },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setRejectIds([]);
+                    setSelected([]);
+                },
+                onFinish: () => setBusy(false),
+            },
+        );
     };
 
     const handleDelete = () => {
@@ -120,6 +132,17 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                     )}
                 </div>
 
+                {props.flash?.wa_followups && props.flash.wa_followups.length > 0 && (
+                    <WaFollowupsPanel
+                        followups={props.flash.wa_followups}
+                        title={c.enrollments.followupsTitle}
+                        hint={c.enrollments.followupsHint}
+                        copyLabel={c.enrollments.copy}
+                        copiedLabel={c.enrollments.copied}
+                        dismissLabel={c.enrollments.dismiss}
+                    />
+                )}
+
                 <div className="flex gap-3 flex-wrap items-center">
                     <span className="text-sm font-medium text-muted-foreground">{c.enrollments.filters}:</span>
                     <select
@@ -162,11 +185,29 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                             <Checkbox checked={allPendingSelected} onCheckedChange={toggleSelectAllPending} />
                             {c.enrollments.pendingBadge} ({pendingIds.length})
                         </label>
-                        <Button size="sm" className="gap-2" disabled={selected.length === 0 || busy} onClick={() => approve(selected)}>
-                            <Check className="w-4 h-4" />
-                            {c.enrollments.approveSelected}
-                            {selected.length > 0 && ` (${selected.length})`}
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                size="sm"
+                                className="gap-2"
+                                disabled={selected.length === 0 || busy}
+                                onClick={() => approve(selected)}
+                            >
+                                <Check className="w-4 h-4" />
+                                {c.enrollments.approveSelected}
+                                {selected.length > 0 && ` (${selected.length})`}
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-2 border-destructive/40 text-destructive hover:bg-destructive/10"
+                                disabled={selected.length === 0 || busy}
+                                onClick={() => setRejectIds(selected.filter((id) => pendingIds.includes(id)))}
+                            >
+                                <X className="w-4 h-4" />
+                                {c.enrollments.rejectSelected}
+                                {selected.length > 0 && ` (${selected.filter((id) => pendingIds.includes(id)).length})`}
+                            </Button>
+                        </div>
                     </div>
                 )}
 
@@ -245,7 +286,7 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     disabled={busy}
-                                                                    onClick={() => setRejectItem(enr)}
+                                                                    onClick={() => setRejectIds([enr.id])}
                                                                     title={c.enrollments.reject}
                                                                     className="text-destructive hover:text-destructive/80"
                                                                 >
@@ -280,12 +321,18 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                     description={c.enrollments.deleteDescription}
                 />
 
-                <ConfirmationDialog
-                    isOpen={!!rejectItem}
-                    onClose={() => setRejectItem(null)}
-                    onConfirm={handleReject}
-                    title={c.enrollments.rejectTitle}
-                    description={c.enrollments.rejectDescription}
+                <ReasonRejectDialog
+                    isOpen={rejectIds.length > 0}
+                    onClose={() => setRejectIds([])}
+                    onSubmit={handleReject}
+                    title={c.enrollments.bulkRejectTitle}
+                    description={c.enrollments.bulkRejectDescription}
+                    reasonLabel={c.enrollments.reasonLabel}
+                    reasonPlaceholder={c.enrollments.reasonPlaceholder}
+                    presets={c.enrollments.rejectReasons}
+                    confirmText={c.enrollments.reject}
+                    cancelText={c.common.cancel}
+                    processing={busy}
                 />
             </div>
         </AppLayout>

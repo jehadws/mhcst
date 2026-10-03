@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Cms\StoreScheduleRequest;
 use App\Models\CmsLevel;
 use App\Models\CmsSchedule;
+use App\Models\CmsStudent;
 use App\Models\CmsSubject;
 use App\Models\CmsTeacher;
+use App\Models\SiteSetting;
 use App\Services\CmsAuthorizationService;
 use App\Services\ScheduleValidatorService;
 use Illuminate\Http\Request;
@@ -88,6 +90,36 @@ class CmsScheduleController extends Controller
 
         return Inertia::render('cms/schedules/show', [
             'schedule' => $schedule,
+        ]);
+    }
+
+    /**
+     * The printable class roster: every active student of the schedule's
+     * level enrolled in the schedule's subject for the schedule's term, with
+     * a signature column. Teachers may print their own classes' rosters.
+     */
+    public function roster(CmsSchedule $schedule)
+    {
+        $this->cmsAuth->ensureTeacherCanViewSchedule(auth()->user(), $schedule);
+
+        $schedule->load(['subject', 'teacher', 'level.department']);
+
+        $students = CmsStudent::query()
+            ->where('level_id', $schedule->level_id)
+            ->where('status', 'active')
+            ->whereHas('enrollments', fn ($q) => $q
+                ->where('subject_id', $schedule->subject_id)
+                ->where('academic_year', $schedule->academic_year)
+                ->where('semester', $schedule->semester)
+                ->where('status', 'active'))
+            ->orderBy('student_no')
+            ->get();
+
+        return view('cms.exports.roster', [
+            'schedule' => $schedule,
+            'students' => $students,
+            'instituteNameAr' => SiteSetting::get('site_name_ar', 'كلية المعايير الحديثة للعلوم والتقنية'),
+            'exportedAt' => now(),
         ]);
     }
 

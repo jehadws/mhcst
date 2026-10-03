@@ -5,7 +5,7 @@ import { BreadcrumbItem } from '@/types';
 import { CmsStudent } from '@/types/cms';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Award, Edit, IdCard, FileSpreadsheet } from 'lucide-react';
+import { Award, Edit, IdCard, FileSpreadsheet, ReceiptText } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function StudentShow({ student }: { student: CmsStudent }) {
@@ -37,6 +37,11 @@ export default function StudentShow({ student }: { student: CmsStudent }) {
                             <Button variant="outline" asChild className="gap-2">
                                 <a href={`/cms/students/${student.id}/transcript`} target="_blank" rel="noopener noreferrer">
                                     <FileSpreadsheet className="w-4 h-4" /> {c.student.printTranscript}
+                                </a>
+                            </Button>
+                            <Button variant="outline" asChild className="gap-2">
+                                <a href={`/cms/students/${student.id}/enrollment-receipt`} target="_blank" rel="noopener noreferrer">
+                                    <ReceiptText className="w-4 h-4" /> {c.student.printReceipt}
                                 </a>
                             </Button>
                             <Button variant="outline" asChild className="gap-2">

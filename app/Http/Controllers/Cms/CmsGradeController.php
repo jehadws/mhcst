@@ -9,6 +9,7 @@ use App\Models\CmsGrade;
 use App\Models\CmsSubject;
 use App\Services\CmsAuthorizationService;
 use App\Services\CmsGradeImportService;
+use App\Services\CmsGradePasteService;
 use App\Services\CmsSpreadsheetService;
 use App\Services\GradeLockService;
 use Illuminate\Http\Request;
@@ -46,16 +47,21 @@ class CmsGradeController extends Controller
             'enrollments' => $enrollments,
             'gradesLocked' => $gradeLock->isLocked(),
             'canEditGrades' => $gradeLock->canEditGrades($user),
+            'gradeDeadline' => $gradeLock->settings()['grade_entry_deadline'],
         ]);
     }
 
     public function update(UpdateGradeRequest $request, GradeLockService $gradeLock)
     {
         if (! $gradeLock->canEditGrades(auth()->user())) {
-            return redirect()->back()->withErrors(['grades' => 'Grade entry is locked. Contact an administrator to unlock.']);
+            return redirect()->back()->withErrors(['grades' => $gradeLock->lockMessage() ?? __('cms.grades.locked')]);
         }
 
-        $this->cmsAuth->ensureTeacherCanAccessEnrollment(auth()->user(), (int) $request->input('enrollment_id'));
+        // Policy guard (CmsGradePolicy::write): managers everywhere, teachers
+        // only for enrollments in their own subjects. A missing enrollment
+        // denies, matching the legacy 403 (not 404) answer.
+        $enrollment = CmsEnrollment::find((int) $request->input('enrollment_id'));
+        $this->authorize('write', [CmsGrade::class, $enrollment]);
 
         $data = $request->validated();
         $enrollmentId = $data['enrollment_id'];
@@ -85,7 +91,7 @@ class CmsGradeController extends Controller
     public function bulkUpdate(Request $request, GradeLockService $gradeLock)
     {
         if (! $gradeLock->canEditGrades(auth()->user())) {
-            return redirect()->back()->withErrors(['grades' => 'Grade entry is locked. Contact an administrator to unlock.']);
+            return redirect()->back()->withErrors(['grades' => $gradeLock->lockMessage() ?? __('cms.grades.locked')]);
         }
 
         $request->validate([
@@ -113,12 +119,9 @@ class CmsGradeController extends Controller
                 }
             }
 
-            if (isset($item['_updated_at'])) {
-                request()->attributes->set(
-                    'expected_grade_updated_at',
-                    $item['_updated_at']
-                );
-            }
+            // Reset per row: without this, one row's expected timestamp would
+            // leak into the next row's optimistic-lock check.
+            request()->attributes->set('expected_grade_updated_at', $item['_updated_at'] ?? null);
 
             $grade->entered_by = auth()->id();
             $grade->entered_at = now();
@@ -126,6 +129,31 @@ class CmsGradeController extends Controller
         }
 
         return redirect()->back()->with('success', 'Grades updated in bulk successfully.');
+    }
+
+    /**
+     * Parses pasted TSV (Excel/Sheets clipboard) grade data into rows matched
+     * against the subject's active enrollments. Read-only: the client applies
+     * the result to the grade sheet and saves through the normal bulk update.
+     */
+    public function parsePaste(Request $request)
+    {
+        $request->validate([
+            'subject_id' => ['required', 'integer', 'exists:cms_subjects,id'],
+            'paste' => ['required', 'string', 'max:20000'],
+        ]);
+
+        $user = auth()->user();
+        $this->cmsAuth->ensureTeacherCanAccessSubject($user, (int) $request->input('subject_id'));
+
+        $enrollments = CmsEnrollment::with(['student', 'grade'])
+            ->where('subject_id', $request->integer('subject_id'))
+            ->where('status', 'active')
+            ->get();
+
+        return response()->json(
+            app(CmsGradePasteService::class)->parse($request->input('paste'), $enrollments)
+        );
     }
 
     public function export(Request $request)
@@ -172,11 +200,11 @@ class CmsGradeController extends Controller
 
     public function import(Request $request, GradeLockService $gradeLock)
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsGrade::class);
 
         if (! $gradeLock->canEditGrades(auth()->user())) {
             return redirect()->back()
-                ->withErrors(['grades' => 'Grade entry is locked. Contact an administrator to unlock.']);
+                ->withErrors(['grades' => $gradeLock->lockMessage() ?? __('cms.grades.locked')]);
         }
 
         $request->validate([

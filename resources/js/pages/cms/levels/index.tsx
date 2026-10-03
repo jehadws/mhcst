@@ -2,14 +2,14 @@ import AppLayout from '@/layouts/app-layout';
 import { useCms } from '@/hooks/use-cms';
 import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem, PaginatedData } from '@/types';
-import { CmsDepartment, CmsLevel } from '@/types/cms';
+import { CmsLevel } from '@/types/cms';
 import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Edit } from 'lucide-react';
+import { Plus, Trash2, Edit, Printer } from 'lucide-react';
 import ConfirmationDialog from '@/components/confirmation-dialog';
 import { useState } from 'react';
 
-export default function LevelsIndex({ levels, departments }: { levels: PaginatedData<CmsLevel>; departments: CmsDepartment[] }) {
+export default function LevelsIndex({ levels }: { levels: PaginatedData<CmsLevel> }) {
     const { c } = useCms();
 
     const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [
@@ -72,6 +72,11 @@ export default function LevelsIndex({ levels, departments }: { levels: Paginated
                                         <td className="p-4 font-semibold text-success">{lvl.students_count ?? 0}</td>
                                         <td className="p-4 text-left">
                                             <div className="flex items-center justify-end gap-2">
+                                                <Button variant="ghost" size="sm" asChild title={c.levels.printList}>
+                                                    <a href={`/cms/levels/${lvl.id}/students-print`} target="_blank" rel="noopener noreferrer">
+                                                        <Printer className="w-4 h-4" />
+                                                    </a>
+                                                </Button>
                                                 <Button variant="ghost" size="sm" asChild>
                                                     <Link href={`/cms/levels/${lvl.id}/edit`}>
                                                         <Edit className="w-4 h-4" />

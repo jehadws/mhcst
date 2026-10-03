@@ -11,6 +11,7 @@ use App\Services\AttendanceAlertNotifier;
 use App\Services\AttendanceAlertService;
 use App\Services\CmsAuthorizationService;
 use App\Services\CmsSpreadsheetService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -27,7 +28,7 @@ class CmsAttendanceController extends Controller
             : CmsSubject::orderBy('code')->get(['id', 'code', 'name']);
 
         $selectedSubjectId = (int) $request->input('subject_id', $subjects->first()?->id);
-        $date = $request->input('date', now()->format('Y-m-d'));
+        $date = Carbon::parse($request->input('date', now()->format('Y-m-d')))->toDateString();
 
         if ($selectedSubjectId && $this->cmsAuth->isTeacher($user)) {
             $this->cmsAuth->ensureTeacherCanAccessSubject($user, $selectedSubjectId);
@@ -39,7 +40,9 @@ class CmsAttendanceController extends Controller
 
         if ($selectedSubjectId) {
             $enrollments = CmsEnrollment::with(['student', 'attendance' => function ($q) use ($date) {
-                $q->where('date', $date);
+                // Carbon instance so the lookup matches the stored date format
+                // on both SQLite (tests) and MySQL.
+                $q->where('date', Carbon::parse($date)->startOfDay());
             }])
                 ->where('subject_id', $selectedSubjectId)
                 ->where('status', 'active')
@@ -68,7 +71,7 @@ class CmsAttendanceController extends Controller
         $this->cmsAuth->ensureTeacherCanAccessEnrollment(auth()->user(), (int) $data['enrollment_id']);
 
         CmsAttendance::updateOrCreate(
-            ['enrollment_id' => $data['enrollment_id'], 'date' => $data['date']],
+            ['enrollment_id' => $data['enrollment_id'], 'date' => Carbon::parse($data['date'])->startOfDay()],
             ['status' => $data['status'], 'notes' => $data['notes'] ?? null, 'recorded_by' => auth()->id()]
         );
 
@@ -94,7 +97,7 @@ class CmsAttendanceController extends Controller
             }
 
             CmsAttendance::updateOrCreate(
-                ['enrollment_id' => $record['enrollment_id'], 'date' => $request->date],
+                ['enrollment_id' => $record['enrollment_id'], 'date' => Carbon::parse($request->date)->startOfDay()],
                 ['status' => $record['status'], 'notes' => $record['notes'] ?? null, 'recorded_by' => auth()->id()]
             );
 
@@ -113,7 +116,7 @@ class CmsAttendanceController extends Controller
         $date = $request->input('date', now()->format('Y-m-d'));
 
         $query = CmsEnrollment::with(['student', 'subject', 'attendance' => function ($q) use ($date) {
-            $q->where('date', $date);
+            $q->where('date', Carbon::parse($date)->startOfDay());
         }])->where('status', 'active');
 
         $this->cmsAuth->scopeEnrollmentsForUser($query, auth()->user());

@@ -13,6 +13,7 @@ use App\Models\CmsLevel;
 use App\Models\CmsStudent;
 use App\Models\SiteSetting;
 use App\Models\User;
+use App\Services\CmsAcademicSettingsService;
 use App\Services\CmsAuthorizationService;
 use App\Services\CmsSpreadsheetService;
 use App\Services\CmsStudentImportService;
@@ -67,7 +68,7 @@ class CmsStudentController extends Controller
 
     public function store(StoreStudentRequest $request)
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsStudent::class);
 
         $data = $request->validated();
         $createUser = (bool) ($data['create_user_account'] ?? false);
@@ -96,7 +97,7 @@ class CmsStudentController extends Controller
 
     public function show(CmsStudent $student): Response
     {
-        $this->cmsAuth->ensureTeacherCanViewStudent(auth()->user(), $student);
+        $this->authorize('view', $student);
 
         return Inertia::render('cms/students/show', [
             'student' => $student->load([
@@ -111,7 +112,7 @@ class CmsStudentController extends Controller
 
     public function edit(CmsStudent $student): Response
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsStudent::class);
 
         return Inertia::render('cms/students/edit', [
             'student' => $student->load(['level', 'user']),
@@ -121,7 +122,7 @@ class CmsStudentController extends Controller
 
     public function update(StoreStudentRequest $request, CmsStudent $student)
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsStudent::class);
 
         $data = $request->validated();
         unset($data['create_user_account'], $data['password']);
@@ -133,7 +134,7 @@ class CmsStudentController extends Controller
 
     public function destroy(CmsStudent $student)
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsStudent::class);
 
         DB::transaction(function () use ($student) {
             $enrollmentIds = CmsEnrollment::where('student_id', $student->id)->toBase()->pluck('id');
@@ -164,6 +165,41 @@ class CmsStudentController extends Controller
         ]);
     }
 
+    /**
+     * The printable enrollment receipt / registration confirmation: the
+     * student's subject picks for one term with their statuses. Defaults to
+     * the current term pair; `academic_year` / `semester` query params
+     * override it.
+     */
+    public function enrollmentReceipt(Request $request, CmsStudent $student, CmsAcademicSettingsService $academicSettings)
+    {
+        $this->authorize('manage', CmsStudent::class);
+
+        $term = $academicSettings->currentTerm();
+        $academicYear = (string) ($request->query('academic_year', $term['academic_year'] ?? ''));
+        $semester = (string) ($request->query('semester', $term['semester'] ?? ''));
+
+        $enrollments = CmsEnrollment::query()
+            ->with('subject')
+            ->where('student_id', $student->id)
+            ->whereIn('status', ['pending', 'active', 'completed'])
+            ->when($academicYear !== '', fn ($q) => $q->where('academic_year', $academicYear))
+            ->when($semester !== '', fn ($q) => $q->where('semester', $semester))
+            ->orderBy('subject_id')
+            ->get();
+
+        $student->load('level.department');
+
+        return view('cms.exports.enrollment-receipt', [
+            'student' => $student,
+            'enrollments' => $enrollments,
+            'academicYear' => $academicYear,
+            'semester' => $semester,
+            'instituteNameAr' => SiteSetting::get('site_name_ar', 'كلية المعايير الحديثة للعلوم والتقنية'),
+            'exportedAt' => now(),
+        ]);
+    }
+
     public function transcript(CmsStudent $student, CmsTranscriptService $transcriptService)
     {
         return $transcriptService->render($student);
@@ -171,7 +207,7 @@ class CmsStudentController extends Controller
 
     public function import(Request $request)
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsStudent::class);
 
         $request->validate([
             'file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
@@ -209,7 +245,7 @@ class CmsStudentController extends Controller
 
     public function export(Request $request)
     {
-        $this->cmsAuth->ensureCanManage(auth()->user());
+        $this->authorize('manage', CmsStudent::class);
 
         $format = $request->input('format', 'xlsx');
         $title = $request->input('title', 'كشف الطلاب الأكاديميين');

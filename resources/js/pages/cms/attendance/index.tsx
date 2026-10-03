@@ -3,10 +3,10 @@ import { useCms } from '@/hooks/use-cms';
 import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem } from '@/types';
 import { CmsEnrollment, CmsSubject } from '@/types/cms';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { AlertCircle, CheckCircle, Clock, Download, FileText, XCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, Download, FileText, ShieldCheck, XCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function AttendanceIndex({
@@ -23,6 +23,8 @@ export default function AttendanceIndex({
     alerts: Record<number, any>;
 }) {
     const { c, canManage } = useCms();
+    const serverErrors = usePage().props.errors as Record<string, string>;
+    const serverError = serverErrors ? Object.values(serverErrors)[0] : null;
 
     const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [
         { label: c.nav.attendance, href: '/cms/attendance' },
@@ -102,6 +104,12 @@ export default function AttendanceIndex({
                     </div>
                 </div>
 
+                {serverError && (
+                    <div className="p-4 rounded-xl border border-destructive/20 bg-destructive/10 text-sm font-medium text-destructive">
+                        {serverError}
+                    </div>
+                )}
+
                 <div className="bg-card p-4 rounded-xl border flex flex-wrap items-center gap-4">
                     <div>
                         <label className="text-xs font-semibold text-muted-foreground block mb-1">{c.attendance.selectSubject}</label>
@@ -170,15 +178,24 @@ export default function AttendanceIndex({
                                                     >
                                                         <XCircle className="w-3.5 h-3.5" /> {c.labels.attendanceStatus.absent}
                                                     </button>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setStatus(enr.id, 'late')}
-                                                        className={`px-3 py-1 rounded-sm text-xs font-semibold flex items-center gap-1 transition ${
-                                                            st === 'late' ? 'bg-warning text-warning-foreground shadow-sm' : 'bg-muted text-muted-foreground'
-                                                        }`}
-                                                    >
-                                                        <Clock className="w-3.5 h-3.5" /> {c.labels.attendanceStatus.late}
-                                                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setStatus(enr.id, 'late')}
+                        className={`px-3 py-1 rounded-sm text-xs font-semibold flex items-center gap-1 transition ${
+                            st === 'late' ? 'bg-warning text-warning-foreground shadow-sm' : 'bg-muted text-muted-foreground'
+                        }`}
+                    >
+                        <Clock className="w-3.5 h-3.5" /> {c.labels.attendanceStatus.late}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setStatus(enr.id, 'excused')}
+                        className={`px-3 py-1 rounded-sm text-xs font-semibold flex items-center gap-1 transition ${
+                            st === 'excused' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground'
+                        }`}
+                    >
+                        <ShieldCheck className="w-3.5 h-3.5" /> {c.labels.attendanceStatus.excused}
+                    </button>
                                                 </div>
                                             </td>
                                             <td className="p-4">
