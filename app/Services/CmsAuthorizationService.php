@@ -177,6 +177,17 @@ class CmsAuthorizationService
             return false;
         }
 
+        return $this->canWriteGrade($user, $enrollment);
+    }
+
+    /**
+     * Boolean verdict behind the grade/attendance write guards: managers
+     * everywhere, teachers only for enrollments in their own subjects.
+     * Powers CmsGradePolicy::write so policies and service agree by
+     * construction.
+     */
+    public function canWriteGrade(?User $user, CmsEnrollment $enrollment): bool
+    {
         if ($this->canManage($user)) {
             return true;
         }
@@ -188,8 +199,30 @@ class CmsAuthorizationService
         return in_array((int) $enrollment->subject_id, $this->teacherSubjectIds($user), true);
     }
 
+    /**
+     * Boolean verdict behind ensureTeacherCanViewStudent — managers
+     * everywhere, teachers only for students in their classes. Powers
+     * CmsStudentPolicy::view.
+     */
+    public function canViewStudent(?User $user, CmsStudent $student): bool
+    {
+        if ($this->canManage($user)) {
+            return true;
+        }
+
+        if (! $this->isTeacher($user)) {
+            return false;
+        }
+
+        return in_array($student->id, $this->teacherStudentIds($user), true);
+    }
+
     public function ensureTeacherCanViewStudent(?User $user, CmsStudent $student): void
     {
+        if ($this->canManage($user)) {
+            return;
+        }
+
         if (! $this->isTeacher($user)) {
             return;
         }
