@@ -52,7 +52,7 @@ Route::get('/browserconfig.xml', [SeoController::class, 'browserConfig'])->name(
 
 // Post-deploy hook (FTP deploys cannot run artisan directly) — token-guarded.
 Route::get('/deploy/run', DeployRunController::class)
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:5,1,deploy-run')
     ->name('deploy.run');
 
 Route::get('/', [SiteController::class, 'home'])->name('home');
@@ -67,7 +67,7 @@ Route::redirect('/blog', '/blog-posts');
 Route::redirect('/blog/{slug}', '/blog-posts/{slug}');
 Route::get('/student/portal', [StudentPortalController::class, 'index'])->name('student.portal');
 Route::get('/student/portal/search', [StudentPortalController::class, 'search'])
-    ->middleware('throttle:20,1')
+    ->middleware('throttle:20,1,student-portal-search')
     ->name('student.portal.search');
 
 // Student self-registration (public, guests only). Draft autosave keeps a
@@ -75,11 +75,14 @@ Route::get('/student/portal/search', [StudentPortalController::class, 'search'])
 Route::middleware('guest')->group(function () {
     Route::get('/student/register', [StudentRegistrationController::class, 'create'])
         ->name('student.register');
+    // The trailing prefix gives each route its own throttle bucket — without
+    // it, every throttle:5,1 route shares one per-IP bucket and a first
+    // registration submit can be 429'd by unrelated earlier requests.
     Route::post('/student/register', [StudentRegistrationController::class, 'store'])
-        ->middleware('throttle:5,1')
+        ->middleware('throttle:5,1,student-register')
         ->name('student.register.store');
     Route::post('/student/register/draft', [StudentRegistrationController::class, 'saveDraft'])
-        ->middleware('throttle:30,1')
+        ->middleware('throttle:30,1,student-register-draft')
         ->name('student.register.draft');
 });
 
@@ -93,13 +96,13 @@ Route::get('/privacy-policy', fn () => app(SiteContentController::class)->show('
 
 // Public form submissions
 Route::post('/contact', [SiteController::class, 'contactStore'])
-    ->middleware('throttle:5,1')
+    ->middleware('throttle:5,1,contact')
     ->name('contact.store');
 Route::post('/newsletter', [NewsletterController::class, 'subscribe'])
-    ->middleware('throttle:10,1')
+    ->middleware('throttle:10,1,newsletter')
     ->name('newsletter.subscribe');
 Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])
-    ->middleware('throttle:10,1')
+    ->middleware('throttle:10,1,newsletter-unsubscribe')
     ->name('newsletter.unsubscribe');
 
 Route::middleware(['auth', 'dashboard.role'])->group(function () {
@@ -371,7 +374,7 @@ Route::middleware(['auth', 'dashboard.role'])->group(function () {
 });
 
 Route::post('/locale', [LocaleController::class, 'update'])
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:30,1,locale')
     ->name('locale.update');
 
 require __DIR__.'/settings.php';

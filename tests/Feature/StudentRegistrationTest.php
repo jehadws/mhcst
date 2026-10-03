@@ -9,11 +9,9 @@ use App\Models\CmsLevel;
 use App\Models\CmsStudent;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\RateLimiter;
 use Spatie\Permission\Models\Role;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -164,29 +162,27 @@ test('mid-transaction failure rolls back user, application, and role', function 
         ->and(DB::table('model_has_roles')->where('role_id', '>', 0)->count())->toBe(0);
 });
 
-test('sixth rapid registration attempt returns 429', function () {
-    RateLimiter::clear('student.register.store');
+test('sixth registration attempt returns 429', function () {
     Role::firstOrCreate(['name' => UserRole::Student->value, 'guard_name' => 'web']);
 
-    for ($i = 1; $i <= 5; $i++) {
-        RateLimiter::hit('student.register.store');
+    // Empty payloads fail validation (302 redirect) but still pass through
+    // the route's throttle middleware, so they fill the bucket.
+    for ($i = 0; $i < 5; $i++) {
+        $this->post(route('student.register.store'), [])->assertRedirect();
     }
 
-    // Exceed rate limit by simulating 6th attempt via the actual endpoint
-    RateLimiter::for('api', fn () => Limit::none());
+    $this->post(route('student.register.store'), [])->assertStatus(429);
+});
 
-    $responseOk = true;
-    foreach (range(1, 6) as $attempt) {
-        $response = $this->post(
-            route('student.register.store'),
-            validRegistrationPayload(1, 1, ['email' => "rate{$attempt}@test.com"])
-        );
-        if ($response->status() === 429) {
-            $responseOk = false;
-            break;
-        }
+test('exhausting other throttle:5,1 routes does not consume the registration bucket', function () {
+    Role::firstOrCreate(['name' => UserRole::Student->value, 'guard_name' => 'web']);
+
+    for ($i = 0; $i < 5; $i++) {
+        $this->post(route('password.email'), ['email' => 'nonexistent@example.com'])->assertRedirect();
     }
+    $this->post(route('password.email'), ['email' => 'nonexistent@example.com'])->assertStatus(429);
 
-    // At least one of the 6 attempts should have been throttled
-    expect($responseOk)->toBeFalse();
-})->skip('Rate limiter test requires real HTTP stack; skipped in unit mode');
+    // The registration route has its own bucket, so the first attempt here
+    // must not be throttled even though the password-reset bucket is full.
+    $this->post(route('student.register.store'), [])->assertRedirect();
+});
