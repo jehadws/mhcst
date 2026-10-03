@@ -263,6 +263,66 @@ test('available subjects exclude blocked enrollments and keep withdrawn picks', 
     expect($available->pluck('code')->all())->toBe(['A200']);
 });
 
+test('enrollments from a previous term do not block current-term registration', function () {
+    [$user, $student, , $department] = createRegistrationStudent();
+    setRegistrationTerm('2026-2027', 'second');
+    $subject = createRegistrationSubject($department->id, 'T101', 'second');
+
+    CmsEnrollment::create([
+        'student_id' => $student->id,
+        'subject_id' => $subject->id,
+        'academic_year' => '2025-2026',
+        'semester' => 'first',
+        'enrollment_date' => now(),
+        'status' => 'active',
+    ]);
+
+    expect(app(CmsSubjectRegistrationService::class)->availableFor($student)->pluck('code')->all())->toBe(['T101']);
+
+    $this->actingAs($user)
+        ->post(route('dashboard.subject-registration.store'), ['subject_ids' => [$subject->id]])
+        ->assertRedirect();
+
+    expect(CmsEnrollment::query()
+        ->where('student_id', $student->id)
+        ->where('subject_id', $subject->id)
+        ->where('academic_year', '2026-2027')
+        ->where('semester', 'second')
+        ->where('status', 'pending')
+        ->count())->toBe(1);
+});
+
+test('a completed course from a previous term can be registered again for a retake', function () {
+    [$user, $student, , $department] = createRegistrationStudent();
+    setRegistrationTerm('2026-2027', 'second');
+    $subject = createRegistrationSubject($department->id, 'T102', 'second');
+
+    CmsEnrollment::create([
+        'student_id' => $student->id,
+        'subject_id' => $subject->id,
+        'academic_year' => '2025-2026',
+        'semester' => 'second',
+        'enrollment_date' => now(),
+        'status' => 'completed',
+    ]);
+
+    expect(app(CmsSubjectRegistrationService::class)->availableFor($student)->pluck('code')->all())->toBe(['T102']);
+
+    $this->actingAs($user)
+        ->post(route('dashboard.subject-registration.store'), ['subject_ids' => [$subject->id]])
+        ->assertRedirect();
+
+    expect(CmsEnrollment::query()->where('student_id', $student->id)->count())->toBe(2);
+});
+
+test('subjects stay hidden when the current term is only partially configured', function () {
+    [$user, $student, , $department] = createRegistrationStudent();
+    setRegistrationTerm('', 'second');
+    createRegistrationSubject($department->id, 'T103', 'second');
+
+    expect(app(CmsSubjectRegistrationService::class)->availableFor($student))->toBeEmpty();
+});
+
 test('academic settings page controls the registration window', function () {
     $admin = createAdminUser();
     [$user, $student, , $department] = createRegistrationStudent();

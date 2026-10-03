@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\CmsAcademicSettingsService;
 use App\Services\CmsSubjectRegistrationService;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Phase 3 — student self-drop inside the add/drop window.
@@ -245,4 +246,57 @@ test('the preview endpoint returns an empty list for a clean selection', functio
 test('drop requires authentication', function () {
     $this->post(route('dashboard.subject-registration.drop', ['enrollment' => 1]))
         ->assertRedirect('/login');
+});
+
+test('an enrollment from a previous term cannot be self-dropped', function () {
+    [$user, $student, $department] = selfDropSetup();
+    $subject = selfDropSubject($department->id, 'D110');
+    $enrollment = CmsEnrollment::create([
+        'student_id' => $student->id,
+        'subject_id' => $subject->id,
+        'academic_year' => '2025-2026',
+        'semester' => 'second',
+        'enrollment_date' => now(),
+        'status' => 'active',
+        'source' => 'self',
+    ]);
+
+    $this->actingAs($user)
+        ->post(route('dashboard.subject-registration.drop', ['enrollment' => $enrollment->id]))
+        ->assertSessionHasErrors('enrollment');
+
+    expect($enrollment->refresh()->status)->toBe('active');
+});
+
+test('a suspended student cannot self-drop', function () {
+    [$user, $student, $department] = selfDropSetup();
+    $subject = selfDropSubject($department->id, 'D111');
+    $enrollment = selfDropEnrollment($student, $subject, 'active');
+    $student->update(['status' => 'suspended']);
+
+    $this->actingAs($user)
+        ->post(route('dashboard.subject-registration.drop', ['enrollment' => $enrollment->id]))
+        ->assertSessionHasErrors('enrollment');
+
+    expect($enrollment->refresh()->status)->toBe('active');
+});
+
+test('the service refuses enrollments belonging to another student', function () {
+    [$user, $student] = selfDropSetup();
+    $otherStudent = CmsStudent::create([
+        'user_id' => User::factory()->create()->id,
+        'student_no' => 'DROP-0003',
+        'name' => 'Third Student',
+        'level_id' => 1,
+        'enrollment_date' => now(),
+        'status' => 'active',
+    ]);
+
+    $subject = selfDropSubject(1, 'DX02');
+    $enrollment = selfDropEnrollment($otherStudent, $subject, 'active');
+
+    expect(fn () => app(CmsSubjectRegistrationService::class)->dropRegistration($student, $enrollment))
+        ->toThrow(HttpException::class);
+
+    expect($enrollment->refresh()->status)->toBe('active');
 });

@@ -31,27 +31,33 @@ class CmsSubjectRegistrationService
     /**
      * Subjects the student may self-register: their department's subjects for
      * the current term (from the CMS academic settings), excluding subjects
-     * they already hold a pending, active, or completed enrollment for.
+     * they already hold a pending, active, or completed enrollment for in
+     * that same term. Enrollments from earlier terms are history — they never
+     * block this term's registration (e.g. retaking a failed course).
      *
      * @return Collection<int, CmsSubject>
      */
     public function availableFor(CmsStudent $student): Collection
     {
         $departmentId = $student->level?->department_id;
-        $semester = $this->academicSettings->currentTerm()['semester'];
+        $term = $this->academicSettings->currentTerm();
+        $academicYear = $term['academic_year'];
+        $semester = $term['semester'];
 
-        if ($departmentId === null || $semester === null) {
+        if ($departmentId === null || $academicYear === null || $semester === null) {
             return collect();
         }
 
         return CmsSubject::query()
             ->where('department_id', $departmentId)
             ->where('semester', $semester)
-            ->whereNotExists(function ($query) use ($student) {
+            ->whereNotExists(function ($query) use ($student, $academicYear, $semester) {
                 $query->selectRaw(1)
                     ->from('cms_enrollments')
                     ->whereColumn('cms_enrollments.subject_id', 'cms_subjects.id')
                     ->where('cms_enrollments.student_id', $student->id)
+                    ->where('cms_enrollments.academic_year', $academicYear)
+                    ->where('cms_enrollments.semester', $semester)
                     ->whereNull('cms_enrollments.deleted_at')
                     ->whereIn('cms_enrollments.status', self::BLOCKING_STATUSES);
             })
@@ -126,6 +132,8 @@ class CmsSubjectRegistrationService
             $blocking = CmsEnrollment::withTrashed()
                 ->where('student_id', $student->id)
                 ->where('subject_id', $subject->id)
+                ->where('academic_year', $academicYear)
+                ->where('semester', $semester)
                 ->whereNull('deleted_at')
                 ->whereIn('status', self::BLOCKING_STATUSES)
                 ->exists();
@@ -255,12 +263,32 @@ class CmsSubjectRegistrationService
     }
 
     /**
-     * The student drops one of their own pending/active picks. Allowed while
-     * the term's add/drop deadline has not passed (a term without a deadline
-     * never closes self-drop); afterwards only admins withdraw, with a reason.
+     * The student drops one of their own pending/active picks for the current
+     * term. Allowed while the term's add/drop deadline has not passed (a term
+     * without a deadline never closes self-drop); afterwards only admins
+     * withdraw, with a reason. Ownership, student status, and the enrollment's
+     * term are re-asserted here so the service stays safe regardless of caller.
      */
     public function dropRegistration(CmsStudent $student, CmsEnrollment $enrollment): CmsEnrollment
     {
+        if ((int) $enrollment->student_id !== (int) $student->id) {
+            abort(403, 'This enrollment does not belong to the requesting student.');
+        }
+
+        if ($student->status !== 'active') {
+            throw ValidationException::withMessages([
+                'enrollment' => 'Only active students can drop registrations. — لا يستطيع حذف التسجيلات إلا الطالب النشط.',
+            ]);
+        }
+
+        $term = $this->academicSettings->currentTerm();
+
+        if ($enrollment->academic_year !== $term['academic_year'] || $enrollment->semester !== $term['semester']) {
+            throw ValidationException::withMessages([
+                'enrollment' => 'Only registrations for the current term can be dropped — contact administration to change earlier terms. — لا يمكن الحذف الذاتي إلا لتسجيلات الفصل الحالي؛ تواصل مع الإدارة لتعديل فصول سابقة.',
+            ]);
+        }
+
         if (! in_array($enrollment->status, ['pending', 'active'], true)) {
             throw ValidationException::withMessages([
                 'enrollment' => 'Only pending or active registrations can be dropped.',

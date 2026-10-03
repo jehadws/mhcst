@@ -9,6 +9,7 @@ use App\Models\CmsSubject;
 use App\Models\NotificationsLog;
 use App\Models\NotificationTemplate;
 use App\Models\User;
+use App\Services\CmsAcademicSettingsService;
 use App\Services\CmsNotificationDispatcher;
 use App\Services\CmsSubjectRegistrationService;
 use App\Services\RegistrationStatusNotifier;
@@ -86,6 +87,16 @@ it('queues and logs the rejection email including the withdrawal reason', functi
 
 it('confirms a self-drop by email and logs it', function () {
     Mail::fake();
+    // The self-drop path requires the enrollment's term to match the
+    // configured current term.
+    app(CmsAcademicSettingsService::class)->updateSettings([
+        'grades_locked' => false,
+        'academic_year' => '2026-2027',
+        'current_semester' => 'first',
+        'subject_registration_open' => true,
+        'consecutive_absence_threshold' => 3,
+        'absence_rate_threshold' => 20,
+    ]);
     $enrollment = notif_seedEnrollment();
 
     app(CmsSubjectRegistrationService::class)->dropRegistration($enrollment->student, $enrollment->refresh());
