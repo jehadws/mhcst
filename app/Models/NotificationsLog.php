@@ -15,7 +15,7 @@ class NotificationsLog extends Model
 
     public $timestamps = false;
 
-    protected $fillable = ['recipient', 'channel', 'template_id', 'status', 'sent_at'];
+    protected $fillable = ['recipient', 'channel', 'template_id', 'trigger_event', 'status', 'error_message', 'sent_at'];
 
     protected $casts = [
         'sent_at' => 'datetime',

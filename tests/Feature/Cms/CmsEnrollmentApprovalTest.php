@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Mail\CmsNotificationMail;
 use App\Models\CmsAuditLog;
 use App\Models\CmsDepartment;
 use App\Models\CmsEnrollment;
@@ -12,6 +13,7 @@ use App\Models\NotificationTemplate;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Services\CmsSubjectRegistrationService;
+use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
 
 function createApprovalStudent(): array
@@ -253,7 +255,8 @@ test('rejecting a registration emails the student and records the notification',
     expect(NotificationsLog::query()->sole()->recipient)->toBe('approval-student@test.com');
 });
 
-test('approval still succeeds when no notification template exists', function () {
+test('approval still succeeds and notifies via the Arabic fallback when no template exists', function () {
+    Mail::fake();
     $admin = createAdminUser();
     [$user, $student, , $department] = createApprovalStudent();
     $subject = createApprovalSubject($department->id, 'AP303');
@@ -264,7 +267,11 @@ test('approval still succeeds when no notification template exists', function ()
         ->assertRedirect(route('cms.enrollments.index'));
 
     expect($pending->refresh()->status)->toBe('active');
-    expect(NotificationsLog::count())->toBe(0);
+
+    // A missing template row must never silently suppress the notification:
+    // the notifier's inline Arabic fallback is used and the send is logged.
+    Mail::assertQueued(CmsNotificationMail::class, fn (CmsNotificationMail $mail) => $mail->triggerEvent === 'registration.approved');
+    expect(NotificationsLog::count())->toBe(1);
 });
 
 test('bulk approval emails only the registrations that were actually flipped', function () {
