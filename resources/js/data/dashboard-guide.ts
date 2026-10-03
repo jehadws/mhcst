@@ -57,7 +57,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
         intro: {
             title: 'What is this?',
             paragraphs: [
-                'The college platform has two main parts. The public website is what visitors see — homepage, departments, blog, contact form, and certificate checks.',
+                'The college platform has two main parts. The public website is what visitors see — homepage, departments, blog, contact form, and the student portal.',
                 'The dashboard (where you are now) is the staff area. Teachers, admins, content editors, and students sign in here to do their work.',
                 'Most academic work — students, grades, attendance, and timetables — lives under the College system section in the left menu.',
             ],
@@ -181,7 +181,6 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 steps: [
                     'Homepage, About, Departments, FAQ, and Contact explain the college to the public.',
                     'Blog shows news and articles that content editors publish from the dashboard.',
-                    'Certificate verification lets anyone check if a training certificate is valid.',
                     'Student portal on the website is a simple lookup — students with accounts should use the dashboard instead.',
                 ],
                 links: [{ label: 'View public site', href: '/' }],
@@ -249,7 +248,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 steps: [
                     'Write a blog post, add a title and body, optionally set a short SEO description, then publish.',
                     'Keep FAQs up to date so the contact team gets fewer repeat questions.',
-                    'Add or edit testimonials and training certificates shown on the site.',
+                    'Add or edit testimonials shown on the site.',
                     'When uploading images, use the upload button inside the editor — do not paste external image URLs.',
                 ],
                 links: [

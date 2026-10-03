@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
 use App\Models\BlogPost;
+use App\Models\CmsApplication;
 use App\Models\CmsAttendance;
 use App\Models\CmsDepartment;
 use App\Models\CmsEnrollment;
@@ -15,6 +16,8 @@ use App\Models\CmsTeacher;
 use App\Models\Faq;
 use App\Models\Testimonial;
 use App\Models\User;
+use App\Services\CmsAdmissionService;
+use App\Services\CmsWorkbenchService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -22,6 +25,8 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
+    public function __construct(private CmsAdmissionService $admission) {}
+
     public function index(): Response
     {
         $user = auth()->user();
@@ -93,6 +98,7 @@ class DashboardController extends Controller
                 $this->monthlyTotals(CmsAttendance::query(), $now),
                 $now
             ),
+            'workbench' => app(CmsWorkbenchService::class)->summary(),
         ]);
     }
 
@@ -169,11 +175,16 @@ class DashboardController extends Controller
     {
         $student = CmsStudent::with('level.department')->where('user_id', $user->id)->first();
 
+        $application = $student === null || $student->status === 'pending'
+            ? $this->presentApplication($this->admission->applicationForUser($user))
+            : null;
+
         if (! $student) {
             return Inertia::render('dashboard/index', [
                 'dashboardRole' => 'student',
                 'studentProfile' => null,
                 'transcriptUrl' => null,
+                'application' => $application,
             ]);
         }
 
@@ -219,6 +230,7 @@ class DashboardController extends Controller
                 ],
             ],
             'transcriptUrl' => route('dashboard.my-transcript'),
+            'application' => $application,
             'todaySchedules' => $todaySchedules,
             'recentGrades' => $enrollments
                 ->filter(fn ($e) => $e->grade !== null)
@@ -320,5 +332,23 @@ class DashboardController extends Controller
         }
 
         return round((($current - $previous) / $previous) * 100, 1);
+    }
+
+    /**
+     * The applicant's admission state for the dashboard banner. Null when
+     * there is nothing to follow up on (no application, or already accepted).
+     *
+     * @return array{status: string, rejected_reason: ?string}|null
+     */
+    private function presentApplication(?CmsApplication $application): ?array
+    {
+        if ($application === null || $application->status === 'accepted') {
+            return null;
+        }
+
+        return [
+            'status' => $application->status,
+            'rejected_reason' => $application->rejected_reason,
+        ];
     }
 }

@@ -5,7 +5,9 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { useSite } from '@/context/site-context';
 import AppLayout from '@/layouts/app-layout';
 import { ContentDashboardView, StudentDashboardView, TeacherDashboardView } from '@/components/dashboard/role-dashboards';
+import { WorkbenchSection } from '@/components/dashboard/workbench';
 import { BreadcrumbItem } from '@/types';
+import type { Workbench } from '@/types/cms';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowUpRight, BookOpen, Building2, Calendar, CalendarCheck, ClipboardList, GraduationCap, Users, UserCheck } from 'lucide-react';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
@@ -79,6 +81,8 @@ export default function Dashboard() {
     teacherClasses?: Array<{ id: number; code: string; name: string; student_count: number; pending_grades: number }>;
     studentProfile?: { id: number; name: string; student_no: string; department?: string | null } | null;
     transcriptUrl?: string | null;
+    application?: { status: string; rejected_reason?: string | null } | null;
+    workbench?: Workbench;
   }>().props;
 
   const {
@@ -93,6 +97,8 @@ export default function Dashboard() {
     teacherClasses = [],
     studentProfile,
     transcriptUrl,
+    application,
+    workbench,
   } = pageProps;
 
   const { t, locale } = useSite();
@@ -176,6 +182,7 @@ export default function Dashboard() {
         <StudentDashboardView
           locale={locale}
           studentProfile={studentProfile ?? null}
+          application={application ?? null}
           stats={{
             enrolled_subjects: (stats.enrolled_subjects as number) ?? 0,
             gpa: stats.gpa as number | null,
@@ -223,9 +230,11 @@ export default function Dashboard() {
           </p>
         </div>
 
+        {/* ─── Needs action (workbench) ─── */}
+        {workbench && <WorkbenchSection workbench={workbench} locale={locale} />}
+
         {/* ─── Stat Cards ─── */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          {statCards.map((card) => (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">          {statCards.map((card) => (
             <Card key={card.label} className="relative overflow-hidden">
               <CardContent className="flex items-center justify-between p-5">
                 <div className="space-y-2">

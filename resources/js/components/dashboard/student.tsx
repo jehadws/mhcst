@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cmsBilingual, sessionTypeLabel } from '@/lib/cms-helpers';
 import { Link } from '@inertiajs/react';
-import { AlertTriangle, BookOpen, CalendarDays, ClipboardList, FileSpreadsheet } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, ArrowRight, BookOpen, CalendarDays, CalendarRange, ClipboardList, FileSpreadsheet, FileText, XCircle } from 'lucide-react';
 
 export interface StudentScheduleSession {
   id: number;
@@ -53,6 +53,96 @@ export function PendingApprovalBanner({ locale }: { locale: string }) {
         <p className="mt-1 opacity-90">{c.myStudies.pendingApprovalHint}</p>
       </div>
     </div>
+  );
+}
+
+export interface ApplicationSummary {
+  status: string;
+  rejected_reason?: string | null;
+}
+
+/**
+ * The applicant's "طلبي" banner on the dashboard: current admission state and
+ * a link to the dedicated status page. Covers the phase-2 flow where the
+ * applicant may not have a cms_students row yet at all.
+ */
+export function ApplicationStatusBanner({ locale, application }: { locale: string; application: ApplicationSummary }) {
+  const ar = locale === 'ar';
+  const rejected = application.status === 'rejected';
+
+  const stateLabel = ar
+    ? {
+        submitted: 'طلبك مُرسل وبانتظار مراجعة الإدارة',
+        under_review: 'طلبك قيد المراجعة الآن',
+        rejected: 'لم يتم اعتماد طلبك',
+      }[application.status] ?? 'طلبك قيد المتابعة'
+    : {
+        submitted: 'Your application is submitted and awaiting review',
+        under_review: 'Your application is under review',
+        rejected: 'Your application was not accepted',
+      }[application.status] ?? 'Application in progress';
+
+  return (
+    <div
+      className={
+        rejected
+          ? 'border-destructive/30 bg-destructive/10 flex items-start gap-3 rounded-xl border p-4 text-sm text-destructive'
+          : 'border-warning/20 bg-warning/10 flex items-start gap-3 rounded-xl border p-4 text-sm text-warning'
+      }
+    >
+      {rejected ? <XCircle className="mt-1 h-4 w-4 shrink-0" /> : <AlertTriangle className="mt-1 h-4 w-4 shrink-0" />}
+      <div className="min-w-0 flex-1">
+        <p className="font-medium">{stateLabel}</p>
+        {rejected && application.rejected_reason && (
+          <p className="mt-1 opacity-90">
+            {ar ? 'السبب: ' : 'Reason: '}
+            {application.rejected_reason}
+          </p>
+        )}
+        <Link
+          href="/student/application"
+          className="mt-2 inline-flex items-center gap-1.5 font-bold underline-offset-4 hover:underline"
+        >
+          <FileText className="h-4 w-4" />
+          {ar ? 'تابع طلبك — «طلبي»' : 'Follow your application'}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Shown on the dashboard for a logged-in applicant whose application has not
+ * been accepted yet (no cms_students row, or still pending after backfill).
+ */
+export function ApplicantDashboardCard({ locale, application }: { locale: string; application: ApplicationSummary }) {
+  const ar = locale === 'ar';
+
+  return (
+    <Card>
+      <CardContent className="flex flex-col items-start gap-3 p-8">
+        <div className="text-primary bg-primary/10 flex size-12 items-center justify-center rounded-full">
+          <FileText className="h-6 w-6" />
+        </div>
+        <div>
+          <h1 className="font-display text-2xl font-extrabold leading-snug">
+            {ar ? 'طلب تسجيلك قيد المتابعة' : 'Your admission application'}
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {ar
+              ? 'بمجرد اعتماد الإدارة سيصبح حسابك حساب طالب كامل مع تسجيل المواد والدرجات والجدول.'
+              : 'Once the administration accepts it, your account becomes a full student account with subjects, grades, and schedule.'}
+          </p>
+        </div>
+        <ApplicationStatusBanner locale={locale} application={application} />
+        <Button asChild className="mt-2 gap-2">
+          <Link href="/student/application">
+            {ar ? 'فتح صفحة «طلبي»' : 'Open my application'}
+            {ar ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -138,6 +228,7 @@ export function StudentQuickLinks({ locale }: { locale: string }) {
   return (
     <div className="flex flex-wrap gap-2">
       {[
+        { title: c.myTerm.title, url: route('dashboard.my-term'), icon: CalendarRange },
         { title: c.myStudies.courses, url: route('dashboard.my-courses'), icon: BookOpen },
         { title: c.myStudies.schedule, url: route('dashboard.my-schedule'), icon: CalendarDays },
         { title: c.myStudies.grades, url: route('dashboard.my-grades'), icon: ClipboardList },

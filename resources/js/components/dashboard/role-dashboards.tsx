@@ -1,4 +1,6 @@
 import {
+  ApplicantDashboardCard,
+  ApplicationStatusBanner,
   PendingApprovalBanner,
   StudentNotLinkedCard,
   StudentProfileHeader,
@@ -108,18 +110,32 @@ export function TeacherDashboardView({
           <CardContent>
             <ul className="space-y-3">
               {teacherClasses.map((c) => (
-                <li key={c.id} className="flex items-center justify-between">
+                <li key={c.id} className="flex items-center justify-between gap-2">
                   <div>
                     <p className="font-medium">{c.name}</p>
                     <p className="text-muted-foreground text-xs">
                       {c.code} · {c.student_count} {ar ? 'طالب' : 'students'}
                     </p>
                   </div>
-                  {c.pending_grades > 0 && (
-                    <Badge variant="secondary">
-                      {c.pending_grades} {ar ? 'معلّقة' : 'pending'}
-                    </Badge>
-                  )}
+                  <div className="flex shrink-0 items-center gap-3">
+                    {c.pending_grades > 0 && (
+                      <Badge variant="secondary">
+                        {c.pending_grades} {ar ? 'معلّقة' : 'pending'}
+                      </Badge>
+                    )}
+                    <Link
+                      href={`/cms/attendance?subject_id=${c.id}`}
+                      className="text-primary hover:underline text-xs font-semibold"
+                    >
+                      {ar ? 'حضور' : 'Attendance'}
+                    </Link>
+                    <Link
+                      href={`/cms/grades?subject_id=${c.id}`}
+                      className="text-primary hover:underline text-xs font-semibold"
+                    >
+                      {ar ? 'درجات' : 'Grades'}
+                    </Link>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -133,6 +149,7 @@ export function TeacherDashboardView({
 export function StudentDashboardView({
   locale,
   studentProfile,
+  application,
   stats,
   todaySchedules,
   recentGrades,
@@ -147,6 +164,7 @@ export function StudentDashboardView({
     department?: string | null;
     level?: { year: number; section: string } | null;
   } | null;
+  application?: { status: string; rejected_reason?: string | null } | null;
   stats?: { enrolled_subjects: number; gpa: number | null; attendance_rate: number | null; today_classes_count: number };
   todaySchedules: ScheduleRow[];
   recentGrades: Array<{ subject?: string; code?: string; total?: number; grade_letter?: string }>;
@@ -155,6 +173,10 @@ export function StudentDashboardView({
   const ar = locale === 'ar';
 
   if (!studentProfile) {
+    if (application) {
+      return <ApplicantDashboardCard locale={locale} application={application} />;
+    }
+
     return <StudentNotLinkedCard locale={locale} />;
   }
 
@@ -162,7 +184,8 @@ export function StudentDashboardView({
     <>
       <StudentProfileHeader locale={locale} student={studentProfile} transcriptUrl={transcriptUrl} />
 
-      {studentProfile.status === 'pending' && <PendingApprovalBanner locale={locale} />}
+      {studentProfile.status === 'pending' && application && <ApplicationStatusBanner locale={locale} application={application} />}
+      {studentProfile.status === 'pending' && !application && <PendingApprovalBanner locale={locale} />}
 
       <StudentQuickLinks locale={locale} />
 

@@ -2,8 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { useCms } from '@/hooks/use-cms';
 import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem, PaginatedData } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
+import { Head, Link, router } from '@inertiajs/react';import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 interface AuditLog {
@@ -11,6 +10,7 @@ interface AuditLog {
     action: string;
     entity_type: string;
     entity_id: number | null;
+    entity_url?: string | null;
     ip_address: string | null;
     created_at: string;
     user?: { id: number; name: string; email: string } | null;
@@ -101,8 +101,21 @@ export default function AuditLogsIndex({
                                             <Badge variant="outline">{log.action.toUpperCase()}</Badge>
                                         </td>
                                         <td className="p-4 text-xs tabular-nums">
-                                            {log.entity_type}
-                                            {log.entity_id ? ` #${log.entity_id}` : ''}
+                                            {log.entity_url ? (
+                                                <Link
+                                                    href={log.entity_url}
+                                                    title={c.audit.openRecord}
+                                                    className="text-primary font-semibold underline-offset-2 hover:underline"
+                                                >
+                                                    {log.entity_type}
+                                                    {log.entity_id ? ` #${log.entity_id}` : ''}
+                                                </Link>
+                                            ) : (
+                                                <>
+                                                    {log.entity_type}
+                                                    {log.entity_id ? ` #${log.entity_id}` : ''}
+                                                </>
+                                            )}
                                         </td>
                                         <td className="p-4 text-xs text-muted-foreground">{log.ip_address ?? '—'}</td>
                                     </tr>
