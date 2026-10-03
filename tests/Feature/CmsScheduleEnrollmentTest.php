@@ -127,13 +127,14 @@ test('authenticated user can view and update an enrollment', function () {
             'student_id' => $student->id,
             'subject_id' => $subject->id,
             'academic_year' => '2025-2026',
-            'semester' => 'second',
+            'semester' => 'first',
             'status' => 'completed',
         ])
         ->assertRedirect(route('cms.enrollments.index'));
 
+    // The term identity is immutable on the edit path; only the status changes.
     expect($enrollment->fresh())
-        ->semester->toBe('second')
+        ->semester->toBe('first')
         ->status->toBe('completed');
 });
 

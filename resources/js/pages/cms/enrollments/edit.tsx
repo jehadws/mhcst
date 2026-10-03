@@ -1,12 +1,25 @@
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import CmsErrorBanner from '@/components/cms/cms-error-banner';
 import { useCms } from '@/hooks/use-cms';
 import AppLayout from '@/layouts/app-layout';
-import { cmsBreadcrumbs } from '@/lib/cms-helpers';
+import { cmsBreadcrumbs, semesterLabel } from '@/lib/cms-helpers';
 import { BreadcrumbItem } from '@/types';
 import { CmsEnrollment, CmsStudent, CmsSubject } from '@/types/cms';
 import { Head, Link, useForm } from '@inertiajs/react';
+
+/**
+ * Mirror of the server-side state machine: the current status is always
+ * selectable (no-op save), plus the transitions the backend allows.
+ */
+const ENROLLMENT_TRANSITIONS: Record<string, string[]> = {
+    pending: ['active', 'withdrawn'],
+    active: ['withdrawn', 'completed'],
+    dropped: ['pending', 'withdrawn'],
+    withdrawn: ['pending'],
+    completed: [],
+};
 
 export default function EnrollmentEdit({
   enrollment,
@@ -33,6 +46,12 @@ export default function EnrollmentEdit({
     withdrawn_reason: enrollment.withdrawn_reason ?? '',
   });
 
+  // Identity (student, subject, term) is immutable server-side: it is shown
+  // read-only and still sent so the request validates.
+  const student = students.find((s) => s.id === enrollment.student_id);
+  const subject = subjects.find((sub) => sub.id === enrollment.subject_id);
+  const statusOptions = [enrollment.status, ...(ENROLLMENT_TRANSITIONS[enrollment.status] ?? [])];
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     put(`/cms/enrollments/${enrollment.id}`);
@@ -45,60 +64,33 @@ export default function EnrollmentEdit({
         <h1 className="font-display mb-6 text-3xl leading-snug font-extrabold">{c.enrollments.editHeading}</h1>
 
         <form onSubmit={submit} className="bg-card space-y-5 rounded-xl border p-6">
+          <CmsErrorBanner />
           <div>
             <Label htmlFor="student_id">{c.enrollments.student}</Label>
-            <select
-              id="student_id"
-              className="bg-background mt-1 w-full rounded-lg border p-2.5 text-sm"
-              value={data.student_id}
-              onChange={(e) => setData('student_id', e.target.value)}
-            >
-              {students.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} ({s.student_no})
-                </option>
-              ))}
-            </select>
+            <p id="student_id" className="bg-muted mt-1 w-full rounded-lg border p-2.5 text-sm">
+              {student ? `${student.name} (${student.student_no})` : data.student_id}
+            </p>
           </div>
 
           <div>
             <Label htmlFor="subject_id">{c.enrollments.subject}</Label>
-            <select
-              id="subject_id"
-              className="bg-background mt-1 w-full rounded-lg border p-2.5 text-sm"
-              value={data.subject_id}
-              onChange={(e) => setData('subject_id', e.target.value)}
-            >
-              {subjects.map((sub) => (
-                <option key={sub.id} value={sub.id}>
-                  {sub.name} ({sub.code})
-                </option>
-              ))}
-            </select>
+            <p id="subject_id" className="bg-muted mt-1 w-full rounded-lg border p-2.5 text-sm">
+              {subject ? `${subject.name} (${subject.code})` : data.subject_id}
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="academic_year">{c.enrollments.academicYear}</Label>
-              <input
-                id="academic_year"
-                className="bg-background mt-1 w-full rounded-lg border p-2.5 text-sm"
-                value={data.academic_year}
-                onChange={(e) => setData('academic_year', e.target.value)}
-              />
+              <p id="academic_year" className="bg-muted mt-1 w-full rounded-lg border p-2.5 text-sm">
+                {data.academic_year}
+              </p>
             </div>
             <div>
               <Label htmlFor="semester">{c.enrollments.semester}</Label>
-              <select
-                id="semester"
-                className="bg-background mt-1 w-full rounded-lg border p-2.5 text-sm"
-                value={data.semester}
-                onChange={(e) => setData('semester', e.target.value as typeof data.semester)}
-              >
-                <option value="first">{c.labels.semesters.first}</option>
-                <option value="second">{c.labels.semesters.second}</option>
-                <option value="summer">{c.labels.semesters.summer}</option>
-              </select>
+              <p id="semester" className="bg-muted mt-1 w-full rounded-lg border p-2.5 text-sm">
+                {semesterLabel(c, data.semester)}
+              </p>
             </div>
           </div>
 
@@ -110,11 +102,11 @@ export default function EnrollmentEdit({
               value={data.status}
               onChange={(e) => setData('status', e.target.value as typeof data.status)}
             >
-              <option value="pending">{c.labels.enrollmentStatus.pending}</option>
-              <option value="active">{c.labels.enrollmentStatus.active}</option>
-              <option value="dropped">{c.labels.enrollmentStatus.dropped}</option>
-              <option value="withdrawn">{c.labels.enrollmentStatus.withdrawn}</option>
-              <option value="completed">{c.labels.enrollmentStatus.completed}</option>
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {c.labels.enrollmentStatus[status as keyof typeof c.labels.enrollmentStatus]}
+                </option>
+              ))}
             </select>
             <p className="text-muted-foreground mt-1 text-xs">{c.enrollments.statusHint}</p>
           </div>

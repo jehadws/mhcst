@@ -26,6 +26,20 @@ use Inertia\Response;
 
 class CmsEnrollmentController extends Controller
 {
+    /**
+     * Allowed status changes on the admin edit path. The (student, subject,
+     * year, semester) tuple is identity and is never editable; a filled term
+     * is terminal. Anything not listed must go through the dedicated flows
+     * (approve, reject, withdraw, self-drop).
+     */
+    private const ENROLLMENT_TRANSITIONS = [
+        'pending' => ['active', 'withdrawn'],
+        'active' => ['withdrawn', 'completed'],
+        'dropped' => ['pending', 'withdrawn'],
+        'withdrawn' => ['pending'],
+        'completed' => [],
+    ];
+
     public function __construct(
         private CmsAuthorizationService $cmsAuth,
         private CmsEnrollmentCapacityService $capacity,
@@ -151,9 +165,79 @@ class CmsEnrollmentController extends Controller
     {
         $this->authorize('manage', CmsEnrollment::class);
 
-        $enrollment->update($request->validated());
+        $data = $request->validated();
+
+        foreach (['student_id', 'subject_id', 'academic_year', 'semester'] as $key) {
+            if ((string) $data[$key] !== (string) $enrollment->{$key}) {
+                throw ValidationException::withMessages([
+                    $key => 'لا يمكن تغيير الطالب أو المادة أو الفصل في تسجيل قائم؛ اسحبه وأنشئ تسجيلاً جديداً. — The student, subject, or term of an existing enrollment cannot be changed; withdraw it and create a new one.',
+                ]);
+            }
+        }
+
+        $this->assertStatusTransition($enrollment->status, $data['status'], $data);
+
+        try {
+            DB::transaction(function () use ($enrollment, $data): void {
+                $enrollment = CmsEnrollment::query()
+                    ->whereKey($enrollment->getKey())
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                if ($data['status'] === 'active' && $enrollment->status !== 'active') {
+                    $student = CmsStudent::with('level')->findOrFail($enrollment->student_id);
+                    $this->capacity->assertSeatAvailable(
+                        $student->level,
+                        (int) $enrollment->subject_id,
+                        (string) $enrollment->academic_year,
+                        (string) $enrollment->semester,
+                    );
+                }
+
+                if ($data['status'] === 'pending') {
+                    $data['withdrawn_reason'] = null;
+                }
+
+                $enrollment->update($data);
+            });
+        } catch (QueryException $exception) {
+            // Two concurrent writers can both pass the FormRequest pre-checks;
+            // the loser hits the (student, subject, term) unique index.
+            if (CmsEnrollmentCapacityService::isDuplicateEnrollmentViolation($exception)) {
+                throw ValidationException::withMessages([
+                    'student_id' => 'هذا الطالب مسجل بالفعل في هذه المادة لنفس الفصل الدراسي. — This student is already enrolled in this subject for the selected term.',
+                ]);
+            }
+
+            throw $exception;
+        }
 
         return redirect()->route('cms.enrollments.index')->with('success', 'Enrollment updated successfully.');
+    }
+
+    /**
+     * Enforce the status state machine and the per-target requirements:
+     * withdrawing always carries a reason the student will see.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    private function assertStatusTransition(string $from, string $target, array $data): void
+    {
+        if ($from === $target) {
+            return;
+        }
+
+        if (! in_array($target, self::ENROLLMENT_TRANSITIONS[$from] ?? [], true)) {
+            throw ValidationException::withMessages([
+                'status' => "لا يمكن تغيير حالة التسجيل من {$from} إلى {$target}. — The enrollment status cannot change from {$from} to {$target}.",
+            ]);
+        }
+
+        if ($target === 'withdrawn' && blank($data['withdrawn_reason'] ?? null)) {
+            throw ValidationException::withMessages([
+                'withdrawn_reason' => 'سبب السحب مطلوب. — A withdrawal reason is required.',
+            ]);
+        }
     }
 
     public function bulkEnroll(Request $request)

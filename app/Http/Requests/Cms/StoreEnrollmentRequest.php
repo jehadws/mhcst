@@ -56,7 +56,11 @@ class StoreEnrollmentRequest extends FormRequest
 
             $student = CmsStudent::with('level')->find($studentId);
 
-            if ($student && $student->status !== 'active') {
+            // On update, only activating needs an active student — a suspended
+            // student's enrollment can still be withdrawn or completed.
+            $isUpdate = $this->route('enrollment') !== null;
+
+            if ($student && $student->status !== 'active' && (! $isUpdate || $this->input('status') === 'active')) {
                 $validator->errors()->add('student_id', 'Only active students can be enrolled. — لا يمكن تسجيل الطلاب غير النشطين.');
             }
 
