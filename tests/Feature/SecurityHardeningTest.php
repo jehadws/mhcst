@@ -18,7 +18,3 @@ test('deactivated users cannot log in', function () {
 
     $this->assertGuest();
 });
-
-test('certificate download requires a signed url', function () {
-    $this->get('/verify-certificate/MHCST-2026-00001/download')->assertForbidden();
-});

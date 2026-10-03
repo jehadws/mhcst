@@ -26,6 +26,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_active',
+        'must_change_password',
     ];
 
     /**
@@ -49,6 +50,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'must_change_password' => 'boolean',
         ];
     }
 
@@ -59,13 +61,13 @@ class User extends Authenticatable
             ->logOnlyDirty();
     }
 
-    public function courses()
-    {
-        return $this->hasMany(Course::class, 'created_by');
-    }
-
     public function blogPosts()
     {
         return $this->hasMany(BlogPost::class, 'author_id');
+    }
+
+    public function student()
+    {
+        return $this->hasOne(CmsStudent::class, 'user_id');
     }
 }

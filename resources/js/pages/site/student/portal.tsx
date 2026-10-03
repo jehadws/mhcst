@@ -4,36 +4,13 @@ import { PageHero } from '@/components/site/page-hero';
 import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import { useSite } from '@/context/site-context';
-import { Award, BookOpen, Search } from 'lucide-react';
+import { BookOpen, Search } from 'lucide-react';
 import { useState } from 'react';
-
-interface TrainingEnrollment {
-  id: number;
-  full_name: string;
-  status: string;
-  created_at: string;
-  course?: {
-    title_ar: string;
-    title_en?: string;
-    slug: string;
-  };
-  certificate?: {
-    certificate_number: string;
-    download_url?: string;
-  };
-}
 
 interface AcademicSubject {
   name: string;
   code?: string;
   credits?: number;
-}
-
-interface AcademicCertificate {
-  certificate_number?: string;
-  course_title_ar?: string;
-  course_title_en?: string;
-  download_url?: string;
 }
 
 interface AcademicStudent {
@@ -44,20 +21,17 @@ interface AcademicStudent {
   department?: string;
   level?: string;
   subjects: AcademicSubject[];
-  certificates?: AcademicCertificate[];
 }
 
 export default function StudentPortal() {
   const { t, locale } = useSite();
   const [inputVal, setInputVal] = useState('');
-  const [trainingEnrollments, setTrainingEnrollments] = useState<TrainingEnrollment[]>([]);
   const [academicStudents, setAcademicStudents] = useState<AcademicStudent[]>([]);
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const clearResults = () => {
-    setTrainingEnrollments([]);
     setAcademicStudents([]);
     setSearched(false);
   };
@@ -84,7 +58,6 @@ export default function StudentPortal() {
       }
       if (res.ok) {
         const data = await res.json();
-        setTrainingEnrollments(data.training_enrollments || data.enrollments || []);
         setAcademicStudents(data.academic_students || []);
         setSearched(true);
       } else {
@@ -110,24 +83,23 @@ export default function StudentPortal() {
 
   const statusBadge = (status: string) => {
     switch (status) {
-      case 'completed':
-        return (
-          <span className="bg-success/10 text-success rounded-full px-3 py-1 text-xs font-bold">
-            {locale === 'ar' ? 'مكتملة' : 'Completed'}
-          </span>
-        );
-      case 'confirmed':
       case 'active':
         return (
           <span className="bg-info/10 text-info rounded-full px-3 py-1 text-xs font-bold">
             {locale === 'ar' ? 'نشط' : 'Active'}
           </span>
         );
-      case 'cancelled':
-      case 'dropped':
+      case 'graduated':
+        return (
+          <span className="bg-success/10 text-success rounded-full px-3 py-1 text-xs font-bold">
+            {locale === 'ar' ? 'متخرج' : 'Graduated'}
+          </span>
+        );
+      case 'suspended':
+      case 'withdrawn':
         return (
           <span className="bg-destructive/10 text-destructive rounded-full px-3 py-1 text-xs font-bold">
-            {locale === 'ar' ? 'ملغي' : 'Cancelled'}
+            {locale === 'ar' ? (status === 'suspended' ? 'موقوف' : 'منسحب') : status === 'suspended' ? 'Suspended' : 'Withdrawn'}
           </span>
         );
       default:
@@ -139,7 +111,7 @@ export default function StudentPortal() {
     }
   };
 
-  const totalResults = trainingEnrollments.length + academicStudents.length;
+  const totalResults = academicStudents.length;
 
   return (
     <>
@@ -147,19 +119,19 @@ export default function StudentPortal() {
         title={locale === 'ar' ? 'بوابة الطالب' : 'Student Portal'}
         description={
           locale === 'ar'
-            ? 'استعلم عن دوراتك التدريبية أو سجلك الأكاديمي في الكلية'
-            : 'Search training courses or your college academic record'
+            ? 'استعلم عن سجلك الأكاديمي في الكلية'
+            : 'Search your college academic record'
         }
       />
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="flex-1">
           <PageHero
-            title={locale === 'ar' ? 'استعلام عن الدورات والسجل الأكاديمي' : 'Courses & academic record'}
+            title={locale === 'ar' ? 'استعلام عن السجل الأكاديمي' : 'Academic record lookup'}
             description={
               locale === 'ar'
-                ? 'ابحث برقم القيد أو البريد أو الهاتف — يشمل الدورات التدريبية والتسجيل الأكاديمي'
-                : 'Search by student ID, email, or phone — includes training courses and college enrollment'
+                ? 'ابحث برقم القيد أو البريد أو الهاتف للاستعلام عن التسجيل الأكاديمي'
+                : 'Search by student ID, email, or phone to look up your college enrollment'
             }
             crumbs={[{ label: locale === 'ar' ? 'بوابة الطالب' : 'Student portal', href: '/student/portal' }]}
           />
@@ -208,140 +180,52 @@ export default function StudentPortal() {
                     </h3>
                   </div>
                 ) : (
-                  <>
-                    {academicStudents.length > 0 && (
-                      <section className="space-y-4">
-                        <h3 className="font-display text-primary flex items-center gap-2 text-lg leading-snug font-extrabold">
-                          <Award className="size-5" />
-                          {locale === 'ar' ? 'السجل الأكاديمي (CMS)' : 'College Academic Record'}
-                        </h3>
-                        {academicStudents.map((student) => (
-                          <div key={student.id} className="border-border bg-card rounded-2xl border p-6 shadow-sm">
-                            <div className="flex flex-wrap items-start justify-between gap-3">
-                              <div>
-                                <div className="mb-2">{statusBadge(student.status)}</div>
-                                <h4 className="text-lg font-bold">{student.name}</h4>
-                                <p className="text-muted-foreground text-sm">{student.student_no}</p>
-                                {student.department && (
-                                  <p className="text-sm mt-2">{student.department}{student.level ? ` · ${student.level}` : ''}</p>
-                                )}
-                                {student.subjects.length > 0 && (
-                                  <div className="mt-3 flex flex-wrap gap-1.5">
-                                    {student.subjects.map((subject) => (
-                                      <span
-                                        key={subject.code ?? subject.name}
-                                        className="border-border bg-secondary inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium"
-                                      >
-                                        <BookOpen className="text-muted-foreground size-3" />
-                                        <span>
-                                          {subject.code ? `${subject.code} · ` : ''}
-                                          {subject.name}
-                                        </span>
-                                        {typeof subject.credits === 'number' && (
-                                          <span className="text-muted-foreground">
-                                            {locale === 'ar' ? ` · ${subject.credits} وحدات` : ` · ${subject.credits} cr`}
-                                          </span>
-                                        )}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-                                {student.certificates && student.certificates.length > 0 && (
-                                  <div className="border-border/60 mt-3 space-y-1.5 border-t pt-3">
-                                    <p className="text-success flex items-center gap-1.5 text-xs font-bold">
-                                      <Award className="size-3.5" />
-                                      {locale === 'ar'
-                                        ? `الشهادات التدريبية (${student.certificates.length})`
-                                        : `Training Certificates (${student.certificates.length})`}
-                                    </p>
-                                    {student.certificates.map((cert) => {
-                                      const certTitle =
-                                        locale === 'ar'
-                                          ? cert.course_title_ar ?? cert.course_title_en
-                                          : cert.course_title_en ?? cert.course_title_ar;
-
-                                      return (
-                                        <div
-                                          key={cert.certificate_number ?? cert.download_url ?? certTitle}
-                                          className="flex flex-wrap items-center gap-2 text-xs"
-                                        >
-                                          <span className="text-foreground">{certTitle}</span>
-                                          {cert.certificate_number && (
-                                            <span className="text-muted-foreground font-mono">#{cert.certificate_number}</span>
-                                          )}
-                                          {cert.download_url && (
-                                            <a
-                                              href={cert.download_url}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="text-success font-semibold hover:underline"
-                                            >
-                                              {locale === 'ar' ? 'تحميل' : 'Download'}
-                                            </a>
-                                          )}
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                )}
-                              </div>
-                              <p className="text-xs text-muted-foreground max-w-xs">
-                                {locale === 'ar'
-                                  ? 'سجّل الدخول لعرض كشف الدرجات الكامل'
-                                  : 'Log in to view your full transcript'}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </section>
-                    )}
-
-                    {trainingEnrollments.length > 0 && (
-                      <section className="space-y-4">
-                        <h3 className="font-display text-success flex items-center gap-2 text-lg leading-snug font-extrabold">
-                          <Award className="size-5" />
-                          {locale === 'ar' ? 'الدورات التدريبية' : 'Training Courses'}
-                        </h3>
-                        {trainingEnrollments.map((enr) => {
-                          const courseName = courseTitle(enr.course, locale);
-                          const learnerName = enr.full_name;
-
-                          return (
-                            <div key={`training-${enr.id}`} className="border-border bg-card overflow-hidden rounded-2xl border p-6 shadow-sm">
-                              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                <div className="space-y-1.5">
-                                  <div className="flex items-center gap-2">
-                                    {statusBadge(enr.status)}
-                                    <span className="text-muted-foreground text-xs">{new Date(enr.created_at).toLocaleDateString()}</span>
-                                  </div>
-                                  <h4 className="font-display text-foreground text-lg leading-snug font-extrabold">{courseName}</h4>
-                                  <p className="text-muted-foreground text-xs">
-                                    {locale === 'ar' ? 'المتدرب:' : 'Learner:'} {learnerName}
-                                  </p>
-                                  {enr.certificate?.certificate_number && (
-                                    <p className="text-muted-foreground font-mono text-xs">
-                                      {locale === 'ar' ? 'رقم الشهادة:' : 'Certificate:'} {enr.certificate.certificate_number}
-                                    </p>
-                                  )}
-                                </div>
-                                {enr.certificate?.download_url && (
-                                  <a
-                                    href={enr.certificate.download_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="bg-success text-success-foreground inline-flex shrink-0 items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-xs font-bold shadow-md transition-colors hover:brightness-110"
+                  <section className="space-y-4">
+                    <h3 className="font-display text-primary flex items-center gap-2 text-lg leading-snug font-extrabold">
+                      <BookOpen className="size-5" />
+                      {locale === 'ar' ? 'السجل الأكاديمي' : 'College Academic Record'}
+                    </h3>
+                    {academicStudents.map((student) => (
+                      <div key={student.id} className="border-border bg-card rounded-2xl border p-6 shadow-sm">
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <div className="mb-2">{statusBadge(student.status)}</div>
+                            <h4 className="text-lg font-bold">{student.name}</h4>
+                            <p className="text-muted-foreground text-sm">{student.student_no}</p>
+                            {student.department && (
+                              <p className="text-sm mt-2">{student.department}{student.level ? ` · ${student.level}` : ''}</p>
+                            )}
+                            {student.subjects.length > 0 && (
+                              <div className="mt-3 flex flex-wrap gap-1.5">
+                                {student.subjects.map((subject) => (
+                                  <span
+                                    key={subject.code ?? subject.name}
+                                    className="border-border bg-secondary inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium"
                                   >
-                                    <Award className="size-4" />
-                                    <span>{locale === 'ar' ? 'تحميل الشهادة' : 'Download Certificate'}</span>
-                                  </a>
-                                )}
+                                    <BookOpen className="text-muted-foreground size-3" />
+                                    <span>
+                                      {subject.code ? `${subject.code} · ` : ''}
+                                      {subject.name}
+                                    </span>
+                                    {typeof subject.credits === 'number' && (
+                                      <span className="text-muted-foreground">
+                                        {locale === 'ar' ? ` · ${subject.credits} وحدات` : ` · ${subject.credits} cr`}
+                                      </span>
+                                    )}
+                                  </span>
+                                ))}
                               </div>
-                            </div>
-                          );
-                        })}
-                      </section>
-                    )}
-                  </>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground max-w-xs">
+                            {locale === 'ar'
+                              ? 'سجّل الدخول لعرض كشف الدرجات الكامل'
+                              : 'Log in to view your full transcript'}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </section>
                 )}
               </div>
             )}
@@ -351,9 +235,4 @@ export default function StudentPortal() {
       </div>
     </>
   );
-}
-
-function courseTitle(course?: TrainingEnrollment['course'], locale?: string) {
-  if (!course) return '-';
-  return locale === 'ar' ? course.title_ar : course.title_en || course.title_ar;
 }

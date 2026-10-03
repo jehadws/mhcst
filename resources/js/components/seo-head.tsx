@@ -59,8 +59,8 @@ export function SeoHead({
     const defaultDesc =
         settings.meta_description ||
         (locale === 'ar'
-            ? `${t.brandFull} - دورات تدريبية واحترافية وتدريب تقني وتطوير مهارات في ليبيا.`
-            : `${t.brandFull} - Professional courses and technical training in Libya.`);
+            ? `${t.brandFull} - برامج أكاديمية وتعليم تقني في ليبيا.`
+            : `${t.brandFull} - Academic programs and technical education in Libya.`);
     const metaDescription = description || defaultDesc;
     const canonicalPath = url || page.url.split('?')[0] || '/';
     const canonicalUrl = absoluteUrl(canonicalPath, appUrl);

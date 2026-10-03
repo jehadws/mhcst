@@ -20,20 +20,14 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             SiteSettingSeeder::class,
             CmsPageSeeder::class,
-            CategorySeeder::class,
-            InstructorSeeder::class,
-            CourseSeeder::class,
-            StudentSeeder::class,
-            EnrollmentSeeder::class,
-            CertificateSeeder::class,
             TestimonialSeeder::class,
             BannerSeeder::class,
             FaqSeeder::class,
             BlogPostSeeder::class,
-            ReviewSeeder::class,
             LeadSeeder::class,
             NewsletterSubscriberSeeder::class,
             CmsDemoDataSeeder::class,
+            NotificationTemplateSeeder::class,
         ]);
     }
 }

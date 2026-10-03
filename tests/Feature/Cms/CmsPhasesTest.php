@@ -35,13 +35,13 @@ function createMinimalCmsEnrollment(): CmsEnrollment
     ]);
 }
 
-test('student portal returns both training and academic search results', function () {
+test('student portal returns academic search results', function () {
     createMinimalCmsEnrollment();
 
     $response = $this->getJson('/student/portal/search?query=portal-student@test.com');
 
     $response->assertOk()
-        ->assertJsonStructure(['query', 'training_enrollments', 'academic_students'])
+        ->assertJsonStructure(['query', 'academic_students'])
         ->assertJsonPath('academic_students.0.name', 'Portal Student');
 });
 

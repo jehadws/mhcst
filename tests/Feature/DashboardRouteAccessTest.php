@@ -12,7 +12,6 @@ test('student cannot access content routes by url', function () {
 
     $this->actingAs($user)->get('/dashboard/faqs/list')->assertForbidden();
     $this->actingAs($user)->get('/dashboard/blog-posts/list')->assertForbidden();
-    $this->actingAs($user)->get('/dashboard/certificates/list')->assertForbidden();
 });
 
 test('student cannot access settings or crm routes by url', function () {

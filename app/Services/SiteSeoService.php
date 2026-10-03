@@ -168,7 +168,6 @@ class SiteSeoService
             $this->entry(route('faq'), '0.7', 'monthly'),
             $this->entry(route('contact'), '0.7', 'monthly'),
             $this->entry(route('blog'), '0.8', 'weekly'),
-            $this->entry(route('verify-certificate'), '0.5', 'monthly'),
             $this->entry(route('terms-of-use'), '0.3', 'yearly'),
             $this->entry(route('privacy-policy'), '0.3', 'yearly'),
         ];
