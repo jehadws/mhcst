@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Trash2, Eye, Edit, Check, X } from 'lucide-react';
 import ConfirmationDialog from '@/components/confirmation-dialog';
+import CmsErrorBanner from '@/components/cms/cms-error-banner';
+import CmsPagination from '@/components/cms/cms-pagination';
 import ReasonRejectDialog from '@/components/cms/reason-reject-dialog';
 import WaFollowupsPanel from '@/components/cms/wa-followups';
 import { useMemo, useState } from 'react';
@@ -87,8 +89,10 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
         if (!deleteItem || busy) return;
         setBusy(true);
         router.delete(`/cms/enrollments/${deleteItem.id}`, {
-            onSuccess: () => setDeleteItem(null),
-            onFinish: () => setBusy(false),
+            onFinish: () => {
+                setDeleteItem(null);
+                setBusy(false);
+            },
         });
     };
 
@@ -118,6 +122,7 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.nav.enrollments} />
             <div className="flex flex-col gap-6 p-6">
+                <CmsErrorBanner />
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-2">
                         <h1 className="font-display text-3xl font-extrabold leading-snug">{c.enrollments.title}</h1>
@@ -312,6 +317,8 @@ export default function EnrollmentsIndex({ enrollments, subjects, filters = {} }
                         </tbody>
                     </table>
                 </div>
+
+                <CmsPagination paginator={enrollments} />
 
                 <ConfirmationDialog
                     isOpen={!!deleteItem}

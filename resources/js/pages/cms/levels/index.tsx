@@ -2,14 +2,30 @@ import AppLayout from '@/layouts/app-layout';
 import { useCms } from '@/hooks/use-cms';
 import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem, PaginatedData } from '@/types';
-import { CmsLevel } from '@/types/cms';
+import { CmsDepartment, CmsLevel } from '@/types/cms';
 import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Edit, Printer } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, Trash2, Edit, Printer, Search } from 'lucide-react';
 import ConfirmationDialog from '@/components/confirmation-dialog';
-import { useState } from 'react';
+import CmsErrorBanner from '@/components/cms/cms-error-banner';
+import CmsPagination from '@/components/cms/cms-pagination';
+import { FormEventHandler, useState } from 'react';
 
-export default function LevelsIndex({ levels }: { levels: PaginatedData<CmsLevel> }) {
+interface Filters {
+    search?: string;
+    department_id?: string;
+}
+
+export default function LevelsIndex({
+    levels,
+    departments,
+    filters,
+}: {
+    levels: PaginatedData<CmsLevel>;
+    departments: CmsDepartment[];
+    filters: Filters;
+}) {
     const { c } = useCms();
 
     const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [
@@ -18,10 +34,19 @@ export default function LevelsIndex({ levels }: { levels: PaginatedData<CmsLevel
 
     const [deleteItem, setDeleteItem] = useState<CmsLevel | null>(null);
 
+    const applyFilter = (key: string, value: string) => {
+        router.get('/cms/levels', { ...filters, [key]: value || undefined }, { preserveState: true });
+    };
+
+    const search: FormEventHandler<HTMLFormElement> = (e) => {
+        e.preventDefault();
+        router.get('/cms/levels', { ...filters, search: (e.target as HTMLFormElement).search.value });
+    };
+
     const handleDelete = () => {
         if (!deleteItem) return;
         router.delete(`/cms/levels/${deleteItem.id}`, {
-            onSuccess: () => setDeleteItem(null),
+            onFinish: () => setDeleteItem(null),
         });
     };
 
@@ -29,6 +54,7 @@ export default function LevelsIndex({ levels }: { levels: PaginatedData<CmsLevel
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.nav.levels} />
             <div className="flex flex-col gap-6 p-6">
+                <CmsErrorBanner />
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-2">
                         <h1 className="font-display text-3xl font-extrabold leading-snug">{c.levels.title}</h1>
@@ -39,6 +65,23 @@ export default function LevelsIndex({ levels }: { levels: PaginatedData<CmsLevel
                             <Plus className="w-4 h-4" /> {c.levels.add}
                         </Link>
                     </Button>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                    <form onSubmit={search} className="relative w-full sm:w-72">
+                        <Search className="text-muted-foreground absolute start-3 top-1/2 size-4 -translate-y-1/2" />
+                        <Input name="search" defaultValue={filters.search} placeholder={c.levels.search} className="ps-9" />
+                    </form>
+                    <select
+                        className="rounded-lg border bg-background px-3 py-2 text-sm"
+                        value={filters.department_id ?? ''}
+                        onChange={(e) => applyFilter('department_id', e.target.value)}
+                    >
+                        <option value="">{c.levels.allDepartments}</option>
+                        {departments.map((dept) => (
+                            <option key={dept.id} value={dept.id}>{dept.name}</option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
@@ -93,6 +136,8 @@ export default function LevelsIndex({ levels }: { levels: PaginatedData<CmsLevel
                         </tbody>
                     </table>
                 </div>
+
+                <CmsPagination paginator={levels} />
 
                 <ConfirmationDialog
                     isOpen={!!deleteItem}

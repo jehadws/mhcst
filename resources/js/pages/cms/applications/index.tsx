@@ -15,6 +15,7 @@ import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem, PaginatedData } from '@/types';
 import type { WaFollowup } from '@/types/cms';
 import ReasonRejectDialog from '@/components/cms/reason-reject-dialog';
+import CmsPagination from '@/components/cms/cms-pagination';
 import WaFollowupsPanel from '@/components/cms/wa-followups';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { CheckCircle2, Check, Clock, Copy, FileText, MessageCircle, Search, XCircle } from 'lucide-react';
@@ -58,6 +59,8 @@ export default function ApplicationsIndex({
     const [bulkBusy, setBulkBusy] = useState(false);
 
     const acceptForm = useForm<{ generate_password: boolean }>({ generate_password: false });
+
+    const actionable = (status: string) => status === 'submitted' || status === 'under_review';
 
     const actionableIds = useMemo(
         () => applications.data.filter((application) => actionable(application.status)).map((application) => application.id),
@@ -152,8 +155,6 @@ export default function ApplicationsIndex({
         { label: t.statusAccepted, status: 'accepted', count: counts.accepted ?? 0 },
         { label: t.statusRejected, status: 'rejected', count: counts.rejected ?? 0 },
     ];
-
-    const actionable = (status: string) => status === 'submitted' || status === 'under_review';
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -353,22 +354,7 @@ export default function ApplicationsIndex({
                     </table>
                 </div>
 
-                {applications.last_page > 1 && (
-                    <div className="flex flex-wrap items-center gap-1">
-                        {applications.links.map((link, index) => (
-                            <button
-                                key={index}
-                                type="button"
-                                disabled={!link.url}
-                                onClick={() => link.url && router.get(link.url)}
-                                className={`rounded-lg px-3 py-1.5 text-sm ${
-                                    link.active ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'
-                                } ${!link.url ? 'opacity-50' : ''}`}
-                                dangerouslySetInnerHTML={{ __html: link.label }}
-                            />
-                        ))}
-                    </div>
-                )}
+                {applications.last_page > 1 && <CmsPagination paginator={applications} />}
 
                 {/* Accept dialog */}
                 <Dialog open={!!acceptItem} onOpenChange={(open) => !open && setAcceptItem(null)}>

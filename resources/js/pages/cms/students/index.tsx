@@ -5,12 +5,29 @@ import { BreadcrumbItem, PaginatedData } from '@/types';
 import { CmsLevel, CmsStudent } from '@/types/cms';
 import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Edit, Eye, Users } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, Trash2, Edit, Eye, Users, Search } from 'lucide-react';
 import ConfirmationDialog from '@/components/confirmation-dialog';
+import CmsErrorBanner from '@/components/cms/cms-error-banner';
 import CmsImportExport from '@/components/cms/cms-import-export';
-import { useState } from 'react';
+import CmsPagination from '@/components/cms/cms-pagination';
+import { FormEventHandler, useState } from 'react';
 
-export default function StudentsIndex({ students, levels }: { students: PaginatedData<CmsStudent>; levels: CmsLevel[] }) {
+interface Filters {
+    search?: string;
+    level_id?: string;
+    status?: string;
+}
+
+export default function StudentsIndex({
+    students,
+    levels,
+    filters,
+}: {
+    students: PaginatedData<CmsStudent>;
+    levels: CmsLevel[];
+    filters: Filters;
+}) {
     const { c, canManage } = useCms();
 
     const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [
@@ -19,10 +36,24 @@ export default function StudentsIndex({ students, levels }: { students: Paginate
 
     const [deleteItem, setDeleteItem] = useState<CmsStudent | null>(null);
 
+    const setFilter = (patch: Filters) => {
+        router.get('/cms/students', { ...filters, ...patch }, { preserveState: true });
+    };
+
+    const search: FormEventHandler<HTMLFormElement> = (e) => {
+        e.preventDefault();
+        router.get('/cms/students', { ...filters, search: (e.target as HTMLFormElement).search.value });
+    };
+
+    const statusTabs = [
+        { status: undefined, label: c.students.all },
+        ...Object.entries(c.labels.studentStatus).map(([status, label]) => ({ status, label })),
+    ];
+
     const handleDelete = () => {
         if (!deleteItem) return;
         router.delete(`/cms/students/${deleteItem.id}`, {
-            onSuccess: () => setDeleteItem(null),
+            onFinish: () => setDeleteItem(null),
         });
     };
 
@@ -45,6 +76,7 @@ export default function StudentsIndex({ students, levels }: { students: Paginate
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.nav.students} />
             <div className="flex flex-col gap-6 p-6">
+                <CmsErrorBanner />
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-2">
                         <h1 className="font-display text-3xl font-extrabold leading-snug">{c.students.title}</h1>
@@ -74,6 +106,45 @@ export default function StudentsIndex({ students, levels }: { students: Paginate
                     </div>
                 )}
 
+                {/* Status filter tabs + search + level filter */}
+                <div className="flex flex-wrap items-center gap-2">
+                    {statusTabs.map((tab) => (
+                        <button
+                            key={tab.status ?? 'all'}
+                            type="button"
+                            onClick={() => setFilter({ status: tab.status })}
+                            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                                (filters.status ?? undefined) === tab.status
+                                    ? 'bg-primary text-primary-foreground shadow-md'
+                                    : 'bg-card text-muted-foreground border hover:border-primary/40'
+                            }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+
+                    <form onSubmit={search} className="ms-auto relative w-full sm:w-72">
+                        <Search className="text-muted-foreground absolute start-3 top-1/2 size-4 -translate-y-1/2" />
+                        <Input name="search" defaultValue={filters.search} placeholder={c.students.search} className="ps-9" />
+                    </form>
+
+                    <select
+                        className="p-2.5 rounded-lg border bg-background text-sm"
+                        value={filters.level_id ?? ''}
+                        onChange={(e) => setFilter({ level_id: e.target.value || undefined })}
+                    >
+                        <option value="">{c.students.allLevels}</option>
+                        {levels.map((level) => (
+                            <option key={level.id} value={level.id}>
+                                {c.students.levelOption
+                                    .replace('{department}', level.department?.name ?? '—')
+                                    .replace('{year}', String(level.year))
+                                    .replace('{section}', level.section)}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
                 <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
                     <table className="w-full text-sm text-right">
                         <thead className="bg-muted text-muted-foreground border-b">
@@ -89,7 +160,9 @@ export default function StudentsIndex({ students, levels }: { students: Paginate
                         <tbody className="divide-y divide-border">
                             {students.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">{c.students.empty}</td>
+                                    <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">
+                                        {filters.search || filters.status || filters.level_id ? c.students.emptyFiltered : c.students.empty}
+                                    </td>
                                 </tr>
                             ) : (
                                 students.data.map((student) => (
@@ -136,6 +209,8 @@ export default function StudentsIndex({ students, levels }: { students: Paginate
                         </tbody>
                     </table>
                 </div>
+
+                {students.last_page > 1 && <CmsPagination paginator={students} />}
 
                 <ConfirmationDialog
                     isOpen={!!deleteItem}

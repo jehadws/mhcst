@@ -5,11 +5,18 @@ import { BreadcrumbItem, PaginatedData } from '@/types';
 import { CmsTeacher } from '@/types/cms';
 import { Head, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Edit } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Plus, Trash2, Edit, Search } from 'lucide-react';
 import ConfirmationDialog from '@/components/confirmation-dialog';
-import { useState } from 'react';
+import CmsPagination from '@/components/cms/cms-pagination';
+import { FormEventHandler, useState } from 'react';
 
-export default function TeachersIndex({ teachers }: { teachers: PaginatedData<CmsTeacher> }) {
+interface Filters {
+    search?: string;
+    status?: string;
+}
+
+export default function TeachersIndex({ teachers, filters }: { teachers: PaginatedData<CmsTeacher>; filters: Filters }) {
     const { c } = useCms();
 
     const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [
@@ -17,6 +24,15 @@ export default function TeachersIndex({ teachers }: { teachers: PaginatedData<Cm
     ]);
 
     const [deleteItem, setDeleteItem] = useState<CmsTeacher | null>(null);
+
+    const applyFilter = (key: string, value: string) => {
+        router.get('/cms/teachers', { ...filters, [key]: value || undefined }, { preserveState: true });
+    };
+
+    const search: FormEventHandler<HTMLFormElement> = (e) => {
+        e.preventDefault();
+        router.get('/cms/teachers', { ...filters, search: (e.target as HTMLFormElement).search.value });
+    };
 
     const handleDelete = () => {
         if (!deleteItem) return;
@@ -51,6 +67,23 @@ export default function TeachersIndex({ teachers }: { teachers: PaginatedData<Cm
                             <Plus className="w-4 h-4" /> {c.teachers.add}
                         </Link>
                     </Button>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                    <form onSubmit={search} className="relative w-full sm:w-72">
+                        <Search className="text-muted-foreground absolute start-3 top-1/2 size-4 -translate-y-1/2" />
+                        <Input name="search" defaultValue={filters.search} placeholder={c.teachers.search} className="ps-9" />
+                    </form>
+                    <select
+                        className="rounded-lg border bg-background px-3 py-2 text-sm"
+                        value={filters.status ?? ''}
+                        onChange={(e) => applyFilter('status', e.target.value)}
+                    >
+                        <option value="">{c.teachers.allStatuses}</option>
+                        {Object.entries(c.labels.teacherStatus).map(([status, label]) => (
+                            <option key={status} value={status}>{label}</option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
@@ -105,6 +138,8 @@ export default function TeachersIndex({ teachers }: { teachers: PaginatedData<Cm
                         </tbody>
                     </table>
                 </div>
+
+                <CmsPagination paginator={teachers} />
 
                 <ConfirmationDialog
                     isOpen={!!deleteItem}

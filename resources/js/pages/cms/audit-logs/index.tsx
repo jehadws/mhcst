@@ -4,6 +4,7 @@ import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem, PaginatedData } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import CmsPagination from '@/components/cms/cms-pagination';
 
 interface AuditLog {
     id: number;
@@ -124,6 +125,8 @@ export default function AuditLogsIndex({
                         </tbody>
                     </table>
                 </div>
+
+                <CmsPagination paginator={logs} />
             </div>
         </AppLayout>
     );

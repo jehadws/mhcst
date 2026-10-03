@@ -64,7 +64,7 @@ export default function MyGrades({ student, grades, gpa }: MyGradesProps) {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Award className="h-4 w-4" />
-                  {c.transcript.gpa}
+                  {c.myStudies.gpa}
                 </CardTitle>
               </CardHeader>
               <CardContent>

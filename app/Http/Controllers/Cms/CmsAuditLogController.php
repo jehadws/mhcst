@@ -75,7 +75,7 @@ class CmsAuditLogController extends Controller
             }
 
             if ($type === 'applications' || $type === 'terms') {
-                $urls[$type] = array_fill_keys($ids, route($routeName));
+                $urls[$type] = array_fill_keys($ids->all(), route($routeName));
 
                 continue;
             }

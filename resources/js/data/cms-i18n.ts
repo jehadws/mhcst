@@ -78,6 +78,8 @@ export const cmsEn = {
     deleteTitle: 'Delete academic department',
     deleteDescription: 'Are you sure you want to delete department "{name}"?',
     saveDepartment: 'Save department',
+    search: 'Search by department name...',
+    emptyFiltered: 'No departments match the current filters',
   },
   levels: {
     title: 'Levels & Sections',
@@ -102,6 +104,8 @@ export const cmsEn = {
     deleteDescription: 'Are you sure you want to delete this section?',
     saveSection: 'Save section',
     printList: 'Print list (PDF)',
+    search: 'Search by section name...',
+    allDepartments: 'All departments',
   },
   teachers: {
     title: 'Faculty Members',
@@ -128,6 +132,8 @@ export const cmsEn = {
     deleteTitle: 'Delete teacher',
     deleteDescription: 'Are you sure you want to delete teacher "{name}"?',
     saveData: 'Save data',
+    search: 'Search by name or email...',
+    allStatuses: 'All statuses',
   },
   subjects: {
     title: 'Subjects & Curriculum',
@@ -153,6 +159,9 @@ export const cmsEn = {
     deleteTitle: 'Delete subject',
     deleteDescription: 'Are you sure you want to delete subject "{name}"?',
     saveSubject: 'Save subject',
+    search: 'Search by code or name...',
+    allDepartments: 'All departments',
+    allSemesters: 'All semesters',
   },
   students: {
     title: 'Academic Students',
@@ -185,6 +194,10 @@ export const cmsEn = {
     createAccount: 'Create system login for student',
     accountPassword: 'Account password',
     confirmPassword: 'Confirm password',
+    search: 'Search by name, ID, email, or phone...',
+    all: 'All',
+    allLevels: 'All departments & levels',
+    emptyFiltered: 'No students match the current filters',
   },
   applications: {
     title: 'Admission Applications',
@@ -581,6 +594,7 @@ export const cmsEn = {
     schedule: 'My Schedule',
     grades: 'My Grades',
     transcript: 'My Transcript (PDF)',
+    gpa: 'Cumulative GPA',
     currentTerm: 'Current term',
     semester: 'Semester',
     pickSubjects: 'Subject registration is open — pick your subjects for this semester.',
@@ -804,6 +818,8 @@ export const cmsAr = {
     deleteTitle: 'حذف القسم الأكاديمي',
     deleteDescription: 'هل أنت تأكد من رغبتك في حذف القسم "{name}"؟',
     saveDepartment: 'حفظ القسم',
+    search: 'ابحث باسم القسم...',
+    emptyFiltered: 'لا توجد أقسام مطابقة للفلتر الحالي',
   },
   levels: {
     title: 'الصفوف والشُعب الأكاديمية',
@@ -828,6 +844,8 @@ export const cmsAr = {
     deleteDescription: 'هل أنت تأكد من رغبتك في حذف هذه الشعبة؟',
     saveSection: 'حفظ الشعبة',
     printList: 'طباعة القائمة (PDF)',
+    search: 'ابحث باسم الشعبة...',
+    allDepartments: 'كل الأقسام',
   },
   teachers: {
     title: 'أعضاء هيئة التدريس (المعلمون)',
@@ -854,6 +872,8 @@ export const cmsAr = {
     deleteTitle: 'حذف أستاذ',
     deleteDescription: 'هل أنت تأكد من رغبتك في حذف الأستاذ "{name}"؟',
     saveData: 'حفظ البيانات',
+    search: 'ابحث بالاسم أو البريد...',
+    allStatuses: 'كل الحالات',
   },
   subjects: {
     title: 'المواد والمناهج الدراسية',
@@ -879,6 +899,9 @@ export const cmsAr = {
     deleteTitle: 'حذف مادة دراسية',
     deleteDescription: 'هل أنت تأكد من رغبتك في حذف المادة "{name}"؟',
     saveSubject: 'حفظ المادة',
+    search: 'ابحث بالرمز أو الاسم...',
+    allDepartments: 'كل الأقسام',
+    allSemesters: 'كل الفصول',
   },
   students: {
     title: 'الطلاب الأكاديميون (CMS)',
@@ -911,6 +934,10 @@ export const cmsAr = {
     createAccount: 'إنشاء حساب دخول للنظام للطالب',
     accountPassword: 'كلمة مرور الحساب',
     confirmPassword: 'تأكيد كلمة المرور',
+    search: 'ابحث بالاسم أو رقم القيد أو البريد أو الهاتف...',
+    all: 'الكل',
+    allLevels: 'كل الأقسام والشعب',
+    emptyFiltered: 'لا يوجد طلاب مطابقون للفلاتر الحالية',
   },
   applications: {
     title: 'طلبات التقديم',
@@ -1304,6 +1331,7 @@ export const cmsAr = {
     schedule: 'جدولي',
     grades: 'درجاتي',
     transcript: 'كشف درجاتي (PDF)',
+    gpa: 'المعدل التراكمي',
     currentTerm: 'الفصل الحالي',
     semester: 'الفصل',
     pickSubjects: 'تسجيل المواد مفتوح — اختر موادك لهذا الفصل.',
