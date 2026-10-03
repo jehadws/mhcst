@@ -51,7 +51,10 @@ function cascadeTree(): array
     return compact('dept', 'level', 'subject', 'student', 'enrollment');
 }
 
-test('soft-deleting a student cascades delete to grades, attendance, and revisions', function () {
+// Phase 7 (user-approved): deletes that would hard-erase recorded
+// grades/attendance are refused by CmsDeletionGuard — the records survive.
+
+test('deleting a student with recorded grades, attendance and revisions is refused', function () {
     $manager = makeCascadeManager();
     [
         'student' => $student,
@@ -78,24 +81,19 @@ test('soft-deleting a student cascades delete to grades, attendance, and revisio
         'status' => 'present',
     ]);
 
-    // Destroy student through the controller
     $this->actingAs($manager)
         ->delete(route('cms.students.destroy', $student))
-        ->assertRedirect(route('cms.students.index'));
+        ->assertSessionHasErrors('delete');
 
-    // Student and enrollment are soft-deleted
-    expect(CmsStudent::find($student->id))->toBeNull();
-    expect(CmsStudent::withTrashed()->find($student->id)->trashed())->toBeTrue();
-    expect(CmsEnrollment::find($enrollment->id))->toBeNull();
-    expect(CmsEnrollment::withTrashed()->find($enrollment->id)->trashed())->toBeTrue();
-
-    // Grades, attendance, and revisions are hard-deleted (no soft-delete on these models)
-    expect(CmsGrade::find($grade->id))->toBeNull();
-    expect(CmsGradeRevision::find($revision->id))->toBeNull();
-    expect(CmsAttendance::find($attendance->id))->toBeNull();
+    // Nothing is erased: student, enrollment, and the hard-delete children all survive.
+    expect(CmsStudent::find($student->id))->not->toBeNull()
+        ->and(CmsEnrollment::find($enrollment->id))->not->toBeNull()
+        ->and(CmsGrade::find($grade->id))->not->toBeNull()
+        ->and(CmsGradeRevision::find($revision->id))->not->toBeNull()
+        ->and(CmsAttendance::find($attendance->id))->not->toBeNull();
 });
 
-test('soft-deleting a subject cascades delete to grades, attendance, and revisions', function () {
+test('deleting a subject with recorded grades and attendance is refused', function () {
     $manager = makeCascadeManager();
     [
         'subject' => $subject,
@@ -115,9 +113,9 @@ test('soft-deleting a subject cascades delete to grades, attendance, and revisio
 
     $this->actingAs($manager)
         ->delete(route('cms.subjects.destroy', $subject))
-        ->assertRedirect(route('cms.subjects.index'));
+        ->assertSessionHasErrors('delete');
 
-    expect(CmsEnrollment::withTrashed()->find($enrollment->id)->trashed())->toBeTrue();
-    expect(CmsGrade::find($grade->id))->toBeNull();
-    expect(CmsAttendance::find($attendance->id))->toBeNull();
+    expect(CmsEnrollment::find($enrollment->id))->not->toBeNull()
+        ->and(CmsGrade::find($grade->id))->not->toBeNull()
+        ->and(CmsAttendance::find($attendance->id))->not->toBeNull();
 });

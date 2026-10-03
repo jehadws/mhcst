@@ -14,6 +14,7 @@ use App\Models\CmsSchedule;
 use App\Models\CmsStudent;
 use App\Models\SiteSetting;
 use App\Services\CmsAuthorizationService;
+use App\Services\CmsDeletionGuard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -21,7 +22,10 @@ use Inertia\Response;
 
 class CmsLevelController extends Controller
 {
-    public function __construct(private CmsAuthorizationService $cmsAuth) {}
+    public function __construct(
+        private CmsAuthorizationService $cmsAuth,
+        private CmsDeletionGuard $deletionGuard,
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -105,6 +109,10 @@ class CmsLevelController extends Controller
         DB::transaction(function () use ($level) {
             $studentIds = CmsStudent::where('level_id', $level->id)->toBase()->pluck('id');
             $enrollmentIds = CmsEnrollment::whereIn('student_id', $studentIds)->toBase()->pluck('id');
+
+            // The cascade hard-deletes grades and attendance — refuse while
+            // any student of the level still has recorded data.
+            $this->deletionGuard->assertNoGradeData($enrollmentIds, 'هذا المستوى', 'this level');
 
             CmsSchedule::where('level_id', $level->id)
                 ->chunkById(500, fn ($rows) => $rows->each->delete());

@@ -15,6 +15,7 @@ use App\Models\CmsStudent;
 use App\Models\CmsSubject;
 use App\Models\CmsTeacher;
 use App\Services\CmsAuthorizationService;
+use App\Services\CmsDeletionGuard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -22,7 +23,10 @@ use Inertia\Response;
 
 class CmsDepartmentController extends Controller
 {
-    public function __construct(private CmsAuthorizationService $cmsAuth) {}
+    public function __construct(
+        private CmsAuthorizationService $cmsAuth,
+        private CmsDeletionGuard $deletionGuard,
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -99,6 +103,10 @@ class CmsDepartmentController extends Controller
                 $query->whereIn('student_id', $studentIds)
                     ->orWhereIn('subject_id', $subjectIds);
             })->toBase()->pluck('id')->unique();
+
+            // The cascade hard-deletes grades and attendance — refuse while
+            // any enrollment in the department's orbit still has recorded data.
+            $this->deletionGuard->assertNoGradeData($enrollmentIds, 'هذا القسم', 'this department');
 
             CmsSchedule::whereIn('level_id', $levelIds)
                 ->orWhereIn('subject_id', $subjectIds)

@@ -12,6 +12,7 @@ use App\Models\CmsGradeRevision;
 use App\Models\CmsSchedule;
 use App\Models\CmsSubject;
 use App\Services\CmsAuthorizationService;
+use App\Services\CmsDeletionGuard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -19,7 +20,10 @@ use Inertia\Response;
 
 class CmsSubjectController extends Controller
 {
-    public function __construct(private CmsAuthorizationService $cmsAuth) {}
+    public function __construct(
+        private CmsAuthorizationService $cmsAuth,
+        private CmsDeletionGuard $deletionGuard,
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -89,6 +93,10 @@ class CmsSubjectController extends Controller
                 ->chunkById(500, fn ($rows) => $rows->each->delete());
 
             $enrollmentIds = CmsEnrollment::where('subject_id', $subject->id)->toBase()->pluck('id');
+
+            // The cascade hard-deletes grades and attendance — refuse while
+            // the subject still carries recorded data.
+            $this->deletionGuard->assertNoGradeData($enrollmentIds, 'هذه المادة', 'this subject');
 
             CmsGradeRevision::whereIn('enrollment_id', $enrollmentIds)->delete();
             CmsGrade::whereIn('enrollment_id', $enrollmentIds)->delete();

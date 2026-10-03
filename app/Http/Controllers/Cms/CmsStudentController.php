@@ -15,6 +15,7 @@ use App\Models\SiteSetting;
 use App\Models\User;
 use App\Services\CmsAcademicSettingsService;
 use App\Services\CmsAuthorizationService;
+use App\Services\CmsDeletionGuard;
 use App\Services\CmsSpreadsheetService;
 use App\Services\CmsStudentImportService;
 use App\Services\CmsTranscriptService;
@@ -28,7 +29,10 @@ use Spatie\Permission\Models\Role;
 
 class CmsStudentController extends Controller
 {
-    public function __construct(private CmsAuthorizationService $cmsAuth) {}
+    public function __construct(
+        private CmsAuthorizationService $cmsAuth,
+        private CmsDeletionGuard $deletionGuard,
+    ) {}
 
     public function index(Request $request): Response
     {
@@ -138,6 +142,10 @@ class CmsStudentController extends Controller
 
         DB::transaction(function () use ($student) {
             $enrollmentIds = CmsEnrollment::where('student_id', $student->id)->toBase()->pluck('id');
+
+            // The cascade hard-deletes grades and attendance — refuse while
+            // the student still has recorded data.
+            $this->deletionGuard->assertNoGradeData($enrollmentIds, 'هذا الطالب', 'this student');
 
             CmsGradeRevision::whereIn('enrollment_id', $enrollmentIds)->delete();
             CmsGrade::whereIn('enrollment_id', $enrollmentIds)->delete();

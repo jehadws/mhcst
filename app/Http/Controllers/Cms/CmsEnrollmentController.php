@@ -12,6 +12,7 @@ use App\Models\CmsLevel;
 use App\Models\CmsStudent;
 use App\Models\CmsSubject;
 use App\Services\CmsAuthorizationService;
+use App\Services\CmsDeletionGuard;
 use App\Services\CmsEnrollmentCapacityService;
 use App\Services\CmsSubjectRegistrationService;
 use Illuminate\Database\QueryException;
@@ -29,6 +30,7 @@ class CmsEnrollmentController extends Controller
         private CmsAuthorizationService $cmsAuth,
         private CmsEnrollmentCapacityService $capacity,
         private CmsSubjectRegistrationService $subjectRegistration,
+        private CmsDeletionGuard $deletionGuard,
     ) {}
 
     public function index(Request $request): Response
@@ -350,10 +352,11 @@ class CmsEnrollmentController extends Controller
     {
         $this->authorize('manage', CmsEnrollment::class);
 
-        // Cascade (user-approved Phase 6 cleanup): grades/attendance/revisions
-        // are hard-delete tables with no lifecycle of their own, so leaving
-        // them attached to a soft-deleted enrollment only creates orphans —
-        // the same decision CmsStudentController::destroy already encodes.
+        // Grades/attendance/revisions are hard-delete tables, so a delete here
+        // would permanently erase any recorded data — record-bearing picks are
+        // refused and must be withdrawn instead.
+        $this->deletionGuard->assertNoGradeData([$enrollment->id], 'هذا التسجيل', 'this enrollment');
+
         DB::transaction(function () use ($enrollment) {
             $enrollmentId = $enrollment->id;
 
