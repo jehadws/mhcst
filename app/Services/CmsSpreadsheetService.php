@@ -2,14 +2,25 @@
 
 namespace App\Services;
 
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CmsSpreadsheetService
 {
+    /**
+     * First characters a spreadsheet app may interpret as a formula when the
+     * value is stored as a formula cell.
+     *
+     * @var list<string>
+     */
+    private const FORMULA_PREFIXES = ['=', '+', '-', '@', "\t"];
+
     /**
      * Build an Excel (xlsx) download response from a header row and data rows.
      *
@@ -24,8 +35,10 @@ class CmsSpreadsheetService
 
         $sheet->fromArray($headers, null, 'A1');
 
-        if (! empty($rows)) {
-            $sheet->fromArray($rows, null, 'A2');
+        $rowNumber = 2;
+
+        foreach ($rows as $row) {
+            self::writeDataRow($sheet, $row, $rowNumber++);
         }
 
         $lastColumn = $sheet->getHighestColumn();
@@ -56,8 +69,10 @@ class CmsSpreadsheetService
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->fromArray($headers, null, 'A1');
 
-        if (! empty($rows)) {
-            $sheet->fromArray($rows, null, 'A2');
+        $rowNumber = 2;
+
+        foreach ($rows as $row) {
+            self::writeDataRow($sheet, $row, $rowNumber++);
         }
 
         return response()->streamDownload(function () use ($spreadsheet) {
@@ -71,5 +86,30 @@ class CmsSpreadsheetService
         }, $filename, [
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
+    }
+
+    /**
+     * Write one data row cell by cell. Strings whose first character could
+     * make a spreadsheet app evaluate the cell as a formula (=, +, -, @, TAB)
+     * are forced to TYPE_STRING, so a name like "=HYPERLINK(...)" entered by
+     * an applicant can never execute when a manager opens the export.
+     *
+     * @param  array<int|string, mixed>  $row
+     */
+    private static function writeDataRow(Worksheet $sheet, array $row, int $rowNumber): void
+    {
+        $columnIndex = 1;
+
+        foreach (array_values($row) as $value) {
+            $cell = $sheet->getCell(Coordinate::stringFromColumnIndex($columnIndex).$rowNumber);
+
+            if (is_string($value) && $value !== '' && in_array($value[0], self::FORMULA_PREFIXES, true)) {
+                $cell->setValueExplicit($value, DataType::TYPE_STRING);
+            } else {
+                $cell->setValue($value);
+            }
+
+            $columnIndex++;
+        }
     }
 }
