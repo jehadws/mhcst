@@ -10,11 +10,16 @@ use Illuminate\Support\Facades\Artisan;
  * Post-deploy hook for FTP-based shared hosting.
  *
  * FTP uploads files but cannot execute commands, so after the CI pipeline
- * pushes new code it calls GET /deploy/run?token=... to run the tasks an
- * SSH deploy would have done: migrate, rebuild caches, regenerate static
- * SEO files, restart queue workers.
+ * pushes new code it calls GET /deploy/run to run the tasks an SSH deploy
+ * would have done: migrate, rebuild caches, regenerate static SEO files,
+ * restart queue workers.
  *
- * Authorization is a constant-time comparison against config('app.deploy_token').
+ * The CI call authorizes with an "Authorization: Bearer" header so the token
+ * stays out of access and proxy logs. The ?token= query parameter remains
+ * supported for the manual runbook, at the cost of the token appearing in
+ * server logs for that call.
+ *
+ * Either way the comparison against config('app.deploy_token') is constant-time.
  */
 class DeployRunController extends Controller
 {
@@ -23,7 +28,7 @@ class DeployRunController extends Controller
         $expected = (string) config('app.deploy_token');
 
         abort_if($expected === '', 403, 'Deploy hook is not configured.');
-        abort_unless(hash_equals($expected, (string) $request->query('token')), 403, 'Invalid deploy token.');
+        abort_unless(hash_equals($expected, (string) $this->presentedToken($request)), 403, 'Invalid deploy token.');
 
         Artisan::call('migrate', ['--force' => true]);
         Artisan::call('optimize:clear');
@@ -34,5 +39,20 @@ class DeployRunController extends Controller
         Artisan::call('queue:restart');
 
         return response()->json(['status' => 'ok']);
+    }
+
+    /**
+     * The bearer header wins when present; the query parameter is the
+     * fallback for manual runs.
+     */
+    private function presentedToken(Request $request): ?string
+    {
+        $header = $request->header('Authorization');
+
+        if (is_string($header) && preg_match('#^Bearer\s+(\S+)\s*$#i', $header, $matches) === 1) {
+            return $matches[1];
+        }
+
+        return $request->query('token');
     }
 }
