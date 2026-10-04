@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -61,6 +62,8 @@ class UploadController extends Controller
         $filename = Str::random(16).'_'.time().'.'.$ext;
         $path = $file->storeAs($folder, $filename, 'public');
 
+        $this->recordUpload($path);
+
         return response()->json([
             'path' => $path,
             'url' => asset('storage/'.$path),
@@ -94,6 +97,8 @@ class UploadController extends Controller
         $filename = Str::random(16).'_'.time().'.'.$ext;
         $path = $file->storeAs($folder, $filename, 'public');
 
+        $this->recordUpload($path);
+
         return response()->json([
             'path' => $path,
             'url' => asset('storage/'.$path),
@@ -114,8 +119,20 @@ class UploadController extends Controller
 
         // settings/uploads stores site branding; only CMS Admin + Manager roles
         // may delete from settings folder.
-        if ($folder === 'settings' && ! $this->userCanDeleteFromSettings(auth()->user())) {
+        if ($folder === 'settings' && ! $this->userIsManagerOrAbove(auth()->user())) {
             return response()->json(['message' => 'Insufficient permission for this folder'], 403);
+        }
+
+        // Files uploaded through this endpoint belong to their uploader:
+        // other users may only delete them with manager rights. Paths written
+        // before the user_uploads table existed stay deletable by anyone
+        // with uploads access.
+        $upload = UserUpload::query()->where('path', $path)->first();
+
+        if ($upload !== null
+            && (int) $upload->user_id !== (int) auth()->id()
+            && ! $this->userIsManagerOrAbove(auth()->user())) {
+            return response()->json(['message' => 'You can only delete files you uploaded'], 403);
         }
 
         if (Storage::disk('public')->exists($path)) {
@@ -125,7 +142,15 @@ class UploadController extends Controller
         return response()->json(['message' => 'Deleted']);
     }
 
-    private function userCanDeleteFromSettings(?User $user): bool
+    private function recordUpload(string $path): void
+    {
+        UserUpload::create([
+            'user_id' => auth()->id(),
+            'path' => $path,
+        ]);
+    }
+
+    private function userIsManagerOrAbove(?User $user): bool
     {
         if (! $user) {
             return false;
