@@ -596,19 +596,23 @@ describe('12. Public student portal — search works without auth', function () 
         }
     });
 
-    it('returns search results for a known student_no without authentication', function () {
+    it('returns search results for a known student_no + contact pair without authentication', function () {
         $dept = CmsDepartment::create(['name' => 'Public Dept', 'description' => 'Test']);
         $level = CmsLevel::create(['department_id' => $dept->id, 'year' => 1, 'section' => 'A', 'capacity' => 30]);
         $student = CmsStudent::create([
             'student_no' => '2026-PUBLIC',
             'name' => 'Public Student',
+            'email' => 'public.student@example.com',
             'level_id' => $level->id,
             'enrollment_date' => now()->toDateString(),
             'status' => 'active',
         ]);
 
         $this->assertGuest();
-        $resp = $this->get(route('student.portal.search', ['query' => $student->student_no]));
+        $resp = $this->get(route('student.portal.search', [
+            'query' => $student->student_no,
+            'contact' => 'public.student@example.com',
+        ]));
         $resp->assertOk();
     });
 });

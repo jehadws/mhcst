@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\CmsStudent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,47 +19,33 @@ class StudentPortalController extends Controller
     {
         $validated = $request->validate([
             'query' => ['required', 'string', 'min:4', 'max:255'],
+            'contact' => ['required', 'string', 'min:4', 'max:255'],
         ]);
 
-        $query = trim($validated['query']);
+        $studentNo = trim($validated['query']);
+        $contact = trim($validated['contact']);
 
-        $academicStudents = $this->academicStudentsByStudentNo($query);
-
-        if ($academicStudents->isEmpty()) {
-            $academicStudents = CmsStudent::query()
-                ->with(['level.department', 'enrollments' => fn ($q) => $q->where('status', 'active')->with('subject')])
-                ->where(function ($builder) use ($query) {
-                    $builder->where('email', $query)
-                        ->orWhere('phone', $query)
-                        ->orWhere('name', $query);
-                })
-                ->orderBy('name')
-                ->limit(10)
-                ->get();
-        }
+        // Dual-key lookup: a record is only returned when the student number
+        // AND the private email/phone recorded on it both match. Student
+        // numbers are sequential, so any single-key lookup would let a
+        // guest enumerate the whole student body by iterating numbers.
+        $academicStudents = CmsStudent::query()
+            ->with(['level.department', 'enrollments' => fn ($q) => $q->where('status', 'active')->with('subject')])
+            ->where('student_no', $studentNo)
+            ->where(function ($builder) use ($contact) {
+                $builder->where('email', $contact)
+                    ->orWhere('phone', $contact);
+            })
+            ->orderBy('name')
+            ->limit(10)
+            ->get();
 
         return response()->json([
-            'query' => $query,
+            'query' => $studentNo,
             'academic_students' => $academicStudents
                 ->map(fn (CmsStudent $student) => $this->publicAcademicStudent($student))
                 ->all(),
         ]);
-    }
-
-    /**
-     * Exact student_no matches take priority: when one hits, only those
-     * students are returned for the academic world.
-     *
-     * @return Collection<int, CmsStudent>
-     */
-    private function academicStudentsByStudentNo(string $query): Collection
-    {
-        return CmsStudent::query()
-            ->with(['level.department', 'enrollments' => fn ($q) => $q->where('status', 'active')->with('subject')])
-            ->where('student_no', $query)
-            ->orderBy('name')
-            ->limit(10)
-            ->get();
     }
 
     /**

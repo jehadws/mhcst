@@ -38,7 +38,7 @@ function createMinimalCmsEnrollment(): CmsEnrollment
 test('student portal returns academic search results', function () {
     createMinimalCmsEnrollment();
 
-    $response = $this->getJson('/student/portal/search?query=portal-student@test.com');
+    $response = $this->getJson('/student/portal/search?query=T-1001&contact=portal-student@test.com');
 
     $response->assertOk()
         ->assertJsonStructure(['query', 'academic_students'])
