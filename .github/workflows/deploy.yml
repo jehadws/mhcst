@@ -29,6 +29,27 @@ jobs:
       # ── 1. Checkout the exact commit being deployed ────────────────
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          # Full history so the composer.lock guard can diff this push
+          # against the previous one.
+          fetch-depth: 0
+
+      #    vendor/ is never FTP-deployed (thousands of files at ~4.5s per
+      #    FTP command on this host). The server keeps its own vendor/ from
+      #    composer, so a changed lockfile must be composer-installed on the
+      #    server BEFORE this deploy ships code that depends on it.
+      - name: Fail early if composer.lock changed (vendor is not FTP-deployed)
+        env:
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+        run: |
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            exit 0
+          fi
+          if git diff --name-only "$BEFORE" "$SHA" | grep -q '^composer\.lock$'; then
+            echo "::error::composer.lock changed in this push. SSH into the server, run 'composer install --no-dev --optimize-autoloader' in the app folder, then re-run this deploy."
+            exit 1
+          fi
 
       # ── 2. Build stage: production dependencies + compiled assets ──
       - name: Set up PHP 8.2
@@ -55,8 +76,12 @@ jobs:
       # ── 3. Upload application code over FTPS ───────────────────────
       #    Excluded on purpose (server-only or runtime data):
       #    - storage/  → logs, sessions, user uploads live here
-      #    - public/   → synced separately into the docroot below
+      #    - vendor/   → managed by composer ON the server (see guard above)
+      #    - public/   → synced separately into the docroot + app tree below
       #    - tests/docs/.git/.github/node_modules → dev-only
+      #    NOTE: exclude takes GLOB patterns, not regex — regex patterns
+      #    silently match nothing and caused a 90-minute node_modules dump.
+      #    "**/.git*" also covers .github; keep that pairing intact.
       - name: FTP deploy application code
         uses: SamKirkland/ftp-deploy-action@v4.3.5
         with:
@@ -68,15 +93,17 @@ jobs:
           local-dir: ./
           server-dir: ${{ secrets.DEPLOY_PATH }}/
           exclude: |
-            ^\.git/$
-            ^\.github/$
-            ^node_modules/$
-            ^tests/$
-            ^docs/$
-            ^storage/$
-            ^public/$
-            ^\.env*
-            ^tmp-
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/vendor/**
+            **/tests/**
+            **/docs/**
+            **/storage/**
+            **/public/**
+            **/.env*
+            **/.agents/**
+            tmp-*
           dangerous-clean-slate: false
 
       #    Docroot upload: built assets + static files.
@@ -93,8 +120,8 @@ jobs:
           local-dir: ./public/
           server-dir: ${{ secrets.PUBLIC_PATH }}/
           exclude: |
-            ^storage/$
-            ^\.well-known/
+            **/storage/**
+            **/.well-known/**
           dangerous-clean-slate: false
 
       #    App-tree upload: PHP resolves the Vite manifest via public_path()
@@ -112,8 +139,8 @@ jobs:
           local-dir: ./public/
           server-dir: ${{ secrets.DEPLOY_PATH }}/public/
           exclude: |
-            ^storage/$
-            ^\.well-known/
+            **/storage/**
+            **/.well-known/**
           dangerous-clean-slate: false
 
       # ── 4. Post-deploy tasks via HTTP hook ─────────────────────────
