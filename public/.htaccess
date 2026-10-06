@@ -111,4 +111,12 @@
     <FilesMatch "\.(html|php)$">
         Header set Cache-Control "no-cache, must-revalidate"
     </FilesMatch>
+
+    # LiteSpeed / mod_rewrite: clean-URL responses are rewritten to index.php
+    # internally, so the FilesMatch above may not fire. This rule fires on
+    # every response that was *not* a direct static file match and forces
+    # revalidation for HTML documents served through the front controller.
+    <If "%{REQUEST_FILENAME} !~ /\.(js|css|mjs|woff2?|png|jpe?g|gif|webp|avif|ico|svg|webmanifest)$/">
+        Header always set Cache-Control "no-cache, must-revalidate"
+    </If>
 </IfModule>
