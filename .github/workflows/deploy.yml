@@ -28,7 +28,7 @@ jobs:
     steps:
       # ── 1. Checkout the exact commit being deployed ────────────────
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           # Full history so the composer.lock guard can diff this push
           # against the previous one.
@@ -91,7 +91,7 @@ jobs:
           mkdir deploy-staging && mv deploy-app.zip deploy-staging/
 
       - name: FTP deploy app archive
-        uses: SamKirkland/ftp-deploy-action@v4.3.5
+        uses: SamKirkland/ftp-deploy-action@8e83cea8672e3fbcbb9fdafff34debf6ae4c5f65 # v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
@@ -106,7 +106,7 @@ jobs:
       #    Excludes: storage (the storage:link symlink) and .well-known
       #    (ACME/cPanel-managed SSL challenges).
       - name: FTP deploy public directory
-        uses: SamKirkland/ftp-deploy-action@v4.3.5
+        uses: SamKirkland/ftp-deploy-action@8e83cea8672e3fbcbb9fdafff34debf6ae4c5f65 # v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
@@ -126,7 +126,7 @@ jobs:
       #    from the docroot. Both copies need the new build or PHP serves
       #    stale asset hashes. Same excludes as the docroot upload.
       - name: FTP deploy public directory into the app tree
-        uses: SamKirkland/ftp-deploy-action@v4.3.5
+        uses: SamKirkland/ftp-deploy-action@8e83cea8672e3fbcbb9fdafff34debf6ae4c5f65 # v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
@@ -153,6 +153,10 @@ jobs:
       #    switch back to it once the live server runs that controller.
       - name: Run post-deploy tasks
         run: |
+          # Token is passed as a query param because the host strips the
+          # Authorization / X-Deploy-Token header (see header comment above).
+          # The URL is intentionally NOT echoed to avoid leaking the token in
+          # runner logs. Switch to the header once the server supports it.
           RESPONSE=$(curl -sf --max-time 300 \
             "https://${{ secrets.SITE_URL }}/deploy/run?token=${{ secrets.DEPLOY_TOKEN }}")
           echo "Hook response: $RESPONSE"
@@ -163,7 +167,7 @@ jobs:
         run: |
           STATUS=$(curl -s -o /dev/null -w '%{http_code}' --max-time 30 https://${{ secrets.SITE_URL }})
           echo "HTTP status: $STATUS"
-          test "$STATUS" != "5"
+          [[ "${STATUS:0:1}" != "5" ]]
 
       - name: Notify on failure
         if: failure()
