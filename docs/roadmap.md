@@ -2,16 +2,16 @@
 
 Phased completion plan for CMS gaps and platform polish.
 
-| Phase | Status | Scope |
-|-------|--------|-------|
-| [Phase 1](#phase-1--foundation--demo) | Done | Teacher UI, seeds, cleanup |
-| [Phase 2](#phase-2--student-portal) | Done | CMS + training portal search |
-| [Phase 3](#phase-3--notifications) | Done | Attendance alert emails |
-| [Phase 4](#phase-4--reports) | Done | Teacher performance, enrollment stats, schedule PDF |
-| [Phase 5](#phase-5--academic-settings) | Done | Calendar + alert thresholds |
-| [Phase 6](#phase-6--enrollment-rules) | Done | Validation + tests |
-| [Phase 7](#phase-7--architecture-notes) | Done | Docs + amc-portal note |
-| [Phase 8](#phase-8--seo--security) | Done | Dynamic SEO assets + security hardening |
+| Phase                                   | Status | Scope                                               |
+| --------------------------------------- | ------ | --------------------------------------------------- |
+| [Phase 1](#phase-1--foundation--demo)   | Done   | Teacher UI, seeds, cleanup                          |
+| [Phase 2](#phase-2--student-portal)     | Done   | CMS + training portal search                        |
+| [Phase 3](#phase-3--notifications)      | Done   | Attendance alert emails                             |
+| [Phase 4](#phase-4--reports)            | Done   | Teacher performance, enrollment stats, schedule PDF |
+| [Phase 5](#phase-5--academic-settings)  | Done   | Calendar + alert thresholds                         |
+| [Phase 6](#phase-6--enrollment-rules)   | Done   | Validation + tests                                  |
+| [Phase 7](#phase-7--architecture-notes) | Done   | Docs + amc-portal note                              |
+| [Phase 8](#phase-8--seo--security)      | Done   | Dynamic SEO assets + security hardening             |
 
 ---
 
@@ -20,7 +20,7 @@ Phased completion plan for CMS gaps and platform polish.
 - Hide `canManage` actions on CMS pages teachers can reach (students, enrollments, grades import/export, attendance export)
 - Add `CmsDemoDataSeeder` to `DatabaseSeeder`
 - Link `student1@cms.local` and `student2@cms.local` to login accounts (password: `password`)
-- Add `support@mhcst.ly` demo account
+- Add `support@mhcst.edu.ly` demo account
 
 ## Phase 2 — Student portal
 
@@ -43,11 +43,11 @@ Phased completion plan for CMS gaps and platform polish.
 
 ## Phase 4 — Reports
 
-| Report | Route |
-|--------|-------|
-| Teacher performance | `/cms/reports/teacher-performance` |
-| Enrollment statistics | `/cms/reports/enrollment-stats` |
-| Weekly schedule (+ PDF) | `/cms/reports/schedule` |
+| Report                  | Route                              |
+| ----------------------- | ---------------------------------- |
+| Teacher performance     | `/cms/reports/teacher-performance` |
+| Enrollment statistics   | `/cms/reports/enrollment-stats`    |
+| Weekly schedule (+ PDF) | `/cms/reports/schedule`            |
 
 ## Phase 5 — Academic settings
 
@@ -90,11 +90,11 @@ Tables `students`, `enrollments`, `courses` remain for training-center features 
 
 ### SEO (dynamic, from site settings)
 
-| Asset | Route |
-|-------|-------|
-| Web manifest | `/site.webmanifest` |
-| Robots | `/robots.txt` |
-| Sitemap | `/sitemap.xml` |
+| Asset         | Route                |
+| ------------- | -------------------- |
+| Web manifest  | `/site.webmanifest`  |
+| Robots        | `/robots.txt`        |
+| Sitemap       | `/sitemap.xml`       |
 | Windows tiles | `/browserconfig.xml` |
 
 - Public pages use `SeoHead` — canonical URLs, Open Graph, Twitter, JSON-LD
@@ -106,17 +106,17 @@ Tests: `tests/Feature/SeoTest.php`
 
 ### Security hardening
 
-| Area | Change |
-|------|--------|
-| Registration | Disabled by default (`AUTH_REGISTRATION_ENABLED=false`) |
-| Dashboard | Requires Spatie role (`dashboard.role` middleware) |
-| Teacher dashboard | No admin fallback when CMS teacher profile missing |
-| Student portal | Exact-match search, rate limited, minimal JSON |
-| Certificates | Signed download URLs; verify page exposes public fields only |
-| Public forms | Throttle on contact, newsletter, verify |
-| Content | `HtmlSanitizer` on blog, static pages, newsletters |
-| Uploads | Folder allowlist; path validation on delete |
-| Login | Block `is_active = false` accounts |
+| Area              | Change                                                       |
+| ----------------- | ------------------------------------------------------------ |
+| Registration      | Disabled by default (`AUTH_REGISTRATION_ENABLED=false`)      |
+| Dashboard         | Requires Spatie role (`dashboard.role` middleware)           |
+| Teacher dashboard | No admin fallback when CMS teacher profile missing           |
+| Student portal    | Exact-match search, rate limited, minimal JSON               |
+| Certificates      | Signed download URLs; verify page exposes public fields only |
+| Public forms      | Throttle on contact, newsletter, verify                      |
+| Content           | `HtmlSanitizer` on blog, static pages, newsletters           |
+| Uploads           | Folder allowlist; path validation on delete                  |
+| Login             | Block `is_active = false` accounts                           |
 
 Tests: `tests/Feature/SecurityHardeningTest.php`, updated auth/portal/certificate tests (136 total passing).
 
@@ -124,16 +124,16 @@ Tests: `tests/Feature/SecurityHardeningTest.php`, updated auth/portal/certificat
 
 ## Demo accounts (after `php artisan migrate:fresh --seed`)
 
-| Email | Role | Password |
-|-------|------|----------|
-| `admin@mhcst.ly` | Admin | `password` |
-| `manager@mhcst.ly` | Manager | `password` |
-| `editor@mhcst.ly` | Content Editor | `password` |
-| `support@mhcst.ly` | Support | `password` |
-| `admin@cms.local` | Admin (CMS demo) | `password` |
-| `student1@cms.local` | Student (linked) | `password` |
-| `student2@cms.local` | Student (linked) | `password` |
-| `a.sharif@cms.local` | Teacher | `password` |
+| Email                  | Role             | Password   |
+| ---------------------- | ---------------- | ---------- |
+| `admin@mhcst.edu.ly`   | Admin            | `password` |
+| `manager@mhcst.edu.ly` | Manager          | `password` |
+| `editor@mhcst.edu.ly`  | Content Editor   | `password` |
+| `support@mhcst.edu.ly` | Support          | `password` |
+| `admin@cms.local`      | Admin (CMS demo) | `password` |
+| `student1@cms.local`   | Student (linked) | `password` |
+| `student2@cms.local`   | Student (linked) | `password` |
+| `a.sharif@cms.local`   | Teacher          | `password` |
 
 ---
 

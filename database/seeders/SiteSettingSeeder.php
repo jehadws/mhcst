@@ -16,7 +16,7 @@ class SiteSettingSeeder extends Seeder
             ['key' => 'site_tagline', 'value' => 'Almaayir Alhaditha College for Science and Technology', 'type' => 'text'],
             ['key' => 'site_tagline_ar', 'value' => 'كلية المعايير الحديثة للعلوم والتقنية', 'type' => 'text'],
             ['key' => 'site_logo', 'value' => '', 'type' => 'image'],
-            ['key' => 'contact_email', 'value' => 'info@mhcst.ly', 'type' => 'text'],
+            ['key' => 'contact_email', 'value' => 'info@mhcst.edu.ly', 'type' => 'text'],
             ['key' => 'contact_phone', 'value' => '+218 91 234 5678', 'type' => 'text'],
             ['key' => 'whatsapp_number', 'value' => '+218912345678', 'type' => 'text'],
             ['key' => 'address', 'value' => 'طرابلس، ليبيا', 'type' => 'text'],

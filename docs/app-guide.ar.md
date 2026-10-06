@@ -26,11 +26,11 @@
 
 منصة كلية المعايير الحديثة للعلوم والتقنية هي تطبيق ويب متكامل يتكون من ثلاثة أقسام رئيسية:
 
-| القسم | بادئة الرابط | الغرض |
-|-------|-------------|-------|
-| **الموقع العام** | `/` | التسويق، القبول، المدونة، الأسئلة الشائعة، التحقق من الشهادات |
-| **لوحة التحكم** | `/dashboard` | إدارة المحتوى، CRM، المستخدمين، الصفحة الرئيسية حسب الدور |
-| **نظام إدارة الكلية (CMS)** | `/cms` | العمليات الأكاديمية — الأقسام، الطلاب، الدرجات، الحضور، الجداول، التقارير |
+| القسم                       | بادئة الرابط | الغرض                                                                     |
+| --------------------------- | ------------ | ------------------------------------------------------------------------- |
+| **الموقع العام**            | `/`          | التسويق، القبول، المدونة، الأسئلة الشائعة، التحقق من الشهادات             |
+| **لوحة التحكم**             | `/dashboard` | إدارة المحتوى، CRM، المستخدمين، الصفحة الرئيسية حسب الدور                 |
+| **نظام إدارة الكلية (CMS)** | `/cms`       | العمليات الأكاديمية — الأقسام، الطلاب، الدرجات، الحضور، الجداول، التقارير |
 
 **المصادقة:** تسجيل دخول عبر جلسة Laravel. **التسجيل العام معطّل افتراضياً** — تُنشأ الحسابات الجديدة بواسطة **Admin ← المستخدمون**.  
 **الصلاحيات:** Spatie Laravel Permission مع ستة أدوار معرّفة في `App\Enums\UserRole`.
@@ -45,15 +45,15 @@
 
 ## 2. التقنيات المستخدمة
 
-| الطبقة | التقنية |
-|--------|---------|
-| الخادم | Laravel 12، PHP 8.2 |
-| الواجهة | React 19، TypeScript، Inertia.js v2 |
-| التنسيق | Tailwind CSS v4، shadcn/ui |
-| المصادقة والأدوار | Laravel Breeze + Spatie Permission |
-| قاعدة البيانات | SQLite (تطوير) / MySQL (إنتاج) |
-| الاختبارات | Pest 3 |
-| التعدد اللغوي | سياق الموقع مع نصوص عربية/إنجليزية وتخطيط RTL |
+| الطبقة            | التقنية                                       |
+| ----------------- | --------------------------------------------- |
+| الخادم            | Laravel 12، PHP 8.2                           |
+| الواجهة           | React 19، TypeScript، Inertia.js v2           |
+| التنسيق           | Tailwind CSS v4، shadcn/ui                    |
+| المصادقة والأدوار | Laravel Breeze + Spatie Permission            |
+| قاعدة البيانات    | SQLite (تطوير) / MySQL (إنتاج)                |
+| الاختبارات        | Pest 3                                        |
+| التعدد اللغوي     | سياق الموقع مع نصوص عربية/إنجليزية وتخطيط RTL |
 
 ---
 
@@ -63,19 +63,19 @@
 
 متاح بدون تسجيل دخول.
 
-| الصفحة | المسار | الوصف |
-|--------|--------|-------|
-| الرئيسية | `/` | الصفحة الرئيسية |
-| من نحن | `/about` | نبذة عن المؤسسة |
-| الأقسام | `/departments` | الأقسام الأكاديمية |
-| الأسئلة الشائعة | `/faq` | الأسئلة المتكررة |
-| اتصل بنا | `/contact` | نموذج التواصل |
-| المدونة | `/blog-posts` | الأخبار والمقالات |
-| التحقق من الشهادة | `/verify-certificate` | بحث عام (بيانات محدودة؛ رابط تحميل موقّع) |
-| بوابة الطالب | `/student/portal` | بحث بالتطابق التام (رقم قيد، بريد، أو هاتف) |
-| شروط الاستخدام | `/terms-of-use` | صفحة قانونية |
-| سياسة الخصوصية | `/privacy-policy` | صفحة قانونية |
-| الاشتراك في النشرة | `POST /newsletter` | اشتراك بالبريد |
+| الصفحة             | المسار                | الوصف                                       |
+| ------------------ | --------------------- | ------------------------------------------- |
+| الرئيسية           | `/`                   | الصفحة الرئيسية                             |
+| من نحن             | `/about`              | نبذة عن المؤسسة                             |
+| الأقسام            | `/departments`        | الأقسام الأكاديمية                          |
+| الأسئلة الشائعة    | `/faq`                | الأسئلة المتكررة                            |
+| اتصل بنا           | `/contact`            | نموذج التواصل                               |
+| المدونة            | `/blog-posts`         | الأخبار والمقالات                           |
+| التحقق من الشهادة  | `/verify-certificate` | بحث عام (بيانات محدودة؛ رابط تحميل موقّع)   |
+| بوابة الطالب       | `/student/portal`     | بحث بالتطابق التام (رقم قيد، بريد، أو هاتف) |
+| شروط الاستخدام     | `/terms-of-use`       | صفحة قانونية                                |
+| سياسة الخصوصية     | `/privacy-policy`     | صفحة قانونية                                |
+| الاشتراك في النشرة | `POST /newsletter`    | اشتراك بالبريد                              |
 
 يمكن تبديل اللغة عبر `POST /locale` (عربي / إنجليزي).
 
@@ -87,48 +87,48 @@
 
 #### نظرة عامة
 
-| المسار | الوصف |
-|--------|-------|
+| المسار       | الوصف                                                                                     |
+| ------------ | ----------------------------------------------------------------------------------------- |
 | `/dashboard` | الصفحة الرئيسية حسب الدور — إحصائيات المدير، ملخص الأستاذ، معدل الطالب، أو مقاييس المحتوى |
 
 #### إدارة المحتوى
 
-*الأدوار: Admin، Manager، Content Editor*
+_الأدوار: Admin، Manager، Content Editor_
 
-| الميزة | بادئة المسار |
-|--------|-------------|
-| المقالات | `/dashboard/blog-posts/*` |
-| الشهادات والآراء | `/dashboard/testimonials/*` |
-| الأسئلة الشائعة | `/dashboard/faqs/*` |
-| الشهادات الأكاديمية | `/dashboard/certificates/*` |
+| الميزة                 | بادئة المسار                      |
+| ---------------------- | --------------------------------- |
+| المقالات               | `/dashboard/blog-posts/*`         |
+| الشهادات والآراء       | `/dashboard/testimonials/*`       |
+| الأسئلة الشائعة        | `/dashboard/faqs/*`               |
+| الشهادات الأكاديمية    | `/dashboard/certificates/*`       |
 | سياسة الخصوصية (تحرير) | `/dashboard/pages/privacy-policy` |
-| شروط الاستخدام (تحرير) | `/dashboard/pages/terms-of-use` |
+| شروط الاستخدام (تحرير) | `/dashboard/pages/terms-of-use`   |
 
 #### إدارة علاقات العملاء (CRM)
 
-*الأدوار: Admin، Manager، Support*
+_الأدوار: Admin، Manager، Support_
 
-| الميزة | بادئة المسار |
-|--------|-------------|
-| مشتركو النشرة | `/dashboard/newsletter/*` |
-| الحملات البريدية | `/dashboard/newsletter/campaigns/*` |
-| قوالب الإشعارات | `/dashboard/notification-templates/*` |
+| الميزة           | بادئة المسار                          |
+| ---------------- | ------------------------------------- |
+| مشتركو النشرة    | `/dashboard/newsletter/*`             |
+| الحملات البريدية | `/dashboard/newsletter/campaigns/*`   |
+| قوالب الإشعارات  | `/dashboard/notification-templates/*` |
 
 #### الإعدادات (Admin فقط)
 
-| الميزة | المسار |
-|--------|--------|
-| إدارة المستخدمين | `/dashboard/users/*` |
-| إعدادات الموقع | `/dashboard/site-settings` |
+| الميزة           | المسار                     |
+| ---------------- | -------------------------- |
+| إدارة المستخدمين | `/dashboard/users/*`       |
+| إعدادات الموقع   | `/dashboard/site-settings` |
 
 يمكن تعيين أدوار Spatie متعددة للمستخدم عبر خانات الاختيار في نموذج المستخدم.
 
 #### خدمات الطالب الذاتية
 
-*الدور: Student*
+_الدور: Student_
 
-| الميزة | المسار |
-|--------|--------|
+| الميزة            | المسار                     |
+| ----------------- | -------------------------- |
 | كشف الدرجات (PDF) | `/dashboard/my-transcript` |
 
 يتطلب ربط سجل `CmsStudent` بحساب المستخدم (`user_id`).
@@ -137,7 +137,7 @@
 
 ### 3.3 نظام إدارة الكلية (CMS)
 
-*أدوار الدخول: Admin، Manager، Teacher*
+_أدوار الدخول: Admin، Manager، Teacher_
 
 جميع مسارات CMS تستخدم middleware `cms.access` و `cms.audit` (تُسجَّل العمليات).
 
@@ -155,24 +155,24 @@
 
 #### الإدارة الكاملة (Admin + Manager)
 
-| الوحدة | المسارات | الصلاحيات |
-|--------|---------|-----------|
-| الأقسام | `/cms/departments` | إنشاء، قراءة، تحديث، حذف |
-| المستويات | `/cms/levels` | CRUD (سنة + شعبة لكل قسم) |
-| الأساتذة | `/cms/teachers` | CRUD، ربط بحساب مستخدم |
-| المواد | `/cms/subjects` | CRUD |
-| الطلاب | `/cms/students` | CRUD، استيراد/تصدير، بطاقة، كشف درجات |
-| التسجيلات | `/cms/enrollments` | CRUD، تسجيل جماعي |
-| الدرجات | `/cms/grades` | إدخال، تحديث جماعي، استيراد/تصدير |
-| الحضور | `/cms/attendance` | تسجيل، جماعي، تصدير |
-| الجداول | `/cms/schedules` | CRUD |
-| التقارير | `/cms/reports/*` | الدرجات، الحضور، أوائل الطلاب، ملخص الأقسام |
+| الوحدة    | المسارات           | الصلاحيات                                   |
+| --------- | ------------------ | ------------------------------------------- |
+| الأقسام   | `/cms/departments` | إنشاء، قراءة، تحديث، حذف                    |
+| المستويات | `/cms/levels`      | CRUD (سنة + شعبة لكل قسم)                   |
+| الأساتذة  | `/cms/teachers`    | CRUD، ربط بحساب مستخدم                      |
+| المواد    | `/cms/subjects`    | CRUD                                        |
+| الطلاب    | `/cms/students`    | CRUD، استيراد/تصدير، بطاقة، كشف درجات       |
+| التسجيلات | `/cms/enrollments` | CRUD، تسجيل جماعي                           |
+| الدرجات   | `/cms/grades`      | إدخال، تحديث جماعي، استيراد/تصدير           |
+| الحضور    | `/cms/attendance`  | تسجيل، جماعي، تصدير                         |
+| الجداول   | `/cms/schedules`   | CRUD                                        |
+| التقارير  | `/cms/reports/*`   | الدرجات، الحضور، أوائل الطلاب، ملخص الأقسام |
 
 #### إدارة CMS (Admin فقط)
 
-| الوحدة | المسار |
-|--------|--------|
-| سجل التدقيق | `/cms/audit-logs` |
+| الوحدة               | المسار                                      |
+| -------------------- | ------------------------------------------- |
+| سجل التدقيق          | `/cms/audit-logs`                           |
 | الإعدادات الأكاديمية | `/cms/settings` (قفل الدرجات، موعد الإدخال) |
 
 ---
@@ -181,45 +181,45 @@
 
 الأدوار معرّفة في `App\Enums\UserRole` ومتزامنة عبر Spatie.
 
-| الدور | الاسم في Spatie | لوحة التحكم | CMS | ملاحظات |
-|-------|----------------|-------------|-----|---------|
-| **مدير النظام** | `Admin` | كامل + جميع الأقسام | CMS كامل + التدقيق + الإعدادات | يعدّل الدرجات عند القفل |
-| **مدير** | `Manager` | لوحة المدير + المحتوى + CRM | CMS كامل (بدون تدقيق وإعدادات) | نفس صلاحيات الإدارة في CMS |
-| **محرر المحتوى** | `Content Editor` | لوحة المحتوى | لا وصول (403) | المدونة، الأسئلة، الشهادات، الصفحات القانونية |
-| **الدعم** | `Support` | لوحة افتراضية | لا وصول (403) | النشرة، الحملات، قوالب الإشعارات |
-| **أستاذ** | `Teacher` | لوحة الأستاذ | عمليات تدريس محدودة | درجات وحضور مواده؛ عرض الجداول/الطلاب/التسجيلات |
-| **طالب** | `Student` | لوحة الطالب | لا وصول (403) | المعدل، الجدول، الدرجات؛ كشف الدرجات PDF |
+| الدور            | الاسم في Spatie  | لوحة التحكم                 | CMS                            | ملاحظات                                         |
+| ---------------- | ---------------- | --------------------------- | ------------------------------ | ----------------------------------------------- |
+| **مدير النظام**  | `Admin`          | كامل + جميع الأقسام         | CMS كامل + التدقيق + الإعدادات | يعدّل الدرجات عند القفل                         |
+| **مدير**         | `Manager`        | لوحة المدير + المحتوى + CRM | CMS كامل (بدون تدقيق وإعدادات) | نفس صلاحيات الإدارة في CMS                      |
+| **محرر المحتوى** | `Content Editor` | لوحة المحتوى                | لا وصول (403)                  | المدونة، الأسئلة، الشهادات، الصفحات القانونية   |
+| **الدعم**        | `Support`        | لوحة افتراضية               | لا وصول (403)                  | النشرة، الحملات، قوالب الإشعارات                |
+| **أستاذ**        | `Teacher`        | لوحة الأستاذ                | عمليات تدريس محدودة            | درجات وحضور مواده؛ عرض الجداول/الطلاب/التسجيلات |
+| **طالب**         | `Student`        | لوحة الطالب                 | لا وصول (403)                  | المعدل، الجدول، الدرجات؛ كشف الدرجات PDF        |
 
 ### جدول الصلاحيات التفصيلي
 
-| القدرة | Admin | Manager | Content Editor | Support | Teacher | Student |
-|--------|:-----:|:-------:|:--------------:|:-------:|:-------:|:-------:|
-| الصفحة الرئيسية | ✅ | ✅ | ✅ (محتوى) | ✅ (افتراضي) | ✅ (أستاذ) | ✅ (طالب) |
-| صفحات المحتوى | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| CRM | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ |
-| إدارة المستخدمين | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| إعدادات الموقع | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| CMS — إدخال الدرجات | ✅ | ✅ | ❌ | ❌ | ✅ (مواده) | ❌ |
-| CMS — إدارة الهيكل | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| CMS — التقارير | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| CMS — سجل التدقيق | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| CMS — الإعدادات الأكاديمية | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| كشف درجاتي | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| رفع الصور | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ |
+| القدرة                     | Admin | Manager | Content Editor |   Support    |  Teacher   |  Student  |
+| -------------------------- | :---: | :-----: | :------------: | :----------: | :--------: | :-------: |
+| الصفحة الرئيسية            |  ✅   |   ✅    |   ✅ (محتوى)   | ✅ (افتراضي) | ✅ (أستاذ) | ✅ (طالب) |
+| صفحات المحتوى              |  ✅   |   ✅    |       ✅       |      ❌      |     ❌     |    ❌     |
+| CRM                        |  ✅   |   ✅    |       ❌       |      ✅      |     ❌     |    ❌     |
+| إدارة المستخدمين           |  ✅   |   ❌    |       ❌       |      ❌      |     ❌     |    ❌     |
+| إعدادات الموقع             |  ✅   |   ❌    |       ❌       |      ❌      |     ❌     |    ❌     |
+| CMS — إدخال الدرجات        |  ✅   |   ✅    |       ❌       |      ❌      | ✅ (مواده) |    ❌     |
+| CMS — إدارة الهيكل         |  ✅   |   ✅    |       ❌       |      ❌      |     ❌     |    ❌     |
+| CMS — التقارير             |  ✅   |   ✅    |       ❌       |      ❌      |     ❌     |    ❌     |
+| CMS — سجل التدقيق          |  ✅   |   ❌    |       ❌       |      ❌      |     ❌     |    ❌     |
+| CMS — الإعدادات الأكاديمية |  ✅   |   ❌    |       ❌       |      ❌      |     ❌     |    ❌     |
+| كشف درجاتي                 |  ❌   |   ❌    |       ❌       |      ❌      |     ❌     |    ✅     |
+| رفع الصور                  |  ✅   |   ✅    |       ✅       |      ❌      |     ✅     |    ❌     |
 
 ### ربط Middleware بالأدوار
 
-| Middleware | الأدوار المسموحة |
-|------------|------------------|
-| `dashboard.role` | أي مستخدم لديه دور Spatie واحد على الأقل |
-| `cms.access` | Admin، Manager، Teacher |
-| `cms.manage` | Admin، Manager |
-| `dashboard.access:content` | Admin، Manager، Content Editor |
-| `dashboard.access:crm` | Admin، Manager، Support |
-| `dashboard.access:settings` | Admin |
-| `dashboard.access:cms_admin` | Admin |
-| `dashboard.access:student` | Student |
-| `dashboard.access:uploads` | Admin، Manager، Teacher، Content Editor |
+| Middleware                   | الأدوار المسموحة                         |
+| ---------------------------- | ---------------------------------------- |
+| `dashboard.role`             | أي مستخدم لديه دور Spatie واحد على الأقل |
+| `cms.access`                 | Admin، Manager، Teacher                  |
+| `cms.manage`                 | Admin، Manager                           |
+| `dashboard.access:content`   | Admin، Manager، Content Editor           |
+| `dashboard.access:crm`       | Admin، Manager، Support                  |
+| `dashboard.access:settings`  | Admin                                    |
+| `dashboard.access:cms_admin` | Admin                                    |
+| `dashboard.access:student`   | Student                                  |
+| `dashboard.access:uploads`   | Admin، Manager، Teacher، Content Editor  |
 
 ### قواعد نطاق الأستاذ
 
@@ -233,14 +233,14 @@
 
 ### تسميات الأدوار في الواجهة
 
-| Spatie | English | العربية |
-|--------|---------|---------|
-| Admin | Administrator | مدير النظام |
-| Manager | Manager | مدير |
+| Spatie         | English        | العربية      |
+| -------------- | -------------- | ------------ |
+| Admin          | Administrator  | مدير النظام  |
+| Manager        | Manager        | مدير         |
 | Content Editor | Content Editor | محرر المحتوى |
-| Support | Support | الدعم |
-| Teacher | Teacher | أستاذ |
-| Student | Student | طالب |
+| Support        | Support        | الدعم        |
+| Teacher        | Teacher        | أستاذ        |
+| Student        | Student        | طالب         |
 
 ---
 
@@ -287,57 +287,63 @@ POST /register                        [404 ما لم يُفعَّل AUTH_REGISTR
 ### مسارات لوحة التحكم (تتطلب تسجيل دخول)
 
 جميع المسارات أدناه تتطلب `auth` + `dashboard.role`.
-GET  /dashboard
-GET  /dashboard/my-transcript          [Student]
+GET /dashboard
+GET /dashboard/my-transcript [Student]
 
-/dashboard/users/*                     [Admin]
-/dashboard/site-settings               [Admin]
+/dashboard/users/\* [Admin]
+/dashboard/site-settings [Admin]
 
-/dashboard/blog-posts/*                [Content]
-/dashboard/testimonials/*
-/dashboard/faqs/*
-/dashboard/certificates/*
+/dashboard/blog-posts/_ [Content]
+/dashboard/testimonials/_
+/dashboard/faqs/_
+/dashboard/certificates/_
 /dashboard/pages/privacy-policy
 /dashboard/pages/terms-of-use
 
-/dashboard/newsletter/*                [CRM]
-/dashboard/notification-templates/*
+/dashboard/newsletter/_ [CRM]
+/dashboard/notification-templates/_
 
-POST /uploads/image                    [أدوار الرفع؛ مجلدات مسموحة]
-DELETE /uploads/image                  [أدوار الرفع؛ مسارات مسموحة]
+POST /uploads/image [أدوار الرفع؛ مجلدات مسموحة]
+DELETE /uploads/image [أدوار الرفع؛ مسارات مسموحة]
+
 ```
 
 ### مسارات CMS
 
 ```
+
 # جميع مستخدمي CMS (نطاق الأستاذ في المتحكمات)
-GET  /cms/grades
+
+GET /cms/grades
 POST /cms/grades/update
 POST /cms/grades/bulk-update
-GET  /cms/attendance
+GET /cms/attendance
 POST /cms/attendance
 POST /cms/attendance/bulk
-GET  /cms/schedules
-GET  /cms/schedules/{id}
-GET  /cms/students
-GET  /cms/students/{id}
-GET  /cms/enrollments
-GET  /cms/enrollments/{id}
+GET /cms/schedules
+GET /cms/schedules/{id}
+GET /cms/students
+GET /cms/students/{id}
+GET /cms/enrollments
+GET /cms/enrollments/{id}
 
 # Admin + Manager فقط (cms.manage)
+
 /cms/departments, /cms/levels, /cms/teachers, /cms/subjects
-/cms/students/*                        [إنشاء، تعديل، استيراد، تصدير، كشف]
-/cms/enrollments/*
-/cms/grades/export, /cms/grades/import/*
+/cms/students/_ [إنشاء، تعديل، استيراد، تصدير، كشف]
+/cms/enrollments/_
+/cms/grades/export, /cms/grades/import/_
 /cms/attendance/export
 /cms/schedules/create, edit, delete
-/cms/reports/*
+/cms/reports/_
 
 # Admin فقط
-GET  /cms/audit-logs
-GET  /cms/settings
-PUT  /cms/settings
-```
+
+GET /cms/audit-logs
+GET /cms/settings
+PUT /cms/settings
+
+````
 
 ---
 
@@ -347,10 +353,10 @@ PUT  /cms/settings
 
 | البريد | الدور | ملاحظات |
 |--------|------|---------|
-| `admin@mhcst.ly` | Admin | مدير النظام الرئيسي |
-| `manager@mhcst.ly` | Manager | |
-| `editor@mhcst.ly` | Content Editor | |
-| `support@mhcst.ly` | Support | |
+| `admin@mhcst.edu.ly` | Admin | مدير النظام الرئيسي |
+| `manager@mhcst.edu.ly` | Manager | |
+| `editor@mhcst.edu.ly` | Content Editor | |
+| `support@mhcst.edu.ly` | Support | |
 | `admin@cms.local` | Admin | مدير CMS التجريبي |
 | `a.sharif@cms.local` | Teacher | قسم علوم الحاسوب |
 | `f.werfali@cms.local` | Teacher | |
@@ -439,7 +445,7 @@ php artisan migrate --seed
 npm install
 npm run dev
 # أو: composer run dev
-```
+````
 
 اضبط `APP_URL` على رابط التطوير أو الإنتاج. اترك `AUTH_REGISTRATION_ENABLED=false` ما لم تحتاج تسجيلاً مفتوحاً في بيئة التطوير.
 
@@ -463,19 +469,19 @@ php artisan test --compact tests/Feature/DashboardRouteAccessTest.php
 
 ### ملفات المصدر الرئيسية
 
-| الغرض | المسار |
-|-------|--------|
-| تعريف الأدوار | `app/Enums/UserRole.php` |
-| صلاحيات CMS | `app/Services/CmsAuthorizationService.php` |
-| قفل الدرجات | `app/Services/GradeLockService.php` |
-| المسارات | `routes/web.php` |
-| صلاحيات الواجهة | `resources/js/lib/dashboard-access.ts` |
-| الشريط الجانبي | `resources/js/components/app-sidebar.tsx` |
-| قدرات CMS المشتركة | `app/Http/Middleware/HandleInertiaRequests.php` |
-| خدمة SEO | `app/Services/SiteSeoService.php` |
-| متحكم SEO | `app/Http/Controllers/SeoController.php` |
-| وسوم Meta (React) | `resources/js/components/seo-head.tsx` |
-| تنقية HTML | `app/Support/HtmlSanitizer.php` |
+| الغرض                   | المسار                                           |
+| ----------------------- | ------------------------------------------------ |
+| تعريف الأدوار           | `app/Enums/UserRole.php`                         |
+| صلاحيات CMS             | `app/Services/CmsAuthorizationService.php`       |
+| قفل الدرجات             | `app/Services/GradeLockService.php`              |
+| المسارات                | `routes/web.php`                                 |
+| صلاحيات الواجهة         | `resources/js/lib/dashboard-access.ts`           |
+| الشريط الجانبي          | `resources/js/components/app-sidebar.tsx`        |
+| قدرات CMS المشتركة      | `app/Http/Middleware/HandleInertiaRequests.php`  |
+| خدمة SEO                | `app/Services/SiteSeoService.php`                |
+| متحكم SEO               | `app/Http/Controllers/SeoController.php`         |
+| وسوم Meta (React)       | `resources/js/components/seo-head.tsx`           |
+| تنقية HTML              | `app/Support/HtmlSanitizer.php`                  |
 | بوابة أدوار لوحة التحكم | `app/Http/Middleware/EnsureHasDashboardRole.php` |
 
 ### وثائق ذات صلة
@@ -489,12 +495,12 @@ php artisan test --compact tests/Feature/DashboardRouteAccessTest.php
 
 تُولَّد أصول SEO ديناميكياً من **لوحة التحكم ← إعدادات الموقع** (اسم الموقع، الوصف، بيانات التواصل).
 
-| الأصل | المسار | الوصف |
-|-------|--------|-------|
-| Web manifest | `/site.webmanifest` | اسم PWA، الأيقونات، لون السمة (`#1B365D`) |
-| Robots | `/robots.txt` | يسمح بالصفحات العامة؛ يمنع `/dashboard` و`/cms` والبوابات الخاصة |
-| Sitemap | `/sitemap.xml` | الصفحات العامة + **مقالات المدونة المنشورة** فقط |
-| Browser config | `/browserconfig.xml` | لون وأيقونات بلاط Windows |
+| الأصل          | المسار               | الوصف                                                            |
+| -------------- | -------------------- | ---------------------------------------------------------------- |
+| Web manifest   | `/site.webmanifest`  | اسم PWA، الأيقونات، لون السمة (`#1B365D`)                        |
+| Robots         | `/robots.txt`        | يسمح بالصفحات العامة؛ يمنع `/dashboard` و`/cms` والبوابات الخاصة |
+| Sitemap        | `/sitemap.xml`       | الصفحات العامة + **مقالات المدونة المنشورة** فقط                 |
+| Browser config | `/browserconfig.xml` | لون وأيقونات بلاط Windows                                        |
 
 ### وسوم الصفحات
 
@@ -524,24 +530,24 @@ php artisan test --compact tests/Feature/SeoTest.php
 
 ### المصادقة والحسابات
 
-| الضابط | السلوك |
-|--------|--------|
-| التسجيل العام | **معطّل** افتراضياً (`AUTH_REGISTRATION_ENABLED=false`) |
-| الوصول للوحة التحكم | يتطلب تسجيل دخول **ودور Spatie** (`dashboard.role`) |
-| الحسابات المعطّلة | `is_active = false` لا يمكنها تسجيل الدخول |
-| حد محاولات الدخول | 5 محاولات لكل بريد/IP |
+| الضابط              | السلوك                                                  |
+| ------------------- | ------------------------------------------------------- |
+| التسجيل العام       | **معطّل** افتراضياً (`AUTH_REGISTRATION_ENABLED=false`) |
+| الوصول للوحة التحكم | يتطلب تسجيل دخول **ودور Spatie** (`dashboard.role`)     |
+| الحسابات المعطّلة   | `is_active = false` لا يمكنها تسجيل الدخول              |
+| حد محاولات الدخول   | 5 محاولات لكل بريد/IP                                   |
 
 حسابات جديدة: **Admin ← المستخدمون ← إنشاء** (تعيين الأدوار هناك).
 
 ### النقاط العامة
 
-| النقطة | الحماية |
-|--------|---------|
-| `POST /contact` | حد 5/دقيقة؛ التحقق من البريد في reply-to |
-| `POST /newsletter` | حد 10/دقيقة |
-| بحث بوابة الطالب | تطابق تام، 4 أحرف كحد أدنى، حد 20/دقيقة؛ استجابة JSON محدودة |
-| التحقق من الشهادة | حد 30/دقيقة؛ لا بريد/هاتف في props |
-| تحميل الشهادة | رابط موقّع مطلوب؛ حد 10/دقيقة |
+| النقطة             | الحماية                                                      |
+| ------------------ | ------------------------------------------------------------ |
+| `POST /contact`    | حد 5/دقيقة؛ التحقق من البريد في reply-to                     |
+| `POST /newsletter` | حد 10/دقيقة                                                  |
+| بحث بوابة الطالب   | تطابق تام، 4 أحرف كحد أدنى، حد 20/دقيقة؛ استجابة JSON محدودة |
+| التحقق من الشهادة  | حد 30/دقيقة؛ لا بريد/هاتف في props                           |
+| تحميل الشهادة      | رابط موقّع مطلوب؛ حد 10/دقيقة                                |
 
 المناطق الخاصة (`/dashboard`، `/cms`، `/settings`، بوابة الطالب) تحصل أيضاً على `noindex, nofollow` في قالب Blade الجذر.
 

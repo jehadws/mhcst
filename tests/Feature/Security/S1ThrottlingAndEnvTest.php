@@ -48,6 +48,6 @@ test('UserSeeder is idempotent two runs produce 4 accounts total', function () {
     $this->seed(UserSeeder::class);
     $this->seed(UserSeeder::class);
     $this->assertSame(4, User::whereIn('email', [
-        'admin@mhcst.ly', 'manager@mhcst.ly', 'editor@mhcst.ly', 'support@mhcst.ly',
+        'admin@mhcst.edu.ly', 'manager@mhcst.edu.ly', 'editor@mhcst.edu.ly', 'support@mhcst.edu.ly',
     ])->count());
 });

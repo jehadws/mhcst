@@ -65,7 +65,7 @@ function s8_seedAcademicTree(bool $withEnrollment = false): array
     $teacher = CmsTeacher::create([
         'user_id' => $teacherUser->id,
         'name' => 'Dr. '.Str::random(5),
-        'email' => 'teacher-'.Str::random(6).'@mhcst.ly',
+        'email' => 'teacher-'.Str::random(6).'@mhcst.edu.ly',
         'status' => 'active',
     ]);
     $teacher->setRelation('user', $teacherUser);
@@ -260,7 +260,7 @@ describe('4. Teacher — admin creates a teacher with user account', function ()
     it('creates a teacher and assigns the Teacher role to their user', function () {
         $resp = $this->post(route('cms.teachers.store'), [
             'name' => 'Dr. Aisha',
-            'email' => 'aisha-s8@mhcst.ly',
+            'email' => 'aisha-s8@mhcst.edu.ly',
             'password' => 'Str0ngP@ss!',
             'create_user_account' => true,
             'specialization' => 'Algorithms',
@@ -268,7 +268,7 @@ describe('4. Teacher — admin creates a teacher with user account', function ()
         ]);
         $resp->assertRedirect();
 
-        $teacher = CmsTeacher::where('email', 'aisha-s8@mhcst.ly')->firstOrFail();
+        $teacher = CmsTeacher::where('email', 'aisha-s8@mhcst.edu.ly')->firstOrFail();
         expect($teacher->user)->not->toBeNull();
         expect($teacher->user->hasRole(UserRole::Teacher->value))->toBeTrue();
     });

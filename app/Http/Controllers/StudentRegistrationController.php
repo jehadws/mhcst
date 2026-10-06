@@ -208,7 +208,7 @@ class StudentRegistrationController extends Controller
      */
     private function notifyAdmin(string $studentName, string $studentEmail): void
     {
-        $adminEmail = SiteSetting::where('key', 'contact_email')->value('value') ?: 'info@mhcst.ly';
+        $adminEmail = SiteSetting::where('key', 'contact_email')->value('value') ?: 'info@mhcst.edu.ly';
 
         try {
             Mail::to($adminEmail)->send(new StudentRegistrationPendingMail($studentName, $studentEmail));

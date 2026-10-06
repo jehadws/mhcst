@@ -11,10 +11,10 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $accounts = [
-            ['email' => 'admin@mhcst.ly',   'name' => 'System Admin',  'role' => 'Admin'],
-            ['email' => 'manager@mhcst.ly', 'name' => 'Manager User',  'role' => 'Manager'],
-            ['email' => 'editor@mhcst.ly',  'name' => 'Editor User',   'role' => 'Content Editor'],
-            ['email' => 'support@mhcst.ly', 'name' => 'Support User',  'role' => 'Support'],
+            ['email' => 'admin@mhcst.edu.ly',   'name' => 'System Admin',  'role' => 'Admin'],
+            ['email' => 'manager@mhcst.edu.ly', 'name' => 'Manager User',  'role' => 'Manager'],
+            ['email' => 'editor@mhcst.edu.ly',  'name' => 'Editor User',   'role' => 'Content Editor'],
+            ['email' => 'support@mhcst.edu.ly', 'name' => 'Support User',  'role' => 'Support'],
         ];
 
         $defaultPassword = env('SEEDER_DEFAULT_PASSWORD', null);

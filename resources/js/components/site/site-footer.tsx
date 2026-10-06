@@ -1,6 +1,6 @@
 import { SiteLogo } from '@/components/site/site-logo';
-import { useBrandText, useSiteSettings } from '@/hooks/use-site-settings';
 import { useSite } from '@/context/site-context';
+import { useBrandText, useSiteSettings } from '@/hooks/use-site-settings';
 import { Link } from '@inertiajs/react';
 import { Mail, MapPin, Phone } from 'lucide-react';
 
@@ -49,7 +49,7 @@ export function SiteFooter() {
   const { brandName, brandSub } = useBrandText();
   const settings = useSiteSettings();
   const contactPhone = settings.contact_phone || '+218 91 234 5678';
-  const contactEmail = settings.contact_email || 'info@mhcst.ly';
+  const contactEmail = settings.contact_email || 'info@mhcst.edu.ly';
   const address = settings.address || t.location.addressLine;
   const socialLinks = settings.social_links || {};
 
@@ -130,7 +130,7 @@ export function SiteFooter() {
             <ul className="mt-5 grid gap-4">
               {contactItems.map((c) => (
                 <li key={c.text} className="flex items-center gap-3">
-                  <span className="bg-white/5 text-accent flex size-8 shrink-0 items-center justify-center rounded-md">
+                  <span className="text-accent flex size-8 shrink-0 items-center justify-center rounded-md bg-white/5">
                     <c.icon className="size-4" aria-hidden="true" />
                   </span>
                   <span dir="ltr" className="text-hero-foreground/75 text-sm">

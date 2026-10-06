@@ -26,11 +26,11 @@
 
 Almaayir Alhaditha College for Science and Technology is a full-stack web platform with three main areas:
 
-| Area | URL prefix | Purpose |
-|------|------------|---------|
-| **Public website** | `/` | Marketing, admissions info, blog, FAQ, certificate verification |
-| **Admin dashboard** | `/dashboard` | Content management, CRM, user administration, role-specific home |
-| **College Management System (CMS)** | `/cms` | Academic operations — departments, students, grades, attendance, schedules, reports |
+| Area                                | URL prefix   | Purpose                                                                             |
+| ----------------------------------- | ------------ | ----------------------------------------------------------------------------------- |
+| **Public website**                  | `/`          | Marketing, admissions info, blog, FAQ, certificate verification                     |
+| **Admin dashboard**                 | `/dashboard` | Content management, CRM, user administration, role-specific home                    |
+| **College Management System (CMS)** | `/cms`       | Academic operations — departments, students, grades, attendance, schedules, reports |
 
 Authentication uses **Laravel session login**. **Public self-registration is disabled by default** — new accounts are created by an Admin via **Dashboard → Users**. Authorization uses **Spatie Laravel Permission** with six named roles stored in `App\Enums\UserRole`.
 
@@ -44,15 +44,15 @@ Access is enforced at three layers:
 
 ## 2. Technology stack
 
-| Layer | Technology |
-|-------|------------|
-| Backend | Laravel 12, PHP 8.2 |
-| Frontend | React 19, TypeScript, Inertia.js v2 |
-| Styling | Tailwind CSS v4, shadcn/ui |
-| Auth & roles | Laravel Breeze + Spatie Permission |
-| Database | SQLite (dev) / MySQL (production) |
-| Testing | Pest 3 |
-| i18n | Site context with Arabic/English strings, RTL layout |
+| Layer        | Technology                                           |
+| ------------ | ---------------------------------------------------- |
+| Backend      | Laravel 12, PHP 8.2                                  |
+| Frontend     | React 19, TypeScript, Inertia.js v2                  |
+| Styling      | Tailwind CSS v4, shadcn/ui                           |
+| Auth & roles | Laravel Breeze + Spatie Permission                   |
+| Database     | SQLite (dev) / MySQL (production)                    |
+| Testing      | Pest 3                                               |
+| i18n         | Site context with Arabic/English strings, RTL layout |
 
 ---
 
@@ -62,19 +62,19 @@ Access is enforced at three layers:
 
 Available without login.
 
-| Page | Route | Description |
-|------|-------|-------------|
-| Home | `/` | Landing page |
-| About | `/about` | Institution overview |
-| Departments | `/departments` | Academic departments |
-| FAQ | `/faq` | Frequently asked questions |
-| Contact | `/contact` | Contact form |
-| Blog | `/blog-posts` | News and articles |
-| Certificate verification | `/verify-certificate` | Public certificate lookup (minimal data; signed download link) |
-| Student portal | `/student/portal` | Exact-match lookup by student ID, email, or phone (no partial search) |
-| Terms of use | `/terms-of-use` | Legal page |
-| Privacy policy | `/privacy-policy` | Legal page |
-| Newsletter subscribe | `POST /newsletter` | Email subscription |
+| Page                     | Route                 | Description                                                           |
+| ------------------------ | --------------------- | --------------------------------------------------------------------- |
+| Home                     | `/`                   | Landing page                                                          |
+| About                    | `/about`              | Institution overview                                                  |
+| Departments              | `/departments`        | Academic departments                                                  |
+| FAQ                      | `/faq`                | Frequently asked questions                                            |
+| Contact                  | `/contact`            | Contact form                                                          |
+| Blog                     | `/blog-posts`         | News and articles                                                     |
+| Certificate verification | `/verify-certificate` | Public certificate lookup (minimal data; signed download link)        |
+| Student portal           | `/student/portal`     | Exact-match lookup by student ID, email, or phone (no partial search) |
+| Terms of use             | `/terms-of-use`       | Legal page                                                            |
+| Privacy policy           | `/privacy-policy`     | Legal page                                                            |
+| Newsletter subscribe     | `POST /newsletter`    | Email subscription                                                    |
 
 Locale can be switched via `POST /locale` (Arabic / English).
 
@@ -86,48 +86,48 @@ Requires login **and** a Spatie role. Users without any assigned role receive **
 
 #### Overview
 
-| Route | Description |
-|-------|-------------|
+| Route        | Description                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------- |
 | `/dashboard` | Role-specific home — admin stats, teacher summary, student GPA/schedule, or content metrics |
 
 #### Content management
 
-*Roles: Admin, Manager, Content Editor*
+_Roles: Admin, Manager, Content Editor_
 
-| Feature | Route prefix |
-|---------|--------------|
-| Blog posts | `/dashboard/blog-posts/*` |
-| Testimonials | `/dashboard/testimonials/*` |
-| FAQs | `/dashboard/faqs/*` |
-| Certificates | `/dashboard/certificates/*` |
+| Feature               | Route prefix                      |
+| --------------------- | --------------------------------- |
+| Blog posts            | `/dashboard/blog-posts/*`         |
+| Testimonials          | `/dashboard/testimonials/*`       |
+| FAQs                  | `/dashboard/faqs/*`               |
+| Certificates          | `/dashboard/certificates/*`       |
 | Privacy policy (edit) | `/dashboard/pages/privacy-policy` |
-| Terms of use (edit) | `/dashboard/pages/terms-of-use` |
+| Terms of use (edit)   | `/dashboard/pages/terms-of-use`   |
 
 #### CRM
 
-*Roles: Admin, Manager, Support*
+_Roles: Admin, Manager, Support_
 
-| Feature | Route prefix |
-|---------|--------------|
-| Newsletter subscribers | `/dashboard/newsletter/*` |
-| Email campaigns | `/dashboard/newsletter/campaigns/*` |
+| Feature                | Route prefix                          |
+| ---------------------- | ------------------------------------- |
+| Newsletter subscribers | `/dashboard/newsletter/*`             |
+| Email campaigns        | `/dashboard/newsletter/campaigns/*`   |
 | Notification templates | `/dashboard/notification-templates/*` |
 
 #### Settings (Admin only)
 
-| Feature | Route |
-|---------|-------|
-| User management | `/dashboard/users/*` |
-| Site settings | `/dashboard/site-settings` |
+| Feature         | Route                      |
+| --------------- | -------------------------- |
+| User management | `/dashboard/users/*`       |
+| Site settings   | `/dashboard/site-settings` |
 
 Users can be assigned multiple Spatie roles via checkboxes in the user form.
 
 #### Student self-service
 
-*Role: Student*
+_Role: Student_
 
-| Feature | Route |
-|---------|-------|
+| Feature             | Route                      |
+| ------------------- | -------------------------- |
 | My transcript (PDF) | `/dashboard/my-transcript` |
 
 Requires a `CmsStudent` record linked to the logged-in user (`user_id`).
@@ -136,7 +136,7 @@ Requires a `CmsStudent` record linked to the logged-in user (`user_id`).
 
 ### 3.3 College Management System (CMS)
 
-*Entry roles: Admin, Manager, Teacher*
+_Entry roles: Admin, Manager, Teacher_
 
 All CMS routes use middleware `cms.access` and `cms.audit` (actions are logged).
 
@@ -154,24 +154,24 @@ Teachers **cannot** create/edit/delete departments, levels, teachers, subjects, 
 
 #### Full CMS management (Admin + Manager)
 
-| Module | Routes | Capabilities |
-|--------|--------|--------------|
-| Departments | `/cms/departments` | CRUD |
-| Levels | `/cms/levels` | CRUD (year + section per department) |
-| Teachers | `/cms/teachers` | CRUD, link to user account |
-| Subjects | `/cms/subjects` | CRUD |
-| Students | `/cms/students` | CRUD, import/export, ID card, transcript PDF |
-| Enrollments | `/cms/enrollments` | CRUD, bulk enroll |
-| Grades | `/cms/grades` | Enter, bulk update, import/export |
-| Attendance | `/cms/attendance` | Record, bulk record, export |
-| Schedules | `/cms/schedules` | CRUD (timetable) |
-| Reports | `/cms/reports/*` | Grades, attendance, top students, department summary |
+| Module      | Routes             | Capabilities                                         |
+| ----------- | ------------------ | ---------------------------------------------------- |
+| Departments | `/cms/departments` | CRUD                                                 |
+| Levels      | `/cms/levels`      | CRUD (year + section per department)                 |
+| Teachers    | `/cms/teachers`    | CRUD, link to user account                           |
+| Subjects    | `/cms/subjects`    | CRUD                                                 |
+| Students    | `/cms/students`    | CRUD, import/export, ID card, transcript PDF         |
+| Enrollments | `/cms/enrollments` | CRUD, bulk enroll                                    |
+| Grades      | `/cms/grades`      | Enter, bulk update, import/export                    |
+| Attendance  | `/cms/attendance`  | Record, bulk record, export                          |
+| Schedules   | `/cms/schedules`   | CRUD (timetable)                                     |
+| Reports     | `/cms/reports/*`   | Grades, attendance, top students, department summary |
 
 #### CMS admin only (Admin)
 
-| Module | Route |
-|--------|-------|
-| Audit log | `/cms/audit-logs` |
+| Module            | Route                                        |
+| ----------------- | -------------------------------------------- |
+| Audit log         | `/cms/audit-logs`                            |
 | Academic settings | `/cms/settings` (grade lock, entry deadline) |
 
 ---
@@ -180,45 +180,45 @@ Teachers **cannot** create/edit/delete departments, levels, teachers, subjects, 
 
 Roles are defined in `App\Enums\UserRole` and synced via Spatie.
 
-| Role | Spatie name | Dashboard | CMS | Notes |
-|------|-------------|-----------|-----|-------|
-| **Admin** | `Admin` | Full admin dashboard + all sidebar sections | Full CMS + audit + academic settings | Can edit grades when locked |
-| **Manager** | `Manager` | Admin dashboard + content + CRM | Full CMS (no audit, no academic settings) | Same CMS manage access as Admin |
-| **Content Editor** | `Content Editor` | Content dashboard | No access (403) | Blog, FAQs, testimonials, certificates, legal pages |
-| **Support** | `Support` | Content-style fallback dashboard | No access (403) | Newsletter, campaigns, notification templates |
-| **Teacher** | `Teacher` | Teacher dashboard | Scoped teaching ops only | Grades, attendance, read-only schedules/students/enrollments for own subjects |
-| **Student** | `Student` | Student dashboard | No access (403) | GPA, schedule, grades overview; my transcript PDF |
+| Role               | Spatie name      | Dashboard                                   | CMS                                       | Notes                                                                         |
+| ------------------ | ---------------- | ------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------- |
+| **Admin**          | `Admin`          | Full admin dashboard + all sidebar sections | Full CMS + audit + academic settings      | Can edit grades when locked                                                   |
+| **Manager**        | `Manager`        | Admin dashboard + content + CRM             | Full CMS (no audit, no academic settings) | Same CMS manage access as Admin                                               |
+| **Content Editor** | `Content Editor` | Content dashboard                           | No access (403)                           | Blog, FAQs, testimonials, certificates, legal pages                           |
+| **Support**        | `Support`        | Content-style fallback dashboard            | No access (403)                           | Newsletter, campaigns, notification templates                                 |
+| **Teacher**        | `Teacher`        | Teacher dashboard                           | Scoped teaching ops only                  | Grades, attendance, read-only schedules/students/enrollments for own subjects |
+| **Student**        | `Student`        | Student dashboard                           | No access (403)                           | GPA, schedule, grades overview; my transcript PDF                             |
 
 ### Access matrix (detailed)
 
-| Capability | Admin | Manager | Content Editor | Support | Teacher | Student |
-|------------|:-----:|:-------:|:--------------:|:-------:|:-------:|:-------:|
-| Dashboard home | ✅ | ✅ | ✅ (content) | ✅ (fallback) | ✅ (teacher) | ✅ (student) |
-| Content pages | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| CRM | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ |
-| User management | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Site settings | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| CMS — enter grades | ✅ | ✅ | ❌ | ❌ | ✅ (own subjects) | ❌ |
-| CMS — manage structure | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| CMS — reports | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| CMS — audit log | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| CMS — academic settings | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| My transcript | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Image uploads | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ |
+| Capability              | Admin | Manager | Content Editor |    Support    |      Teacher      |   Student    |
+| ----------------------- | :---: | :-----: | :------------: | :-----------: | :---------------: | :----------: |
+| Dashboard home          |  ✅   |   ✅    |  ✅ (content)  | ✅ (fallback) |   ✅ (teacher)    | ✅ (student) |
+| Content pages           |  ✅   |   ✅    |       ✅       |      ❌       |        ❌         |      ❌      |
+| CRM                     |  ✅   |   ✅    |       ❌       |      ✅       |        ❌         |      ❌      |
+| User management         |  ✅   |   ❌    |       ❌       |      ❌       |        ❌         |      ❌      |
+| Site settings           |  ✅   |   ❌    |       ❌       |      ❌       |        ❌         |      ❌      |
+| CMS — enter grades      |  ✅   |   ✅    |       ❌       |      ❌       | ✅ (own subjects) |      ❌      |
+| CMS — manage structure  |  ✅   |   ✅    |       ❌       |      ❌       |        ❌         |      ❌      |
+| CMS — reports           |  ✅   |   ✅    |       ❌       |      ❌       |        ❌         |      ❌      |
+| CMS — audit log         |  ✅   |   ❌    |       ❌       |      ❌       |        ❌         |      ❌      |
+| CMS — academic settings |  ✅   |   ❌    |       ❌       |      ❌       |        ❌         |      ❌      |
+| My transcript           |  ❌   |   ❌    |       ❌       |      ❌       |        ❌         |      ✅      |
+| Image uploads           |  ✅   |   ✅    |       ✅       |      ❌       |        ✅         |      ❌      |
 
 ### Middleware mapping
 
-| Middleware | Allowed roles |
-|------------|---------------|
-| `dashboard.role` | Any user with at least one Spatie role |
-| `cms.access` | Admin, Manager, Teacher |
-| `cms.manage` | Admin, Manager |
-| `dashboard.access:content` | Admin, Manager, Content Editor |
-| `dashboard.access:crm` | Admin, Manager, Support |
-| `dashboard.access:settings` | Admin |
-| `dashboard.access:cms_admin` | Admin |
-| `dashboard.access:student` | Student |
-| `dashboard.access:uploads` | Admin, Manager, Teacher, Content Editor |
+| Middleware                   | Allowed roles                           |
+| ---------------------------- | --------------------------------------- |
+| `dashboard.role`             | Any user with at least one Spatie role  |
+| `cms.access`                 | Admin, Manager, Teacher                 |
+| `cms.manage`                 | Admin, Manager                          |
+| `dashboard.access:content`   | Admin, Manager, Content Editor          |
+| `dashboard.access:crm`       | Admin, Manager, Support                 |
+| `dashboard.access:settings`  | Admin                                   |
+| `dashboard.access:cms_admin` | Admin                                   |
+| `dashboard.access:student`   | Student                                 |
+| `dashboard.access:uploads`   | Admin, Manager, Teacher, Content Editor |
 
 ### Teacher scoping rules
 
@@ -275,57 +275,63 @@ POST /register                        [404 unless AUTH_REGISTRATION_ENABLED=true
 ### Authenticated dashboard routes
 
 All routes below require `auth` + `dashboard.role`.
-GET  /dashboard
-GET  /dashboard/my-transcript          [Student]
+GET /dashboard
+GET /dashboard/my-transcript [Student]
 
-/dashboard/users/*                     [Admin]
-/dashboard/site-settings               [Admin]
+/dashboard/users/\* [Admin]
+/dashboard/site-settings [Admin]
 
-/dashboard/blog-posts/*                [Content]
-/dashboard/testimonials/*
-/dashboard/faqs/*
-/dashboard/certificates/*
+/dashboard/blog-posts/_ [Content]
+/dashboard/testimonials/_
+/dashboard/faqs/_
+/dashboard/certificates/_
 /dashboard/pages/privacy-policy
 /dashboard/pages/terms-of-use
 
-/dashboard/newsletter/*                [CRM]
-/dashboard/notification-templates/*
+/dashboard/newsletter/_ [CRM]
+/dashboard/notification-templates/_
 
-POST /uploads/image                    [Upload roles; folder allowlist]
-DELETE /uploads/image                  [Upload roles; path allowlist]
+POST /uploads/image [Upload roles; folder allowlist]
+DELETE /uploads/image [Upload roles; path allowlist]
+
 ```
 
 ### CMS routes
 
 ```
+
 # All CMS users (teacher scope in controllers)
-GET  /cms/grades
+
+GET /cms/grades
 POST /cms/grades/update
 POST /cms/grades/bulk-update
-GET  /cms/attendance
+GET /cms/attendance
 POST /cms/attendance
 POST /cms/attendance/bulk
-GET  /cms/schedules
-GET  /cms/schedules/{id}
-GET  /cms/students
-GET  /cms/students/{id}
-GET  /cms/enrollments
-GET  /cms/enrollments/{id}
+GET /cms/schedules
+GET /cms/schedules/{id}
+GET /cms/students
+GET /cms/students/{id}
+GET /cms/enrollments
+GET /cms/enrollments/{id}
 
 # Admin + Manager only (cms.manage)
-/cms/departments, /cms/levels, /cms/teachers, /cms/subjects  [resource CRUD]
-/cms/students/*                        [create, edit, import, export, transcript]
-/cms/enrollments/*
-/cms/grades/export, /cms/grades/import/*
+
+/cms/departments, /cms/levels, /cms/teachers, /cms/subjects [resource CRUD]
+/cms/students/_ [create, edit, import, export, transcript]
+/cms/enrollments/_
+/cms/grades/export, /cms/grades/import/_
 /cms/attendance/export
 /cms/schedules/create, edit, delete
-/cms/reports/*
+/cms/reports/_
 
 # Admin only
-GET  /cms/audit-logs
-GET  /cms/settings
-PUT  /cms/settings
-```
+
+GET /cms/audit-logs
+GET /cms/settings
+PUT /cms/settings
+
+````
 
 ---
 
@@ -335,10 +341,10 @@ Default password for seeded accounts: **`password`**
 
 | Email | Role | Notes |
 |-------|------|-------|
-| `admin@mhcst.ly` | Admin | Main system admin (UserSeeder) |
-| `manager@mhcst.ly` | Manager | |
-| `editor@mhcst.ly` | Content Editor | |
-| `support@mhcst.ly` | Support | |
+| `admin@mhcst.edu.ly` | Admin | Main system admin (UserSeeder) |
+| `manager@mhcst.edu.ly` | Manager | |
+| `editor@mhcst.edu.ly` | Content Editor | |
+| `support@mhcst.edu.ly` | Support | |
 | `admin@cms.local` | Admin | CMS demo admin (CmsDemoDataSeeder) |
 | `a.sharif@cms.local` | Teacher | CS department |
 | `f.werfali@cms.local` | Teacher | |
@@ -427,7 +433,7 @@ php artisan migrate --seed
 npm install
 npm run dev
 # or: composer run dev
-```
+````
 
 Set `APP_URL` to your local or production URL. Keep `AUTH_REGISTRATION_ENABLED=false` unless you explicitly need open sign-up in a dev environment.
 
@@ -451,20 +457,20 @@ php artisan test --compact tests/Feature/DashboardRouteAccessTest.php
 
 ### Key source files
 
-| Purpose | Path |
-|---------|------|
-| Role enum | `app/Enums/UserRole.php` |
-| CMS authorization | `app/Services/CmsAuthorizationService.php` |
-| Grade lock | `app/Services/GradeLockService.php` |
-| Routes | `routes/web.php` |
-| Dashboard access (frontend) | `resources/js/lib/dashboard-access.ts` |
-| Sidebar navigation | `resources/js/components/app-sidebar.tsx` |
-| Shared CMS capabilities | `app/Http/Middleware/HandleInertiaRequests.php` |
-| SEO service | `app/Services/SiteSeoService.php` |
-| SEO controller | `app/Http/Controllers/SeoController.php` |
-| Public meta tags (React) | `resources/js/components/seo-head.tsx` |
-| HTML sanitization | `app/Support/HtmlSanitizer.php` |
-| Dashboard role gate | `app/Http/Middleware/EnsureHasDashboardRole.php` |
+| Purpose                     | Path                                             |
+| --------------------------- | ------------------------------------------------ |
+| Role enum                   | `app/Enums/UserRole.php`                         |
+| CMS authorization           | `app/Services/CmsAuthorizationService.php`       |
+| Grade lock                  | `app/Services/GradeLockService.php`              |
+| Routes                      | `routes/web.php`                                 |
+| Dashboard access (frontend) | `resources/js/lib/dashboard-access.ts`           |
+| Sidebar navigation          | `resources/js/components/app-sidebar.tsx`        |
+| Shared CMS capabilities     | `app/Http/Middleware/HandleInertiaRequests.php`  |
+| SEO service                 | `app/Services/SiteSeoService.php`                |
+| SEO controller              | `app/Http/Controllers/SeoController.php`         |
+| Public meta tags (React)    | `resources/js/components/seo-head.tsx`           |
+| HTML sanitization           | `app/Support/HtmlSanitizer.php`                  |
+| Dashboard role gate         | `app/Http/Middleware/EnsureHasDashboardRole.php` |
 
 ### Related documentation
 
@@ -477,12 +483,12 @@ php artisan test --compact tests/Feature/DashboardRouteAccessTest.php
 
 Dynamic SEO assets are generated from **Dashboard → Site Settings** (site name, meta description, contact info).
 
-| Asset | Route | Description |
-|-------|-------|-------------|
-| Web manifest | `/site.webmanifest` | PWA name, icons, theme color (`#1B365D`), start URL |
-| Robots | `/robots.txt` | Allows public pages; disallows `/dashboard`, `/cms`, auth, student portal |
-| Sitemap | `/sitemap.xml` | Public pages + **published** blog posts only |
-| Browser config | `/browserconfig.xml` | Windows tile color and icons |
+| Asset          | Route                | Description                                                               |
+| -------------- | -------------------- | ------------------------------------------------------------------------- |
+| Web manifest   | `/site.webmanifest`  | PWA name, icons, theme color (`#1B365D`), start URL                       |
+| Robots         | `/robots.txt`        | Allows public pages; disallows `/dashboard`, `/cms`, auth, student portal |
+| Sitemap        | `/sitemap.xml`       | Public pages + **published** blog posts only                              |
+| Browser config | `/browserconfig.xml` | Windows tile color and icons                                              |
 
 ### Page-level metadata
 
@@ -512,24 +518,24 @@ php artisan test --compact tests/Feature/SeoTest.php
 
 ### Authentication & accounts
 
-| Control | Behavior |
-|---------|----------|
+| Control             | Behavior                                                                                              |
+| ------------------- | ----------------------------------------------------------------------------------------------------- |
 | Public registration | **Disabled** by default (`AUTH_REGISTRATION_ENABLED=false`). Enable only in `.env` for dev if needed. |
-| Dashboard access | Requires login **and** at least one Spatie role (`dashboard.role` middleware) |
-| Inactive users | `is_active = false` accounts cannot log in |
-| Login rate limit | 5 attempts per email/IP (via `LoginRequest`) |
+| Dashboard access    | Requires login **and** at least one Spatie role (`dashboard.role` middleware)                         |
+| Inactive users      | `is_active = false` accounts cannot log in                                                            |
+| Login rate limit    | 5 attempts per email/IP (via `LoginRequest`)                                                          |
 
 New staff/student accounts: **Admin → Users → Create** (assign roles there).
 
 ### Public endpoints
 
-| Endpoint | Protection |
-|----------|------------|
-| `POST /contact` | Throttle 5/min; reply-to validated as email |
-| `POST /newsletter` | Throttle 10/min |
+| Endpoint              | Protection                                                       |
+| --------------------- | ---------------------------------------------------------------- |
+| `POST /contact`       | Throttle 5/min; reply-to validated as email                      |
+| `POST /newsletter`    | Throttle 10/min                                                  |
 | Student portal search | Exact match, min 4 chars, throttle 20/min; minimal JSON response |
-| Certificate verify | Throttle 30/min; no email/phone in page props |
-| Certificate download | Signed URL required; throttle 10/min |
+| Certificate verify    | Throttle 30/min; no email/phone in page props                    |
+| Certificate download  | Signed URL required; throttle 10/min                             |
 
 Private areas (`/dashboard`, `/cms`, `/settings`, student portal) also receive `noindex, nofollow` in the root Blade template.
 

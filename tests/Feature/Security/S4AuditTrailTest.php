@@ -144,12 +144,12 @@ test('passwords never appear in any cms audit log json column', function () {
 
 test('successful login is logged in activity log', function () {
     $user = User::factory()->create([
-        'email' => 'test-user@mhcst.ly',
+        'email' => 'test-user@mhcst.edu.ly',
         'password' => Hash::make('password123'),
     ]);
 
     $response = $this->post(route('login'), [
-        'email' => 'test-user@mhcst.ly',
+        'email' => 'test-user@mhcst.edu.ly',
         'password' => 'password123',
     ]);
 
@@ -165,7 +165,7 @@ test('successful login is logged in activity log', function () {
 
 test('failed login is logged in activity log with submitted email but without password', function () {
     $response = $this->post(route('login'), [
-        'email' => 'wrong-user@mhcst.ly',
+        'email' => 'wrong-user@mhcst.edu.ly',
         'password' => 'superSecretPassword999!',
     ]);
 
@@ -175,7 +175,7 @@ test('failed login is logged in activity log with submitted email but without pa
 
     expect($activity)->not->toBeNull();
     expect($activity->causer_id)->toBeNull();
-    expect($activity->properties['email'])->toBe('wrong-user@mhcst.ly');
+    expect($activity->properties['email'])->toBe('wrong-user@mhcst.edu.ly');
 
     $serializedProps = json_encode($activity->properties);
     expect($serializedProps)->not->toContain('superSecretPassword999!');
@@ -198,7 +198,7 @@ test('lockout and password reset events are logged in activity log', function ()
     $user = User::factory()->create();
 
     $request = Request::create('/login', 'POST', [
-        'email' => 'locked@mhcst.ly',
+        'email' => 'locked@mhcst.edu.ly',
         'password' => 'SecretPass123',
     ]);
 

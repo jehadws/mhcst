@@ -57,7 +57,7 @@ class DeployRunController extends Controller
         Artisan::call('queue:restart');
 
         return response()->json([
-            'status'    => 'ok',
+            'status' => 'ok',
             'extracted' => $extracted,
         ]);
     }
@@ -97,65 +97,6 @@ class DeployRunController extends Controller
         }
 
         return 'extracted';
-    }
-
-    /**
-     * The dedicated deploy header wins (it survives PHP handlers that strip
-     * the Authorization header); bearer is next; the query parameter is the
-     * fallback for manual runs.
-     */
-    private function presentedToken(Request $request): ?string
-    {
-        $custom = $request->header('X-Deploy-Token');
-
-        if (is_string($custom) && trim($custom) !== '') {
-            return trim($custom);
-        }
-
-        $header = $request->header('Authorization');
-
-        if (is_string($header) && preg_match('#^Bearer\s+(\S+)\s*$#i', $header, $matches) === 1) {
-            return $matches[1];
-        }
-
-        return $request->query('token');
-    }
-}
-
-
-        $this->extractAppArchive();
-
-        Artisan::call('migrate', ['--force' => true]);
-        Artisan::call('optimize:clear');
-        Artisan::call('config:cache');
-        Artisan::call('route:cache');
-        Artisan::call('view:cache');
-        Artisan::call('seo:generate-static');
-        Artisan::call('queue:restart');
-
-        return response()->json(['status' => 'ok']);
-    }
-
-    /**
-     * Extract the CI-uploaded deploy-app.zip over the app root before the
-     * artisan tasks run. The archive is removed only after a clean
-     * extraction, so an interrupted run retries on the next hook call.
-     */
-    private function extractAppArchive(): void
-    {
-        $archive = base_path('deploy-app.zip');
-
-        if (! is_file($archive)) {
-            return;
-        }
-
-        $zip = new ZipArchive;
-
-        abort_unless($zip->open($archive) === true, 500, 'Could not open the deploy archive.');
-        abort_unless($zip->extractTo(base_path()), 500, 'Could not extract the deploy archive.');
-
-        $zip->close();
-        unlink($archive);
     }
 
     /**

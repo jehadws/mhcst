@@ -155,7 +155,7 @@ class SiteController extends Controller
             'status' => 'new',
         ]);
 
-        $adminEmail = SiteSetting::where('key', 'contact_email')->value('value') ?: 'info@mhcst.ly';
+        $adminEmail = SiteSetting::where('key', 'contact_email')->value('value') ?: 'info@mhcst.edu.ly';
 
         try {
             Mail::raw(

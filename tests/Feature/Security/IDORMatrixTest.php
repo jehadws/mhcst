@@ -47,7 +47,7 @@ function idor_seedTwoDocsTwoSubjects(): array
     $levelA = CmsLevel::create(['department_id' => $dept->id, 'year' => 1, 'section' => 'A', 'capacity' => 30]);
     $levelB = CmsLevel::create(['department_id' => $dept->id, 'year' => 1, 'section' => 'B', 'capacity' => 30]);
 
-    $userA = idor_makeUser(UserRole::Teacher->value, ['email' => 'dr-a-'.Str::random(5).'@mhcst.ly']);
+    $userA = idor_makeUser(UserRole::Teacher->value, ['email' => 'dr-a-'.Str::random(5).'@mhcst.edu.ly']);
     $doctorA = CmsTeacher::create([
         'user_id' => $userA->id,
         'name' => 'Dr. A',
@@ -55,7 +55,7 @@ function idor_seedTwoDocsTwoSubjects(): array
         'status' => 'active',
     ]);
 
-    $userB = idor_makeUser(UserRole::Teacher->value, ['email' => 'dr-b-'.Str::random(5).'@mhcst.ly']);
+    $userB = idor_makeUser(UserRole::Teacher->value, ['email' => 'dr-b-'.Str::random(5).'@mhcst.edu.ly']);
     $doctorB = CmsTeacher::create([
         'user_id' => $userB->id,
         'name' => 'Dr. B',
@@ -175,10 +175,10 @@ describe('Student A vs Student B — My* routes show only own data', function ()
 
         [, , , , $stA1, , $stB1] = idor_seedTwoDocsTwoSubjects();
 
-        $this->userA1 = idor_makeUser(UserRole::Student->value, ['email' => 's-a1-'.Str::random(5).'@mhcst.ly']);
+        $this->userA1 = idor_makeUser(UserRole::Student->value, ['email' => 's-a1-'.Str::random(5).'@mhcst.edu.ly']);
         $stA1->update(['user_id' => $this->userA1->id]);
 
-        $this->userB1 = idor_makeUser(UserRole::Student->value, ['email' => 's-b1-'.Str::random(5).'@mhcst.ly']);
+        $this->userB1 = idor_makeUser(UserRole::Student->value, ['email' => 's-b1-'.Str::random(5).'@mhcst.edu.ly']);
         $stB1->update(['user_id' => $this->userB1->id]);
     });
 

@@ -27,7 +27,7 @@ export default function PublicContactPage({ faqs = [] }: Props) {
   const isRtl = locale === 'ar';
 
   const contactPhone = settings.contact_phone || '+218 91 234 5678';
-  const contactEmail = settings.contact_email || 'info@mhcst.ly';
+  const contactEmail = settings.contact_email || 'info@mhcst.edu.ly';
   const address = settings.address || (isRtl ? 'طرابلس، ليبيا' : 'Tripoli, Libya');
 
   const [submitting, setSubmitting] = useState(false);
@@ -52,7 +52,13 @@ export default function PublicContactPage({ faqs = [] }: Props) {
   const cards = [
     { icon: Mail, title: isRtl ? 'البريد الإلكتروني' : 'Email', value: contactEmail, href: `mailto:${contactEmail}` },
     { icon: Phone, title: isRtl ? 'الهاتف' : 'Phone', value: contactPhone, href: `tel:${contactPhone}` },
-    { icon: Building2, title: isRtl ? 'العنوان' : 'Address', value: address, href: `https://maps.google.com/?q=${encodeURIComponent(address)}`, external: true },
+    {
+      icon: Building2,
+      title: isRtl ? 'العنوان' : 'Address',
+      value: address,
+      href: `https://maps.google.com/?q=${encodeURIComponent(address)}`,
+      external: true,
+    },
     {
       icon: MessageCircle,
       title: 'WhatsApp',
@@ -70,7 +76,11 @@ export default function PublicContactPage({ faqs = [] }: Props) {
         <main className="flex-1">
           <PageHero
             title={isRtl ? 'نسعد بالتواصل معك' : "We'd love to hear from you"}
-            description={isRtl ? 'احصل على استشارة مجانية حول برامجنا الأكاديمية والتدريبية.' : 'Get a free consultation about our academic and training programs.'}
+            description={
+              isRtl
+                ? 'احصل على استشارة مجانية حول برامجنا الأكاديمية والتدريبية.'
+                : 'Get a free consultation about our academic and training programs.'
+            }
             crumbs={[{ label: isRtl ? 'القبول والتسجيل' : 'Admissions', href: '/contact' }]}
           />
 
@@ -124,7 +134,7 @@ export default function PublicContactPage({ faqs = [] }: Props) {
                       rows={5}
                       value={form.message}
                       onChange={(e) => setForm({ ...form, message: e.target.value })}
-                      className="border-input bg-background w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                      className="border-input bg-background focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:ring-2"
                     />
                   </div>
                   <button
@@ -196,7 +206,7 @@ function Field({
         value={value}
         dir={dir}
         onChange={(e) => onChange(e.target.value)}
-        className="border-input bg-background w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+        className="border-input bg-background focus:border-primary focus:ring-primary/20 w-full rounded-lg border px-4 py-2.5 text-sm outline-none focus:ring-2"
       />
     </div>
   );
