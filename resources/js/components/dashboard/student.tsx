@@ -160,7 +160,7 @@ export function StudentProfileHeader({ locale, student, transcriptUrl }: { local
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h1 className="font-display text-3xl font-extrabold leading-snug tracking-tight">{student.name}</h1>
+        <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug tracking-tight">{student.name}</h1>
         <p className="text-muted-foreground tabular-nums text-sm">
           {student.student_no}
           {student.department ? ` · ${student.department}` : ''}

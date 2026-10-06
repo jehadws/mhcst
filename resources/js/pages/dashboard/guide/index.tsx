@@ -68,7 +68,7 @@ export default function DashboardGuidePage() {
                 <div className="flex flex-col gap-2">
                     <div className="text-primary flex items-center gap-2">
                         <BookOpen className="size-6" aria-hidden="true" />
-                        <h1 className="font-display text-3xl font-extrabold leading-snug tracking-tight">{guide.title}</h1>
+                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug tracking-tight">{guide.title}</h1>
                     </div>
                     <p className="text-muted-foreground text-sm leading-normal">{guide.subtitle}</p>
                     {roles.length > 0 && (

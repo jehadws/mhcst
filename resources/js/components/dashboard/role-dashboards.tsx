@@ -49,7 +49,7 @@ export function TeacherDashboardView({
   return (
     <>
       <div className="flex flex-col gap-2">
-        <h1 className="font-display text-3xl font-extrabold leading-snug tracking-tight">{ar ? `مرحباً، ${teacherProfile.name}` : `Welcome, ${teacherProfile.name}`}</h1>
+        <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug tracking-tight">{ar ? `مرحباً، ${teacherProfile.name}` : `Welcome, ${teacherProfile.name}`}</h1>
         <p className="text-muted-foreground text-sm">{teacherProfile.specialization ?? (ar ? 'لوحة المعلم' : 'Teacher Dashboard')}</p>
       </div>
 
@@ -64,7 +64,7 @@ export function TeacherDashboardView({
             <CardContent className="flex items-center justify-between p-5">
               <div className="space-y-2">
                 <p className="text-muted-foreground text-sm">{card.label}</p>
-                <p className="font-display text-3xl font-extrabold leading-snug tabular-nums">{card.value}</p>
+                <p className="font-display text-2xl sm:text-3xl font-extrabold leading-snug tabular-nums">{card.value}</p>
               </div>
               <card.icon className="text-primary h-8 w-8 opacity-80" />
             </CardContent>
@@ -73,7 +73,7 @@ export function TeacherDashboardView({
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
+        <Card className="min-w-0">
           <CardHeader>
             <CardTitle>{ar ? 'جدول اليوم' : "Today's Schedule"}</CardTitle>
           </CardHeader>
@@ -100,7 +100,7 @@ export function TeacherDashboardView({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>{ar ? 'موادي الدراسية' : 'My Classes'}</CardTitle>
             <Button variant="outline" size="sm" asChild>
@@ -199,14 +199,14 @@ export function StudentDashboardView({
           <Card key={card.label}>
             <CardContent className="p-5">
               <p className="text-muted-foreground text-sm">{card.label}</p>
-              <p className="font-display text-3xl font-extrabold leading-snug tabular-nums">{card.value}</p>
+              <p className="font-display text-2xl sm:text-3xl font-extrabold leading-snug tabular-nums">{card.value}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
+        <Card className="min-w-0">
           <CardHeader className="flex-row items-center justify-between space-y-0">
             <CardTitle>{ar ? 'جدول اليوم' : "Today's Schedule"}</CardTitle>
             <StudentViewAllLink locale={locale} href={route('dashboard.my-schedule')} />
@@ -216,7 +216,7 @@ export function StudentDashboardView({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="min-w-0">
           <CardHeader className="flex-row items-center justify-between space-y-0">
             <CardTitle>{ar ? 'آخر الدرجات' : 'Recent Grades'}</CardTitle>
             <StudentViewAllLink locale={locale} href={route('dashboard.my-grades')} />
@@ -255,7 +255,7 @@ export function ContentDashboardView({
   return (
     <>
       <div className="flex flex-col gap-2">
-        <h1 className="font-display text-3xl font-extrabold leading-snug">{ar ? 'لوحة المحتوى' : 'Content Dashboard'}</h1>
+        <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">{ar ? 'لوحة المحتوى' : 'Content Dashboard'}</h1>
         <p className="text-muted-foreground text-sm">{ar ? 'إدارة الأخبار والمحتوى العام للموقع' : 'Manage site content and publications'}</p>
       </div>
 
@@ -270,7 +270,7 @@ export function ContentDashboardView({
             <Link href={card.href}>
               <CardContent className="p-5">
                 <p className="text-muted-foreground text-sm">{card.label}</p>
-                <p className="font-display text-3xl font-extrabold leading-snug tabular-nums">{card.value}</p>
+                <p className="font-display text-2xl sm:text-3xl font-extrabold leading-snug tabular-nums">{card.value}</p>
               </CardContent>
             </Link>
           </Card>

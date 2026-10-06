@@ -18,9 +18,9 @@ export default function ScheduleShow({ schedule }: { schedule: CmsSchedule }) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={c.schedules.showTitle.replace('{subject}', schedule.subject?.name ?? '')} />
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-4 sm:p-6">
         <div className="flex items-center justify-between">
-          <h1 className="font-display text-3xl leading-snug font-extrabold">{schedule.subject?.name}</h1>
+          <h1 className="font-display text-2xl sm:text-3xl leading-snug font-extrabold">{schedule.subject?.name}</h1>
           <div className="flex items-center gap-2">
             <Button asChild variant="outline" className="gap-2">
               <a href={`/cms/schedules/${schedule.id}/roster`} target="_blank" rel="noopener noreferrer">

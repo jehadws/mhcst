@@ -18,7 +18,7 @@ export default function EditUser({ user, availableRoles }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="تعديل مستخدم" />
-      <div className="flex h-full flex-1 flex-col gap-6 p-6">
+      <div className="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6">
         <UserForm user={user} availableRoles={availableRoles} />
       </div>
     </AppLayout>

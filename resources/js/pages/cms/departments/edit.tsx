@@ -33,9 +33,9 @@ export default function DepartmentEdit({ department, teachers }: { department: C
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`${c.departments.editTitle} ${department.name}`} />
-      <div className="mx-auto max-w-2xl p-6">
-        <h1 className="mb-6 font-display text-3xl font-extrabold leading-snug">{c.departments.editHeading}</h1>
-        <form onSubmit={submit} className="space-y-5 rounded-xl border bg-card p-6">
+      <div className="mx-auto max-w-2xl p-4 sm:p-6">
+        <h1 className="mb-6 font-display text-2xl sm:text-3xl font-extrabold leading-snug">{c.departments.editHeading}</h1>
+        <form onSubmit={submit} className="space-y-5 rounded-xl border bg-card p-4 sm:p-6">
           <div>
             <Label htmlFor="name">{c.departments.name}</Label>
             <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} />

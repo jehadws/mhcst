@@ -105,7 +105,7 @@ export function WorkbenchSection({ workbench, locale }: WorkbenchSectionProps) {
                         <CardContent className="flex items-center justify-between p-5">
                             <div className="space-y-1.5">
                                 <p className="text-sm font-medium text-muted-foreground">{queue.label}</p>
-                                <p className="font-display text-3xl font-extrabold leading-snug tabular-nums">
+                                <p className="font-display text-2xl sm:text-3xl font-extrabold leading-snug tabular-nums">
                                     {numberFmt.format(queue.count)}
                                 </p>
                                 <p className="text-xs text-muted-foreground">{queue.hint}</p>
@@ -176,7 +176,7 @@ export function WorkbenchSection({ workbench, locale }: WorkbenchSectionProps) {
             )}
 
             <div className="grid gap-6 lg:grid-cols-2">
-                <Card>
+                <Card className="min-w-0">
                     <CardHeader className="gap-2">
                         <CardTitle className="flex items-center gap-2">
                             <AlarmClock className="h-5 w-5 text-primary" />
@@ -216,7 +216,7 @@ export function WorkbenchSection({ workbench, locale }: WorkbenchSectionProps) {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="min-w-0">
                     <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
                         <div className="space-y-1.5">
                             <CardTitle>{ar ? 'طلاب بدون تسجيل في الفصل الحالي' : 'Students without enrollment this term'}</CardTitle>

@@ -59,7 +59,7 @@ export default function ScheduleEdit({
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={c.schedules.editTitle} />
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <h1 className="font-display mb-6 text-3xl leading-snug font-extrabold">{c.schedules.editHeading}</h1>
 
         {errors.conflict && (
@@ -68,7 +68,7 @@ export default function ScheduleEdit({
           </div>
         )}
 
-        <form onSubmit={submit} className="bg-card space-y-5 rounded-xl border p-6">
+        <form onSubmit={submit} className="bg-card space-y-5 rounded-xl border p-4 sm:p-6">
           <div>
             <Label htmlFor="subject_id">{c.schedules.subject}</Label>
             <select

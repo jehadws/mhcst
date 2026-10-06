@@ -31,9 +31,9 @@ export default function LevelCreate({ departments }: { departments: CmsDepartmen
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={c.levels.addTitle} />
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <h1 className="font-display mb-6 text-3xl leading-snug font-extrabold">{c.levels.addHeading}</h1>
-        <form onSubmit={submit} className="bg-card space-y-5 rounded-xl border p-6">
+        <form onSubmit={submit} className="bg-card space-y-5 rounded-xl border p-4 sm:p-6">
           <div>
             <Label htmlFor="department_id">{c.levels.department}</Label>
             <select

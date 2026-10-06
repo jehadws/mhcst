@@ -247,10 +247,10 @@ export default function GradesIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.nav.grades} />
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 p-4 sm:p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex flex-col gap-2">
-                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.gradesPage.title}</h1>
+                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">{c.gradesPage.title}</h1>
                         <p className="text-sm text-muted-foreground">{c.gradesPage.subtitle}</p>
                     </div>
                     <div className="flex items-center gap-3">

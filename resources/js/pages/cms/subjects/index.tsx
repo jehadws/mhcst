@@ -54,11 +54,11 @@ export default function SubjectsIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.nav.subjects} />
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 p-4 sm:p-6">
                 <CmsErrorBanner />
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-4">
                     <div className="flex flex-col gap-2">
-                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.subjects.title}</h1>
+                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">{c.subjects.title}</h1>
                         <p className="text-sm text-muted-foreground">{c.subjects.subtitle}</p>
                     </div>
                     <Button asChild className="gap-2">
@@ -95,7 +95,7 @@ export default function SubjectsIndex({
                     </select>
                 </div>
 
-                <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
+                <div className="bg-card border rounded-xl overflow-x-auto shadow-sm">
                     <table className="w-full text-sm text-right">
                         <thead className="bg-muted text-muted-foreground border-b">
                             <tr>

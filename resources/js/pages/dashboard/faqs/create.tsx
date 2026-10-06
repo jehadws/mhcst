@@ -13,7 +13,7 @@ export default function CreateFaq() {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="إضافة سؤال" />
-      <div className="flex h-full flex-1 flex-col gap-6 p-6">
+      <div className="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6">
         <FaqForm />
       </div>
     </AppLayout>

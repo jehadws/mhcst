@@ -64,9 +64,9 @@ export default function NotificationTemplatesListPage({ templates }: { templates
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="قوالب الإشعارات" />
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 p-4 sm:p-6">
                 <div className="flex items-center justify-between">
-                    <h1 className="font-display text-3xl font-extrabold leading-snug">قوالب الإشعارات</h1>
+                    <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">قوالب الإشعارات</h1>
                     <Button onClick={() => router.get(route('dashboard.notification-templates.create'))} className="gap-2">
                         <Plus className="w-4 h-4" /> إضافة قالب
                     </Button>

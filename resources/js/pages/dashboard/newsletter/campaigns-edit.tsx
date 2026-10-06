@@ -38,7 +38,7 @@ export default function NewsletterCampaignEditPage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.editTitle} />
-            <div className="flex h-full flex-1 flex-col gap-6 p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6">
                 <Card>
                     <CardHeader><CardTitle>{c.editTitle}: {campaign.subject}</CardTitle></CardHeader>
                     <CardContent>

@@ -19,14 +19,14 @@ export default function StudentShow({ student }: { student: CmsStudent }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${c.student.profile} - ${student.name}`} />
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-2xl">
                             {student.name.charAt(0)}
                         </div>
                         <div>
-                            <h1 className="font-display text-3xl font-extrabold leading-snug">{student.name}</h1>
+                            <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">{student.name}</h1>
                             <p className="text-sm text-muted-foreground tabular-nums">
                                 {c.student.studentNoLabel.replace('{studentNo}', student.student_no)} | {student.level?.department?.name}
                             </p>

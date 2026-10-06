@@ -159,9 +159,9 @@ export default function ApplicationsIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t.title} />
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 p-4 sm:p-6">
                 <div className="flex flex-col gap-2">
-                    <h1 className="font-display text-3xl font-extrabold leading-snug">{t.title}</h1>
+                    <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">{t.title}</h1>
                     <p className="text-sm text-muted-foreground">{t.subtitle}</p>
                 </div>
 
@@ -238,7 +238,7 @@ export default function ApplicationsIndex({
                     </form>
                 </div>
 
-                <div className="bg-card border overflow-hidden rounded-xl shadow-sm">
+                <div className="bg-card border overflow-x-auto rounded-xl shadow-sm">
                     <table className="w-full text-sm text-start">
                         <thead className="bg-muted text-muted-foreground border-b">
                             <tr>

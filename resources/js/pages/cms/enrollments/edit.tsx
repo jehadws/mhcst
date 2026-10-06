@@ -60,10 +60,10 @@ export default function EnrollmentEdit({
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={c.enrollments.editTitle} />
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <h1 className="font-display mb-6 text-3xl leading-snug font-extrabold">{c.enrollments.editHeading}</h1>
 
-        <form onSubmit={submit} className="bg-card space-y-5 rounded-xl border p-6">
+        <form onSubmit={submit} className="bg-card space-y-5 rounded-xl border p-4 sm:p-6">
           <CmsErrorBanner />
           <div>
             <Label htmlFor="student_id">{c.enrollments.student}</Label>

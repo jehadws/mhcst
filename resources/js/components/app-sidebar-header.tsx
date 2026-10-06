@@ -12,7 +12,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
     const search = t.cms.search;
 
     return (
-        <header className="border-sidebar-border/50 flex h-16 shrink-0 items-center gap-2 border-b px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
+        <header className="border-sidebar-border/50 flex h-16 shrink-0 items-center gap-2 border-b px-3 transition-[width,height] ease-linear sm:px-4 group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2">
                 <SidebarTrigger className="-ms-1" />
                 <Breadcrumbs breadcrumbs={breadcrumbs} />

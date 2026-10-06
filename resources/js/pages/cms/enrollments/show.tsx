@@ -21,7 +21,7 @@ export default function EnrollmentShow({ enrollment }: { enrollment: CmsEnrollme
             <div className="max-w-3xl mx-auto p-6 space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-2">
-                        <h1 className="font-display text-3xl font-extrabold leading-snug">{enrollment.student?.name}</h1>
+                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">{enrollment.student?.name}</h1>
                         <p className="text-sm text-muted-foreground">{enrollment.subject?.name} ({enrollment.subject?.code})</p>
                     </div>
                     <Button asChild variant="outline" className="gap-2">

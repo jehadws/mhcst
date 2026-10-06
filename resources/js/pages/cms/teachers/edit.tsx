@@ -34,9 +34,9 @@ export default function TeacherEdit({ teacher }: { teacher: CmsTeacher }) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`${c.teachers.editTitle} ${teacher.name}`} />
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <h1 className="font-display mb-6 text-3xl leading-snug font-extrabold">{c.teachers.editHeading}</h1>
-        <form onSubmit={submit} className="bg-card space-y-5 rounded-xl border p-6">
+        <form onSubmit={submit} className="bg-card space-y-5 rounded-xl border p-4 sm:p-6">
           <div>
             <Label htmlFor="name">{c.teachers.fullName}</Label>
             <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} />

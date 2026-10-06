@@ -83,9 +83,9 @@ export default function NotificationLogsListPage({
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={n.title} />
-      <div className="flex flex-col gap-6 p-6">
+      <div className="flex flex-col gap-6 p-4 sm:p-6">
         <div className="flex flex-col gap-2">
-          <h1 className="font-display text-3xl leading-snug font-extrabold">{n.title}</h1>
+          <h1 className="font-display text-2xl sm:text-3xl leading-snug font-extrabold">{n.title}</h1>
           <p className="text-muted-foreground text-sm">{n.description}</p>
         </div>
         <div className="flex flex-wrap gap-2" role="tablist" aria-label={n.filterLabel}>

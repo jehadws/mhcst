@@ -13,7 +13,7 @@ export default function CreateTestimonial() {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="إضافة رأي" />
-      <div className="flex h-full flex-1 flex-col gap-6 p-6">
+      <div className="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6">
         <TestimonialForm />
       </div>
     </AppLayout>

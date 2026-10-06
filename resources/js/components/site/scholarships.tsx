@@ -18,7 +18,7 @@ export function Scholarships() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl text-start">
-            <h2 className="font-display text-3xl font-extrabold leading-snug sm:text-4xl">
+            <h2 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug sm:text-4xl">
               {t.scholarships.title} <span className="text-accent">{t.scholarships.titleAccent}</span>
             </h2>
             <p className="text-hero-foreground/75 mt-4 text-base leading-normal">{t.scholarships.description}</p>

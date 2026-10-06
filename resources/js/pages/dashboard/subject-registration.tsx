@@ -176,7 +176,7 @@ export default function SubjectRegistration({ subjects, registrations, term, reg
             <Head title={reg.title} />
             <div className="space-y-6 px-6 py-6">
                 <div className="flex flex-col gap-2">
-                    <h1 className="font-display text-3xl font-extrabold leading-snug tracking-tight">{reg.title}</h1>
+                    <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug tracking-tight">{reg.title}</h1>
                     <p className="text-sm text-muted-foreground">{reg.subtitle}</p>
                 </div>
 

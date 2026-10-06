@@ -75,9 +75,9 @@ export default function ReportsIndex() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.reports.title} />
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 p-4 sm:p-6">
                 <div className="flex flex-col gap-2">
-                    <h1 className="font-display text-3xl font-extrabold leading-snug">{c.reports.title}</h1>
+                    <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">{c.reports.title}</h1>
                     <p className="text-sm text-muted-foreground">{c.reports.subtitle}</p>
                 </div>
 

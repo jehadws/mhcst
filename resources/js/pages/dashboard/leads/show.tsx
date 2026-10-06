@@ -44,7 +44,7 @@ export default function LeadShowPage({ lead }: { lead: Lead }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={lead.subject || lead.name} />
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 p-4 sm:p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <Button variant="outline" onClick={() => router.get(route('dashboard.leads.list'))}>
                         <ArrowRight className="ms-2 h-4 w-4" /> {d.show.backToList}

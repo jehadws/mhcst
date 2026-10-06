@@ -17,7 +17,7 @@ export default function CreateUser({ availableRoles }: Props) {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="إضافة مستخدم" />
-      <div className="flex h-full flex-1 flex-col gap-6 p-6">
+      <div className="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6">
         <UserForm availableRoles={availableRoles} />
       </div>
     </AppLayout>

@@ -37,10 +37,10 @@ export default function AuditLogsIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.audit.title} />
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 p-4 sm:p-6">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex flex-col gap-2">
-                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.audit.title}</h1>
+                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">{c.audit.title}</h1>
                         <p className="text-sm text-muted-foreground">{c.audit.subtitle}</p>
                     </div>
                     <Button variant="outline" asChild>
@@ -73,7 +73,7 @@ export default function AuditLogsIndex({
                     </select>
                 </div>
 
-                <div className="bg-card border rounded-xl overflow-hidden">
+                <div className="bg-card border rounded-xl overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead className="bg-muted text-muted-foreground border-b">
                             <tr>

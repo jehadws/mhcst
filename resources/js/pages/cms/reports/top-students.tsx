@@ -16,17 +16,17 @@ export default function TopStudentsReport({ topStudents }: { topStudents: any[] 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.reports.topStudents.pageTitle} />
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-2">
-                        <h1 className="font-display text-3xl font-extrabold leading-snug flex items-center gap-2">
+                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug flex items-center gap-2">
                             <Trophy className="w-6 h-6 text-warning" /> {c.reports.topStudents.pageTitle}
                         </h1>
                         <p className="text-sm text-muted-foreground">{c.reports.topStudents.pageSubtitle}</p>
                     </div>
                 </div>
 
-                <div className="bg-card border rounded-xl overflow-hidden shadow-sm">
+                <div className="bg-card border rounded-xl overflow-x-auto shadow-sm">
                     <table className="w-full text-sm text-right">
                         <thead className="bg-muted text-muted-foreground border-b">
                             <tr>

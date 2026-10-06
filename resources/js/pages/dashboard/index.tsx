@@ -218,11 +218,11 @@ export default function Dashboard() {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={locale === 'ar' ? 'لوحة التحكم الكلية' : 'College Dashboard'} />
-      <div className="flex h-full flex-1 flex-col gap-6 p-6">
+      <div className="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6">
         {adminView ? (
           <>
         <div className="flex flex-col gap-2">
-          <h1 className="font-display text-3xl font-extrabold leading-snug tracking-tight">
+          <h1 className="font-display text-2xl font-extrabold leading-snug tracking-tight sm:text-3xl">
             {locale === 'ar' ? 'مرحباً بك في النظام الأكاديمي' : 'Welcome to Academic Dashboard'}
           </h1>
           <p className="text-base text-muted-foreground">
@@ -239,7 +239,7 @@ export default function Dashboard() {
               <CardContent className="flex items-center justify-between p-5">
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-muted-foreground">{card.label}</p>
-                  <p className="font-display text-3xl font-extrabold leading-snug tabular-nums">{card.value}</p>
+                  <p className="font-display text-2xl sm:text-3xl font-extrabold leading-snug tabular-nums">{card.value}</p>
                   {card.delta !== null && card.delta !== undefined && (
                     <p
                       className={`flex items-center gap-1 text-xs font-medium ${card.delta >= 0 ? 'text-success' : 'text-destructive'}`}
@@ -260,7 +260,7 @@ export default function Dashboard() {
         {/* ─── Charts ─── */}
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Department Distribution */}
-          <Card>
+          <Card className="min-w-0">
             <CardHeader className="gap-2">
               <CardTitle>{locale === 'ar' ? 'توزيع الطلاب حسب القسم' : 'Students per Department'}</CardTitle>
               <CardDescription>{locale === 'ar' ? 'عدد الطلاب المقيدين بكل قسم أكاديمي' : 'Registered student breakdown by department'}</CardDescription>
@@ -279,7 +279,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Attendance Trend */}
-          <Card>
+          <Card className="min-w-0">
             <CardHeader className="gap-2">
               <CardTitle>{locale === 'ar' ? 'سجل الحضور الشهري' : 'Monthly Attendance Records'}</CardTitle>
               <CardDescription>{locale === 'ar' ? 'معدل تسجيل الحضور والغياب خلال الأشهر الماضية' : 'Monthly recorded attendance activity'}</CardDescription>
@@ -314,7 +314,7 @@ export default function Dashboard() {
         {/* ─── Tables ─── */}
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Today's Schedule Overview */}
-          <Card>
+          <Card className="min-w-0">
             <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
               <div className="space-y-2">
                 <CardTitle>{locale === 'ar' ? 'الجدول الدراسي اليومي' : "Today's Schedule"}</CardTitle>
@@ -363,7 +363,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Recent Registered Students */}
-          <Card>
+          <Card className="min-w-0">
             <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
               <div className="space-y-2">
                 <CardTitle>{locale === 'ar' ? 'آخر الطلاب المسجلين' : 'Recently Registered Students'}</CardTitle>
@@ -413,7 +413,7 @@ export default function Dashboard() {
         </div>
 
         {/* ─── Recent Grades ─── */}
-        <Card>
+        <Card className="min-w-0">
           <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
             <div className="space-y-2">
               <CardTitle>{locale === 'ar' ? 'آخر الدرجات المسجلة' : 'Recently Recorded Grades'}</CardTitle>

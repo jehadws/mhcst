@@ -30,10 +30,10 @@ export default function DepartmentsReport({ departments }: { departments: Depart
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.reports.departments.title} />
-            <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-6 p-4 sm:p-6">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex flex-col gap-2">
-                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.reports.departments.title}</h1>
+                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">{c.reports.departments.title}</h1>
                         <p className="text-sm text-muted-foreground">{c.reports.departments.subtitle}</p>
                     </div>
                     <Button variant="outline" asChild className="gap-2">
@@ -43,7 +43,7 @@ export default function DepartmentsReport({ departments }: { departments: Depart
                     </Button>
                 </div>
 
-                <div className="bg-card border rounded-xl overflow-hidden">
+                <div className="bg-card border rounded-xl overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/50 text-muted-foreground border-b">
                             <tr>

@@ -34,10 +34,10 @@ export default function SchedulesIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.schedules.title} />
-            <div className="flex flex-col gap-6 p-6">
-                <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-6 p-4 sm:p-6">
+                <div className="flex flex-wrap items-center justify-between gap-4">
                     <div className="flex flex-col gap-2">
-                        <h1 className="font-display text-3xl font-extrabold leading-snug">{c.schedules.title}</h1>
+                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">{c.schedules.title}</h1>
                         <p className="text-sm text-muted-foreground">{c.schedules.subtitle}</p>
                     </div>
                     {canManage && (

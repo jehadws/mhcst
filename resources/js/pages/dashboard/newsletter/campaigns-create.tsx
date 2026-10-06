@@ -36,7 +36,7 @@ export default function NewsletterCampaignCreatePage() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.create} />
-            <div className="flex h-full flex-1 flex-col gap-6 p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6">
                 <Card>
                     <CardHeader><CardTitle>{c.create}</CardTitle></CardHeader>
                     <CardContent>

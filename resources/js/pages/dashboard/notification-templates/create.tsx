@@ -13,7 +13,7 @@ export default function CreateNotificationTemplate() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="إضافة قالب إشعار" />
-            <div className="flex h-full flex-1 flex-col gap-6 p-6 max-w-3xl">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6 max-w-3xl">
                 <NotificationTemplateForm />
             </div>
         </AppLayout>

@@ -47,8 +47,8 @@ export default function EnrollmentCreate({ students, subjects, levels }: { stude
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={c.enrollments.addTitle} />
-            <div className="  p-6">
-                <h1 className="font-display text-3xl font-extrabold leading-snug mb-6">{c.enrollments.addHeading}</h1>
+            <div className="p-4 sm:p-6">
+                <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug mb-6">{c.enrollments.addHeading}</h1>
 
                 <Tabs defaultValue="single">
                     <TabsList className="grid w-full grid-cols-2 mb-6">

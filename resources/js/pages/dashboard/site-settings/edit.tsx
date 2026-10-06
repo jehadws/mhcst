@@ -261,7 +261,7 @@ export default function SiteSettingsEditPage({ groups }: { groups: SettingGroup[
                 <div className="border-b">
                     <div className="flex items-center justify-between py-4 px-4">
                         <div>
-                            <h1 className="font-display text-3xl font-extrabold leading-snug">{d.siteSettings.title}</h1>
+                            <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">{d.siteSettings.title}</h1>
                             <p className="text-sm text-muted-foreground">{d.siteSettings.description}</p>
                         </div>
                         <Button disabled={processing} type="submit">

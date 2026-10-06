@@ -342,10 +342,10 @@ export default function CmsSettingsIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={s.title} />
-            <div className="flex flex-col gap-6 p-6 pb-28">
+            <div className="flex flex-col gap-6 p-4 sm:p-6 pb-28">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="flex flex-col gap-2">
-                        <h1 className="font-display text-3xl font-extrabold leading-snug">{s.title}</h1>
+                        <h1 className="font-display text-2xl sm:text-3xl font-extrabold leading-snug">{s.title}</h1>
                         <p className="text-sm text-muted-foreground">{s.subtitle}</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -390,7 +390,7 @@ export default function CmsSettingsIndex({
                         </div>
 
                         <TabsContent value="calendar" className="mt-4">
-                            <section className="space-y-5 rounded-xl border bg-card p-6">
+                            <section className="space-y-5 rounded-xl border bg-card p-4 sm:p-6">
                                 <h2 className="font-display text-2xl font-extrabold leading-snug">{s.calendarSection}</h2>
                                 <SettingsField id="academic_year" label={s.academicYear} hint={s.academicYearHint} error={errorOf('academic_year')}>
                                     <select
@@ -433,7 +433,7 @@ export default function CmsSettingsIndex({
                         </TabsContent>
 
                         <TabsContent value="registration" className="mt-4">
-                            <section className="space-y-5 rounded-xl border bg-card p-6">
+                            <section className="space-y-5 rounded-xl border bg-card p-4 sm:p-6">
                                 <h2 className="font-display text-2xl font-extrabold leading-snug">{s.registrationSection}</h2>
                                 <SettingsField id="current_semester" label={s.currentSemester} hint={s.currentSemesterHint} error={errorOf('current_semester')}>
                                     <select
@@ -530,7 +530,7 @@ export default function CmsSettingsIndex({
                         </TabsContent>
 
                         <TabsContent value="admission" className="mt-4">
-                            <section className="space-y-5 rounded-xl border bg-card p-6">
+                            <section className="space-y-5 rounded-xl border bg-card p-4 sm:p-6">
                                 <h2 className="font-display text-2xl font-extrabold leading-snug">{s.admissionSection}</h2>
                                 <SettingsToggleRow
                                     id="admission_open"
@@ -575,7 +575,7 @@ export default function CmsSettingsIndex({
                         </TabsContent>
 
                         <TabsContent value="grades" className="mt-4">
-                            <section className="space-y-5 rounded-xl border bg-card p-6">
+                            <section className="space-y-5 rounded-xl border bg-card p-4 sm:p-6">
                                 <h2 className="font-display text-2xl font-extrabold leading-snug">{s.gradesSection}</h2>
                                 <SettingsField id="grade_entry_deadline" label={s.deadline} hint={s.deadlineHint} error={errorOf('grade_entry_deadline')}>
                                     <DateField
@@ -597,7 +597,7 @@ export default function CmsSettingsIndex({
                         </TabsContent>
 
                         <TabsContent value="attendance" className="mt-4">
-                            <section className="space-y-5 rounded-xl border bg-card p-6">
+                            <section className="space-y-5 rounded-xl border bg-card p-4 sm:p-6">
                                 <h2 className="font-display text-2xl font-extrabold leading-snug">{s.attendanceSection}</h2>
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <SettingsField
