@@ -38,7 +38,28 @@ export default [
         },
     },
     {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js'],
+        ignores: [
+            'vendor',
+            'node_modules',
+            'public',
+            'bootstrap/ssr',
+            'tailwind.config.js',
+            // Agent/tool skill assets: CommonJS helper scripts, not app code.
+            '.agents/**',
+            '.cursor/**',
+            '.opencode/**',
+            '.windsurf/**',
+            'graphify-out/**',
+        ],
+    },
+    {
+        // Root-level Node build scripts run outside the browser bundle.
+        files: ['*.mjs', '*.cjs'],
+        languageOptions: {
+            globals: {
+                ...globals.node,
+            },
+        },
     },
     prettier, // Turn off all rules that might conflict with Prettier
 ];
