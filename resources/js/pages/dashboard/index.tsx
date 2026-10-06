@@ -223,7 +223,7 @@ export default function Dashboard() {
           <>
             <div className="flex flex-col gap-2">
               <h1 className="font-display text-2xl leading-snug font-extrabold tracking-tight sm:text-3xl">
-                {locale === 'ar' ? 'مرحباً بك في النظام الأdsfsdfsdfsdكاديمي' : 'Welcome to Academic Dashboard'}
+                {locale === 'ar' ? 'مرحباً بك في النظام الأكاديمي' : 'Welcome to Academic Dashboard'}
               </h1>
               <p className="text-muted-foreground text-base">
                 {locale === 'ar' ? 'نظرة عامة على الكلية والأحصائيات الأكاديمية' : 'Overview of college statistics and schedules'}
