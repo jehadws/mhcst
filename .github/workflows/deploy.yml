@@ -124,6 +124,7 @@ jobs:
           exclude: |
             **/storage/**
             **/.well-known/**
+            index.php
           dangerous-clean-slate: false
 
       #    App-tree upload: PHP resolves the Vite manifest via public_path()
@@ -143,6 +144,7 @@ jobs:
           exclude: |
             **/storage/**
             **/.well-known/**
+            index.php
           dangerous-clean-slate: false
 
       # ── 4. Post-deploy tasks via HTTP hook ─────────────────────────
