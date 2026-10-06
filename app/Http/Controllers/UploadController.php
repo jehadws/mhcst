@@ -21,6 +21,7 @@ class UploadController extends Controller
         'courses',
         'instructors',
         'departments',
+        'about',
     ];
 
     /** @var list<string> */
