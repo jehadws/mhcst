@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use ZipArchive;
 
 /**
  * Post-deploy hook for FTP-based shared hosting.
@@ -23,6 +24,10 @@ use Illuminate\Support\Facades\Artisan;
  * supported for the manual runbook, at the cost of the token appearing in
  * server logs for that call.
  *
+ * App code arrives as a single deploy-app.zip in the app root (the CI
+ * pipeline uploads one archive because file-by-file FTP keeps dying on
+ * this host); it is extracted over the app root before the artisan tasks.
+ *
  * Either way the comparison against config('app.deploy_token') is constant-time.
  */
 class DeployRunController extends Controller
@@ -34,6 +39,8 @@ class DeployRunController extends Controller
         abort_if($expected === '', 403, 'Deploy hook is not configured.');
         abort_unless(hash_equals($expected, (string) $this->presentedToken($request)), 403, 'Invalid deploy token.');
 
+        $this->extractAppArchive();
+
         Artisan::call('migrate', ['--force' => true]);
         Artisan::call('optimize:clear');
         Artisan::call('config:cache');
@@ -43,6 +50,28 @@ class DeployRunController extends Controller
         Artisan::call('queue:restart');
 
         return response()->json(['status' => 'ok']);
+    }
+
+    /**
+     * Extract the CI-uploaded deploy-app.zip over the app root before the
+     * artisan tasks run. The archive is removed only after a clean
+     * extraction, so an interrupted run retries on the next hook call.
+     */
+    private function extractAppArchive(): void
+    {
+        $archive = base_path('deploy-app.zip');
+
+        if (! is_file($archive)) {
+            return;
+        }
+
+        $zip = new ZipArchive;
+
+        abort_unless($zip->open($archive) === true, 500, 'Could not open the deploy archive.');
+        abort_unless($zip->extractTo(base_path()), 500, 'Could not extract the deploy archive.');
+
+        $zip->close();
+        unlink($archive);
     }
 
     /**

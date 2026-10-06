@@ -73,16 +73,24 @@ jobs:
       - name: Build Vite assets
         run: npm run build
 
-      # ── 3. Upload application code over FTPS ───────────────────────
-      #    Excluded on purpose (server-only or runtime data):
-      #    - storage/  → logs, sessions, user uploads live here
-      #    - vendor/   → managed by composer ON the server (see guard above)
-      #    - public/   → synced separately into the docroot + app tree below
-      #    - tests/docs/.git/.github/node_modules → dev-only
-      #    NOTE: exclude takes GLOB patterns, not regex — regex patterns
-      #    silently match nothing and caused a 90-minute node_modules dump.
-      #    "**/.git*" also covers .github; keep that pairing intact.
-      - name: FTP deploy application code
+      # ── 3. Upload application code as ONE archive over FTPS ────────
+      #    File-by-file FTP kept dying mid-sync on this host (576 files
+      #    ≈ 20+ min vs connection lifetimes of ~8 min), so the app tree
+      #    ships as a single zip and /deploy/run extracts it server-side
+      #    before running artisan tasks. Same exclusions as the old
+      #    file-by-file sync: storage (runtime data), vendor (composer
+      #    on the server), public (synced separately below), tests/docs,
+      #    .env files and dev tooling.
+      - name: Create app code archive
+        run: |
+          zip -r deploy-app.zip . \
+            -x ".git/*" ".github/*" ".gitignore" "node_modules/*" \
+               "vendor/*" "tests/*" "docs/*" "storage/*" "public/*" \
+               ".agents/*" "skills/*" ".env*" "skills-lock.json" \
+               "tmp-*" "*.zip"
+          mkdir deploy-staging && mv deploy-app.zip deploy-staging/
+
+      - name: FTP deploy app archive
         uses: SamKirkland/ftp-deploy-action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -90,22 +98,8 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
           protocol: ftps
-          local-dir: ./
+          local-dir: ./deploy-staging/
           server-dir: ${{ secrets.DEPLOY_PATH }}/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/vendor/**
-            **/tests/**
-            **/docs/**
-            **/storage/**
-            **/public/**
-            **/.env*
-            **/.agents/**
-            **/skills/**
-            skills-lock.json
-            tmp-*
           dangerous-clean-slate: false
 
       #    Docroot upload: built assets + static files.
