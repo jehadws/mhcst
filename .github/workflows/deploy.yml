@@ -105,6 +105,10 @@ jobs:
       #    Docroot upload: built assets + static files.
       #    Excludes: storage (the storage:link symlink) and .well-known
       #    (ACME/cPanel-managed SSL challenges).
+      #    clean-slate=true: public/ only has Vite build artifacts and static
+      #    files (nothing user-generated), so wiping and re-uploading each
+      #    deploy guarantees stale hashed bundles and a stale manifest.json
+      #    never remain on the server.
       - name: FTP deploy public directory
         uses: SamKirkland/ftp-deploy-action@8e83cea8672e3fbcbb9fdafff34debf6ae4c5f65 # v4.3.5
         with:
@@ -119,7 +123,7 @@ jobs:
             **/storage/**
             **/.well-known/**
             index.php
-          dangerous-clean-slate: false
+          dangerous-clean-slate: true
 
       #    App-tree upload: PHP resolves the Vite manifest via public_path()
       #    inside the app root, while the browser fetches the asset files
@@ -139,7 +143,7 @@ jobs:
             **/storage/**
             **/.well-known/**
             index.php
-          dangerous-clean-slate: false
+          dangerous-clean-slate: true
 
       # ── 4. Post-deploy tasks via HTTP hook ─────────────────────────
       #    Runs migrate --force, rebuilds config/route/view caches,
