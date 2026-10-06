@@ -103,6 +103,8 @@ jobs:
             **/public/**
             **/.env*
             **/.agents/**
+            **/skills/**
+            skills-lock.json
             tmp-*
           dangerous-clean-slate: false
 
