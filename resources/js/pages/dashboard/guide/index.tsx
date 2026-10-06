@@ -11,7 +11,7 @@ import { ArrowRight, BookOpen, CircleHelp, KeyRound, Layers, ListOrdered } from 
 function StepList({ steps, numbered = true }: { steps: string[]; numbered?: boolean }) {
     return (
         <ol className={numbered ? 'list-decimal space-y-3 ps-5 text-sm leading-normal' : 'list-none space-y-3 ps-0 text-sm leading-normal'}>
-            {steps.map((step, index) => (
+            {steps.map((step) => (
                 <li key={step} className="text-foreground/90">
                     {numbered ? step : (
                         <span className="flex gap-2">

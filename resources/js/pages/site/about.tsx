@@ -4,14 +4,14 @@ import { FloatingButtons } from '@/components/site/floating-buttons';
 import { PageHero } from '@/components/site/page-hero';
 import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
-import { Testimonials } from '@/components/site/testimonials';
+import { Testimonials, type TestimonialItem } from '@/components/site/testimonials';
 import { useSite } from '@/context/site-context';
 import { cn } from '@/lib/utils';
 import { aboutIcon } from '@/lib/about-icons';
 import type { AboutItemContent, AboutMilestoneContent, AboutPageContent } from '@/types';
 
 interface Props {
-  testimonials?: Array<Record<string, unknown>>;
+  testimonials?: TestimonialItem[];
   aboutContent?: AboutPageContent | null;
 }
 

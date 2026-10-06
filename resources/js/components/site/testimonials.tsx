@@ -1,11 +1,19 @@
 import { useSite } from '@/context/site-context';
-import { testimonials as defaultTestimonials } from '@/data/i18n';
+import { testimonials as defaultTestimonials, type Locale } from '@/data/i18n';
 import { Quote } from 'lucide-react';
 
-export function Testimonials({ items }: { items?: any[] }) {
+export interface TestimonialItem {
+  name: string | Record<Locale, string>
+  quote: string | Record<Locale, string>
+  role?: Record<Locale, string>
+  role_title?: string
+  company?: string
+}
+
+export function Testimonials({ items }: { items?: TestimonialItem[] }) {
   const { t, tr } = useSite();
 
-  const list = items && items.length > 0 ? items : defaultTestimonials;
+  const list: TestimonialItem[] = items && items.length > 0 ? items : defaultTestimonials;
 
   return (
     <section id="testimonials" className="bg-secondary scroll-mt-20 py-28">

@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, X, UploadCloud, RotateCcw, Trash2 } from 'lucide-react';
+import { Loader2, UploadCloud, RotateCcw, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useSite } from '@/context/site-context';

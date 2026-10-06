@@ -35,6 +35,17 @@ interface ParseResult {
     unmatched: Array<{ line: number; identifier: string; reason: string }>;
 }
 
+type GradeFieldKey = (typeof GRADE_FIELDS)[number];
+
+interface GradeEntry {
+    midterm: number | string;
+    final: number | string;
+    assignments: number | string;
+    projects: number | string;
+    participation: number | string;
+    _updated_at: string | null;
+}
+
 export default function GradesIndex({
     subjects,
     selectedSubjectId,
@@ -58,7 +69,7 @@ export default function GradesIndex({
         { label: c.nav.grades, href: '/cms/grades' },
     ]);
 
-    const [gradeState, setGradeState] = useState<Record<number, any>>({});
+    const [gradeState, setGradeState] = useState<Record<number, GradeEntry>>({});
     const [saving, setSaving] = useState(false);
 
     // Paste-from-Excel dialog state
@@ -69,7 +80,7 @@ export default function GradesIndex({
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
-        const initial: Record<number, any> = {};
+        const initial: Record<number, GradeEntry> = {};
         enrollments.forEach((e) => {
             initial[e.id] = {
                 midterm: e.grade?.midterm ?? '',
@@ -87,7 +98,7 @@ export default function GradesIndex({
         router.get('/cms/grades', { subject_id: id }, { preserveState: true });
     };
 
-    const handleInputChange = (enrollmentId: number, field: string, value: string) => {
+    const handleInputChange = (enrollmentId: number, field: GradeFieldKey, value: string) => {
         setGradeState((prev) => ({
             ...prev,
             [enrollmentId]: {
@@ -97,13 +108,13 @@ export default function GradesIndex({
         }));
     };
 
-    const calcTotal = (g: any) => {
+    const calcTotal = (g: GradeEntry | undefined) => {
         if (!g) return 0;
-        const mid = parseFloat(g.midterm) || 0;
-        const fin = parseFloat(g.final) || 0;
-        const ass = parseFloat(g.assignments) || 0;
-        const prj = parseFloat(g.projects) || 0;
-        const par = parseFloat(g.participation) || 0;
+        const mid = parseFloat(String(g.midterm)) || 0;
+        const fin = parseFloat(String(g.final)) || 0;
+        const ass = parseFloat(String(g.assignments)) || 0;
+        const prj = parseFloat(String(g.projects)) || 0;
+        const par = parseFloat(String(g.participation)) || 0;
         const total = mid * 0.30 + fin * 0.40 + ass * 0.15 + prj * 0.10 + par * 0.05;
         return round(total, 2);
     };
@@ -129,11 +140,11 @@ export default function GradesIndex({
         setSaving(true);
         const payload = Object.entries(gradeState).map(([enrId, vals]) => ({
             enrollment_id: parseInt(enrId),
-            midterm: vals.midterm !== '' ? parseFloat(vals.midterm) : null,
-            final: vals.final !== '' ? parseFloat(vals.final) : null,
-            assignments: vals.assignments !== '' ? parseFloat(vals.assignments) : null,
-            projects: vals.projects !== '' ? parseFloat(vals.projects) : null,
-            participation: vals.participation !== '' ? parseFloat(vals.participation) : null,
+            midterm: vals.midterm !== '' ? parseFloat(String(vals.midterm)) : null,
+            final: vals.final !== '' ? parseFloat(String(vals.final)) : null,
+            assignments: vals.assignments !== '' ? parseFloat(String(vals.assignments)) : null,
+            projects: vals.projects !== '' ? parseFloat(String(vals.projects)) : null,
+            participation: vals.participation !== '' ? parseFloat(String(vals.participation)) : null,
             _updated_at: vals._updated_at ?? null,
         }));
 
@@ -333,7 +344,7 @@ export default function GradesIndex({
                                 </tr>
                             ) : (
                                 enrollments.map((enr) => {
-                                    const g = gradeState[enr.id] || {};
+                                    const g = gradeState[enr.id];
                                     const tot = calcTotal(g);
                                     const lettr = calcLetter(tot);
 
@@ -349,7 +360,7 @@ export default function GradesIndex({
                                                         max="100"
                                                         disabled={inputsDisabled}
                                                         className="w-20 mx-auto text-center h-8"
-                                                        value={g[field] ?? ''}
+                                                        value={g?.[field] ?? ''}
                                                         onChange={(e) => handleInputChange(enr.id, field, e.target.value)}
                                                     />
                                                 </td>

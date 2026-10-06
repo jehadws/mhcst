@@ -23,12 +23,11 @@ interface SiteContextValue {
 interface SiteProviderProps {
     children: React.ReactNode
     initialLocale: Locale
-    initialDirection: 'ltr' | 'rtl'
 }
 
 const SiteContext = createContext<SiteContextValue | null>(null)
 
-export function SiteProvider({ children, initialLocale, initialDirection }: SiteProviderProps) {
+export function SiteProvider({ children, initialLocale }: SiteProviderProps) {
     const [locale, setLocaleState] = useState<Locale>(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem(LOCALE_KEY)

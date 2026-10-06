@@ -1,15 +1,22 @@
 import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
-import { faqs as defaultFaqs } from '@/data/i18n'
+import { faqs as defaultFaqs, type Locale } from '@/data/i18n'
 import { SectionHeader } from '@/components/site/section-header'
 import { useSite } from '@/context/site-context'
 import { cn } from '@/lib/utils'
 
-export function Faq({ items }: { items?: any[] }) {
+export interface FaqItem {
+    question?: string
+    answer?: string
+    q?: Record<Locale, string>
+    a?: Record<Locale, string>
+}
+
+export function Faq({ items }: { items?: FaqItem[] }) {
     const { t, tr } = useSite()
     const [openIdx, setOpenIdx] = useState<number | null>(0)
 
-    const list = items && items.length > 0 ? items : defaultFaqs
+    const list: FaqItem[] = items && items.length > 0 ? items : defaultFaqs
 
     return (
         <section id="faq" className="bg-secondary scroll-mt-20 py-20 sm:py-28">

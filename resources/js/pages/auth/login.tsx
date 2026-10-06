@@ -21,7 +21,7 @@ interface LoginProps {
   canRegister?: boolean;
 }
 
-export default function Login({ status, canResetPassword, canRegister = false }: LoginProps) {
+export default function Login({ status, canResetPassword }: LoginProps) {
   const { t, locale } = useSite();
   const { brandName } = useBrandText();
   const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({

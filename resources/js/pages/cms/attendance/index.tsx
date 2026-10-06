@@ -9,6 +9,13 @@ import { Input } from '@/components/ui/input';
 import { AlertCircle, CheckCircle, Clock, Download, FileText, ShieldCheck, XCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
+interface AttendanceAlert {
+    has_alert: boolean;
+    consecutive_absences: number;
+    absence_rate: number;
+    alert_reasons: string[];
+}
+
 export default function AttendanceIndex({
     subjects,
     selectedSubjectId,
@@ -20,7 +27,7 @@ export default function AttendanceIndex({
     selectedSubjectId: number;
     date: string;
     enrollments: CmsEnrollment[];
-    alerts: Record<number, any>;
+    alerts: Record<number, AttendanceAlert>;
 }) {
     const { c, canManage } = useCms();
     const serverErrors = usePage().props.errors as Record<string, string>;

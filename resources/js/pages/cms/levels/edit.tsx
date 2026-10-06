@@ -16,7 +16,7 @@ export default function LevelEdit({ level, departments }: { level: CmsLevel; dep
     { label: c.levels.editTitle, href: `/cms/levels/${level.id}/edit` },
   ]);
 
-  const { data, setData, put, processing, errors } = useForm({
+  const { data, setData, put, processing } = useForm({
     department_id: String(level.department_id),
     year: String(level.year),
     section: level.section,

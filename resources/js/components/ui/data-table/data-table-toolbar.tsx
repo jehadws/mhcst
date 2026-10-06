@@ -19,7 +19,7 @@ interface DataTableToolbarProps<TData> {
       label: string
       value: string
     }[]
-    customFilter?: (value: any, filterValues: string[]) => boolean
+    customFilter?: (value: unknown, filterValues: string[]) => boolean
   }[]
   globalFilter?: string
   onGlobalFilterChange?: (value: string) => void

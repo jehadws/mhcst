@@ -2,10 +2,15 @@ import AppLayout from '@/layouts/app-layout';
 import { useCms } from '@/hooks/use-cms';
 import { cmsBreadcrumbs } from '@/lib/cms-helpers';
 import { BreadcrumbItem } from '@/types';
+import { CmsStudent } from '@/types/cms';
 import { Head } from '@inertiajs/react';
 import { Trophy } from 'lucide-react';
 
-export default function TopStudentsReport({ topStudents }: { topStudents: any[] }) {
+interface TopStudentRow extends CmsStudent {
+    gpa_average?: number | null;
+}
+
+export default function TopStudentsReport({ topStudents }: { topStudents: TopStudentRow[] }) {
     const { c } = useCms();
 
     const breadcrumbs: BreadcrumbItem[] = cmsBreadcrumbs(c, [

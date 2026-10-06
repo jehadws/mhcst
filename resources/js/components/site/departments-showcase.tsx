@@ -7,7 +7,7 @@ import { Link } from '@inertiajs/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
-interface Department {
+export interface Department {
   id: number;
   name: string;
   description?: string;

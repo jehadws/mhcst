@@ -12,7 +12,7 @@ export default function AttendanceReport({
 }: {
     enrollments: CmsEnrollment[];
     subjects: CmsSubject[];
-    filters: any;
+    filters: Partial<{ subject_id: string | null }>;
 }) {
     const { c } = useCms();
 

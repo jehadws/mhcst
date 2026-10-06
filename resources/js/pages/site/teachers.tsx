@@ -7,7 +7,6 @@ import { SiteHeader } from '@/components/site/site-header';
 import { useSite } from '@/context/site-context';
 import { useSiteSettings } from '@/hooks/use-site-settings';
 import { cn } from '@/lib/utils';
-import { Link } from '@inertiajs/react';
 
 interface TeacherDepartment {
   id: number;

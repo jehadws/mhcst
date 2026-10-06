@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button"
 import { useSite } from "@/context/site-context"
-import { InertiaFormProps } from "@inertiajs/react"
 import { ArrowRight } from "lucide-react"
 
 interface FormHeaderProps {
@@ -12,7 +11,10 @@ interface FormHeaderProps {
   onSave: (e: React.FormEvent) => void
   saveLabel?: string
   showReturn?: boolean
-  form: InertiaFormProps<any>
+  form: {
+    processing: boolean
+    hasErrors: boolean
+  }
 }
 
 export default function FormHeader({

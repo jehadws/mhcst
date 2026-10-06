@@ -28,7 +28,7 @@ interface DataTableFacetedFilterProps<TData, TValue> {
     value: string
     icon?: React.ComponentType<{ className?: string }>
   }[]
-  customFilter?: (value: any, filterValues: string[]) => boolean
+  customFilter?: (value: unknown, filterValues: string[]) => boolean
 }
 
 export function DataTableFacetedFilter<TData, TValue>({

@@ -14,7 +14,7 @@ export default function GradeReport({
     enrollments: CmsEnrollment[];
     students: CmsStudent[];
     subjects: CmsSubject[];
-    filters: any;
+    filters: Partial<{ student_id: string | null; subject_id: string | null }>;
 }) {
     const { c } = useCms();
 

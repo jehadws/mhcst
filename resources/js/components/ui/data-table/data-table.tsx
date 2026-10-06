@@ -19,8 +19,13 @@ import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
 import { useSite } from "@/context/site-context"
 
-function getNestedValue(obj: any, path: string): unknown {
-    return path.split('.').reduce((acc, key) => acc?.[key], obj)
+function getNestedValue(obj: unknown, path: string): unknown {
+    return path.split('.').reduce<unknown>((acc, key) => {
+        if (acc != null && typeof acc === 'object') {
+            return (acc as Record<string, unknown>)[key]
+        }
+        return undefined
+    }, obj)
 }
 
 interface DataTableProps<TData, TValue> {
@@ -36,7 +41,7 @@ interface DataTableProps<TData, TValue> {
             label: string
             value: string
         }[]
-        customFilter?: (value: any, filterValues: string[]) => boolean
+        customFilter?: (value: unknown, filterValues: string[]) => boolean
     }[]
     bulkActions?: {
         label: string

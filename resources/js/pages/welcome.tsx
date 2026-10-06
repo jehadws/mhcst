@@ -12,12 +12,16 @@ import { SiteFooter } from '@/components/site/site-footer';
 import { SiteHeader } from '@/components/site/site-header';
 import { WhyUs } from '@/components/site/why-us';
 import { Banner } from '@/types';
+import { type Department } from '@/components/site/departments-showcase';
+import { type FaqItem } from '@/components/site/faq';
+import { type TestimonialItem } from '@/components/site/testimonials';
+import { type NewsPost } from '@/lib/news';
 
 interface Props {
-  departments?: any[];
-  faqs?: any[];
-  testimonials?: any[];
-  posts?: any[];
+  departments?: Department[];
+  faqs?: FaqItem[];
+  testimonials?: TestimonialItem[];
+  posts?: NewsPost[];
   banners?: Banner[];
   stats?: {
     students_count?: number;
@@ -30,7 +34,7 @@ interface Props {
 const DEMO_VIDEO_URL = 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4';
 const DEMO_VIDEO_POSTER = '/banner.webp';
 
-export default function Welcome({ banners, departments, testimonials, posts, stats }: Props) {
+export default function Welcome({ banners, departments, posts, stats }: Props) {
   return (
     <>
       <SeoHead />

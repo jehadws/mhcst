@@ -22,10 +22,9 @@ createInertiaApp({
 
         const initialPage = props.initialPage;
         const locale = initialPage?.props?.locale ?? 'en';
-        const direction = initialPage?.props?.direction ?? 'ltr';
 
         root.render(
-            <SiteProvider initialLocale={locale} initialDirection={direction}>
+            <SiteProvider initialLocale={locale}>
                 <App {...props} />
                 <Toaster />
             </SiteProvider>

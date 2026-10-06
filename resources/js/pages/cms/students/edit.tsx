@@ -16,7 +16,7 @@ export default function StudentEdit({ student, levels }: { student: CmsStudent; 
     { label: c.students.editTitle, href: `/cms/students/${student.id}/edit` },
   ]);
 
-  const { data, setData, put, processing, errors } = useForm({
+  const { data, setData, put, processing } = useForm({
     student_no: student.student_no,
     name: student.name,
     email: student.email || '',
