@@ -14,8 +14,12 @@ use Illuminate\Support\Facades\Artisan;
  * would have done: migrate, rebuild caches, regenerate static SEO files,
  * restart queue workers.
  *
- * The CI call authorizes with an "Authorization: Bearer" header so the token
- * stays out of access and proxy logs. The ?token= query parameter remains
+ * The CI call presents the token in an "X-Deploy-Token" header so the token
+ * stays out of access and proxy logs. Shared-hosting PHP handlers
+ * (LiteSpeed, CGI/FastCGI) strip the standard Authorization header before
+ * it reaches Laravel — a custom request header is never stripped, which is
+ * why the bearer header alone is not enough on this host. Bearer is still
+ * accepted for compatible hosts, and the ?token= query parameter remains
  * supported for the manual runbook, at the cost of the token appearing in
  * server logs for that call.
  *
@@ -42,11 +46,18 @@ class DeployRunController extends Controller
     }
 
     /**
-     * The bearer header wins when present; the query parameter is the
+     * The dedicated deploy header wins (it survives PHP handlers that strip
+     * the Authorization header); bearer is next; the query parameter is the
      * fallback for manual runs.
      */
     private function presentedToken(Request $request): ?string
     {
+        $custom = $request->header('X-Deploy-Token');
+
+        if (is_string($custom) && trim($custom) !== '') {
+            return trim($custom);
+        }
+
         $header = $request->header('Authorization');
 
         if (is_string($header) && preg_match('#^Bearer\s+(\S+)\s*$#i', $header, $matches) === 1) {

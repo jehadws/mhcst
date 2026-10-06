@@ -148,12 +148,14 @@ jobs:
       # ── 4. Post-deploy tasks via HTTP hook ─────────────────────────
       #    Runs migrate --force, rebuilds config/route/view caches,
       #    regenerates static SEO files and restarts queue workers.
-      #    Authorized by DEPLOY_TOKEN via bearer header (also present in
-      #    server .env) — header keeps the token out of access logs.
+      #    Authorized by DEPLOY_TOKEN via the X-Deploy-Token header (also
+      #    present in server .env). A custom header is required because
+      #    shared-hosting PHP handlers strip the Authorization header; the
+      #    custom header keeps the token out of access logs the same way.
       - name: Run post-deploy tasks
         run: |
           RESPONSE=$(curl -sf --max-time 300 \
-            -H "Authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}" \
+            -H "X-Deploy-Token: ${{ secrets.DEPLOY_TOKEN }}" \
             "https://${{ secrets.SITE_URL }}/deploy/run")
           echo "Hook response: $RESPONSE"
           echo "$RESPONSE" | grep -q '"status":"ok"'
