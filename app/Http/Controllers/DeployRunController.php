@@ -39,6 +39,90 @@ class DeployRunController extends Controller
         abort_if($expected === '', 403, 'Deploy hook is not configured.');
         abort_unless(hash_equals($expected, (string) $this->presentedToken($request)), 403, 'Invalid deploy token.');
 
+        // Reset opcache BEFORE extraction so that once new PHP files are
+        // written to disk the next request immediately picks them up, rather
+        // than serving stale bytecode from the previous deploy.
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+
+        $extracted = $this->extractAppArchive();
+
+        Artisan::call('migrate', ['--force' => true]);
+        Artisan::call('optimize:clear');
+        Artisan::call('config:cache');
+        Artisan::call('route:cache');
+        Artisan::call('view:cache');
+        Artisan::call('seo:generate-static');
+        Artisan::call('queue:restart');
+
+        return response()->json([
+            'status'    => 'ok',
+            'extracted' => $extracted,
+        ]);
+    }
+
+    /**
+     * Extract the CI-uploaded deploy-app.zip over the app root before the
+     * artisan tasks run.
+     *
+     * Returns a short status string for the CI log so extraction/unlink
+     * failures are immediately visible without SSH access.
+     */
+    private function extractAppArchive(): string
+    {
+        $archive = base_path('deploy-app.zip');
+
+        if (! is_file($archive)) {
+            return 'no-archive';
+        }
+
+        $zip = new ZipArchive;
+
+        abort_unless($zip->open($archive) === true, 500, 'Could not open the deploy archive.');
+        abort_unless($zip->extractTo(base_path()), 500, 'Could not extract the deploy archive.');
+        $zip->close();
+
+        // On cPanel/LiteSpeed shared hosting the FTP-uploaded file may be
+        // owned by the FTP user with 0644 permissions. chmod to 0600 first
+        // so the PHP process (same user) can delete it.
+        chmod($archive, 0600);
+
+        if (! unlink($archive)) {
+            // Non-fatal: log and continue. The zip will be overwritten on the
+            // next deploy and re-extracted, so this is safe to leave.
+            logger()->warning('deploy: could not delete deploy-app.zip after extraction');
+
+            return 'extracted-unlink-failed';
+        }
+
+        return 'extracted';
+    }
+
+    /**
+     * The dedicated deploy header wins (it survives PHP handlers that strip
+     * the Authorization header); bearer is next; the query parameter is the
+     * fallback for manual runs.
+     */
+    private function presentedToken(Request $request): ?string
+    {
+        $custom = $request->header('X-Deploy-Token');
+
+        if (is_string($custom) && trim($custom) !== '') {
+            return trim($custom);
+        }
+
+        $header = $request->header('Authorization');
+
+        if (is_string($header) && preg_match('#^Bearer\s+(\S+)\s*$#i', $header, $matches) === 1) {
+            return $matches[1];
+        }
+
+        return $request->query('token');
+    }
+}
+
+
         $this->extractAppArchive();
 
         Artisan::call('migrate', ['--force' => true]);
