@@ -14,8 +14,8 @@
 name: Deploy production
 
 on:
-  push:
-    branches: [main]
+  # Disabled automatic push to main; run manually via GitHub Actions when ready
+  workflow_dispatch:
 
 # Never run two deploys at once; superseded runs are cancelled.
 concurrency:
