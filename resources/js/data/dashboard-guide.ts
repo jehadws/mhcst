@@ -67,7 +67,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
             steps: [
                 'Open the college website and click Login at the top.',
                 'Enter the email and password that an administrator created for you.',
-                'If login fails or you forgot your password, contact an Admin — you cannot register yourself.',
+                'If login fails or you forgot your password, contact an Admin. Staff accounts are created for you — the public form is only for new students applying for admission.',
             ],
         },
         sidebarNote: 'The left menu only shows pages you are allowed to open. If something is missing, your account role does not include that feature.',
@@ -80,6 +80,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                     'Set college name and contact details: Settings → Site settings.',
                     'Build the college structure: College system → Departments, then Levels, Teachers, and Subjects.',
                     'Add students and enroll them in subjects: College system → Students, then Enrollments.',
+                    'Review admission applications: College system → Applications — accepting an application creates the student record and its login.',
                     'Build the timetable: College system → Schedules.',
                     'When the term ends, enter grades and lock them: College system → Grades. Use College system → Settings to set grade-lock rules.',
                 ],
@@ -87,6 +88,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                     { label: 'Manage users', href: '/dashboard/users/list' },
                     { label: 'Site settings', href: '/dashboard/site-settings' },
                     { label: 'Departments', href: '/cms/departments' },
+                    { label: 'Applications', href: '/cms/applications' },
                 ],
             },
             {
@@ -115,6 +117,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 tips: [
                     'If your dashboard is empty, an Admin must link your login to a teacher profile in the college system.',
                     'You can view students in your classes but cannot add new students or change departments.',
+                    'Grades accept a whole column copied from a spreadsheet — paste it into the marks grid instead of typing one by one.',
                 ],
                 links: [
                     { label: 'Attendance', href: '/cms/attendance' },
@@ -127,10 +130,14 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 title: 'Student — start here',
                 steps: [
                     'Open Dashboard to see your GPA, today’s classes, and recent grades.',
+                    'Pick your subjects while the registration window is open: Subject registration in the menu. The same page lets you drop a subject during the self-drop window.',
                     'Download your official transcript: use My transcript in the menu (PDF).',
                     'The public “student portal” on the website is a separate lookup tool — use the dashboard for your real records.',
                 ],
-                links: [{ label: 'My transcript', href: '/dashboard/my-transcript' }],
+                links: [
+                    { label: 'Subject registration', href: '/dashboard/subject-registration' },
+                    { label: 'My transcript', href: '/dashboard/my-transcript' },
+                ],
             },
             {
                 roles: ['Content Editor'],
@@ -181,7 +188,8 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 steps: [
                     'Homepage, About, Departments, FAQ, and Contact explain the college to the public.',
                     'Blog shows news and articles that content editors publish from the dashboard.',
-                    'Student portal on the website is a simple lookup — students with accounts should use the dashboard instead.',
+                    'New students apply through the public admission form; the application then waits in the Admin review queue.',
+                    'Student portal on the website is a verification tool — it needs the student number together with the email or phone on the record. Students with accounts should use the dashboard instead.',
                 ],
                 links: [{ label: 'View public site', href: '/' }],
             },
@@ -193,10 +201,12 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 steps: [
                     '1. Create departments (e.g. IT, Business) and levels (years) inside each department.',
                     '2. Add teachers and subjects, then link subjects to departments and levels.',
-                    '3. Register students and create enrollments (which student takes which subject).',
-                    '4. Build the weekly schedule so teachers know when each class runs.',
-                    '5. During the term: teachers record attendance and enter grades.',
-                    '6. At term end: review reports, lock grades, and export data if needed.',
+                    '3. In College system → Settings, choose the current academic term and open the admission and registration windows.',
+                    '4. Review admission applications. Accepting one creates the student record and its login; rejecting sends the applicant a decision email.',
+                    '5. Enroll students in subjects — as Manager/Admin from Enrollments, or let students choose themselves during the registration window.',
+                    '6. Build the weekly schedule so teachers know when each class runs.',
+                    '7. During the term: teachers record attendance and enter grades.',
+                    '8. At term end: review reports, lock grades, and export data if needed.',
                 ],
                 links: [
                     { label: 'Start with departments', href: '/cms/departments' },
@@ -211,7 +221,8 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 steps: [
                     'Create and deactivate user accounts, and assign roles.',
                     'Change college name, logo, phone, email, and address on the public site.',
-                    'Set academic calendar dates and when grades become locked.',
+                    'Open or close the admission window and choose which departments and levels accept applications.',
+                    'Set academic calendar dates, registration windows, and when grades become locked.',
                     'Review the audit log to see who changed important records.',
                 ],
                 links: [
@@ -290,7 +301,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
             },
         ],
         demoTitle: 'Test accounts (development only)',
-        demoPassword: 'Password for all accounts below: password',
+        demoPassword: 'Development seed data only. The @cms.local accounts use the password “password”; the @mhcst.edu.ly accounts take the value of SEEDER_DEFAULT_PASSWORD, or “change-me-on-first-login” when it is not set.',
         demoAccounts: [
             { email: 'admin@mhcst.edu.ly', role: 'Admin' },
             { email: 'manager@mhcst.edu.ly', role: 'Manager' },
@@ -305,7 +316,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
         intro: {
             title: 'ما هذا النظام؟',
             paragraphs: [
-                'منصة الكلية لها جزآن. الموقع العام يراه الزوار — الصفحة الرئيسية، الأقسام، المدونة، التواصل، والتحقق من الشهادات.',
+                'منصة الكلية لها جزآن. الموقع العام يراه الزوار — الصفحة الرئيسية، الأقسام، المدونة، التواصل، ونموذج طلب الالتحاق.',
                 'لوحة التحكم (أنت هنا الآن) هي منطقة الموظفين. يسجّل الأساتذة والإدارة ومحررو المحتوى والطلاب الدخول من هنا.',
                 'معظم العمل الأكاديمي — الطلاب، الدرجات، الحضور، والجداول — موجود تحت قسم «نظام الكلية» في القائمة اليسرى.',
             ],
@@ -315,7 +326,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
             steps: [
                 'افتح موقع الكلية واضغط «تسجيل الدخول» في الأعلى.',
                 'أدخل البريد وكلمة المرور التي أنشأها لك المدير.',
-                'إذا فشل الدخول أو نسيت كلمة المرور، تواصل مع Admin — لا يمكنك إنشاء حساب بنفسك.',
+                'إذا فشل الدخول أو نسيت كلمة المرور، تواصل مع Admin. حسابات المنسقين تُنشأ من لوحة التحكم، أما النموذج العام فهو للطلاب الجدد الذين يطلبون الالتحاق.',
             ],
         },
         sidebarNote: 'القائمة اليسرى تعرض فقط الصفحات المسموح لك بفتحها. إذا لم تجد رابطاً، فدورك لا يتضمن هذه الميزة.',
@@ -328,6 +339,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                     'اسم الكلية وبيانات التواصل: الإعدادات ← إعدادات الموقع.',
                     'بناء هيكل الكلية: نظام الكلية ← الأقسام، ثم المستويات، الأساتذة، والمواد.',
                     'إضافة الطلاب وتسجيلهم في المواد: نظام الكلية ← الطلاب، ثم التسجيلات.',
+                    'مراجعة طلبات الالتحاق: نظام الكلية ← الطلبات — القبول يُنشئ سجل الطالب وحساب دخوله.',
                     'إعداد الجدول الدراسي: نظام الكلية ← الجداول.',
                     'في نهاية الفصل: إدخال الدرجات وقفلها ← نظام الكلية ← الدرجات. قواعد القفل من نظام الكلية ← الإعدادات.',
                 ],
@@ -335,6 +347,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                     { label: 'المستخدمون', href: '/dashboard/users/list' },
                     { label: 'إعدادات الموقع', href: '/dashboard/site-settings' },
                     { label: 'الأقسام', href: '/cms/departments' },
+                    { label: 'الطلبات', href: '/cms/applications' },
                 ],
             },
             {
@@ -363,6 +376,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 tips: [
                     'إذا كانت لوحتك فارغة، يجب على Admin ربط حسابك بملف أستاذ في نظام الكلية.',
                     'يمكنك عرض طلاب صفوفك لكن لا يمكنك إضافة طلاب أو تغيير الأقسام.',
+                    'شبكة الدرجات تقبل لصق عمود كامل منسوخ من جدول بيانات — التزم الصق بدل الإدخال طالباً طالباً.',
                 ],
                 links: [
                     { label: 'الحضور', href: '/cms/attendance' },
@@ -375,10 +389,14 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 title: 'الطالب — ابدأ من هنا',
                 steps: [
                     'افتح لوحة التحكم لرؤية معدلك، حصص اليوم، وآخر الدرجات.',
+                    'اختر موادك أثناء نافذة التسجيل المفتوحة: «تسجيل المواد» من القائمة، ومن نفس الصفحة يمكنك الانسحاب خلال نافذة الانسحاب.',
                     'تحميل كشف الدرجات الرسمي: «كشف درجاتي» من القائمة (PDF).',
-                    '«بوابة الطالب» على الموقع العام أداة بحث منفصلة — استخدم لوحة التحكم لسجلاتك الرسمية.',
+                    '«بوابة الطالب» على الموقع العام أداة تحقّق منفصلة — استخدم لوحة التحكم لسجلاتك الرسمية.',
                 ],
-                links: [{ label: 'كشف درجاتي', href: '/dashboard/my-transcript' }],
+                links: [
+                    { label: 'تسجيل المواد', href: '/dashboard/subject-registration' },
+                    { label: 'كشف درجاتي', href: '/dashboard/my-transcript' },
+                ],
             },
             {
                 roles: ['Content Editor'],
@@ -429,8 +447,8 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 steps: [
                     'الصفحة الرئيسية، من نحن، الأقسام، الأسئلة الشائعة، والتواصل تُعرّف بالكلية.',
                     'المدونة تعرض أخباراً ينشرها محررو المحتوى من لوحة التحكم.',
-                    'التحقق من الشهادات يتيح للجميع التأكد من صحة شهادة تدريب.',
-                    'بوابة الطالب على الموقع أداة بحث بسيطة — الطالب ذو الحساب يستخدم لوحة التحكم.',
+                    'الطلاب الجدد يقدّمون طلب التحاق عبر النموذج العام، ثم ينتظر الطلب قائمة المراجعة لدى Admin.',
+                    'بوابة الطالب على الموقع أداة تحقّق — تحتاج رقم القيد مع البريد أو الهاتف المسجَّل. الطالب ذو الحساب يستخدم لوحة التحكم.',
                 ],
                 links: [{ label: 'عرض الموقع', href: '/' }],
             },
@@ -442,10 +460,12 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 steps: [
                     '١. إنشاء الأقسام (مثل IT، Business) والمستويات (السنوات) داخل كل قسم.',
                     '٢. إضافة الأساتذة والمواد وربط المواد بالأقسام والمستويات.',
-                    '٣. تسجيل الطلاب وإنشاء تسجيلات (أي طالب يدرس أي مادة).',
-                    '٤. بناء الجدول الأسبوعي لمعرفة مواعيد الحصص.',
-                    '٥. أثناء الفصل: الأساتذة يسجلون الحضور والدرجات.',
-                    '٦. نهاية الفصل: مراجعة التقارير، قفل الدرجات، وتصدير البيانات إن لزم.',
+                    '٣. من نظام الكلية ← الإعدادات: حدّد الفصل الدراسي الحالي وافتح نافذتي القبول وتسجيل المواد.',
+                    '٤. مراجعة طلبات الالتحاق — القبول يُنشئ سجل الطالب وحسابه، والرفض يُرسل إليه إشعاراً.',
+                    '٥. تسجيل الطلاب في المواد: من التسجيلات، أو يختارها الطالب بنفسه خلال نافذة التسجيل.',
+                    '٦. بناء الجدول الأسبوعي لمعرفة مواعيد الحصص.',
+                    '٧. أثناء الفصل: الأساتذة يسجلون الحضور والدرجات.',
+                    '٨. نهاية الفصل: مراجعة التقارير، قفل الدرجات، وتصدير البيانات إن لزم.',
                 ],
                 links: [
                     { label: 'ابدأ بالأقسام', href: '/cms/departments' },
@@ -460,7 +480,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 steps: [
                     'إنشاء وتعطيل حسابات المستخدمين وتعيين الأدوار.',
                     'تغيير اسم الكلية، الشعار، الهاتف، البريد، والعنوان على الموقع.',
-                    'ضبط التقويم الأكademي وموعد قفل الدرجات.',
+                    'ضبط التقويم الأكاديمي، نوافذ التسجيل، وموعد قفل الدرجات.',
                     'مراجعة سجل التدقيق لمعرفة من غيّر السجلات المهمة.',
                 ],
                 links: [
@@ -495,7 +515,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
                 steps: [
                     'اكتب مقالاً، أضف العنوان والمحتوى، وصف SEO اختياري، ثم انشر.',
                     'حدّث الأسئلة الشائعة لتقليل الأسئلة المتكررة.',
-                    'أضف أو عدّل الآراء وشهادات التدريب.',
+                    'أضف أو عدّل آراء الطلاب المنشورة على الموقع.',
                     'عند رفع الصور استخدم زر الرفع داخل المحرر.',
                 ],
                 links: [
@@ -537,7 +557,7 @@ export const dashboardGuide: Record<GuideLocale, GuideContent> = {
             },
         ],
         demoTitle: 'حسابات تجريبية (للتطوير فقط)',
-        demoPassword: 'كلمة المرور لجميع الحسابات: password',
+        demoPassword: 'لبيانات البذر في التطوير فقط. حسابات ‎@cms.local كلمة مرورها «password»، أما حسابات ‎@mhcst.edu.ly فتأخذ قيمة SEEDER_DEFAULT_PASSWORD، أو «change-me-on-first-login» إذا لم تُضبط.',
         demoAccounts: [
             { email: 'admin@mhcst.edu.ly', role: 'Admin' },
             { email: 'manager@mhcst.edu.ly', role: 'Manager' },

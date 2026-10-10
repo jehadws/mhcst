@@ -15,7 +15,7 @@
         "laravel/tinker": "^2.10.1",
         "phpoffice/phpspreadsheet": "^5.9",
         "spatie/laravel-activitylog": "^4.12",
-        "spatie/laravel-backup": "*",
+        "spatie/laravel-backup": "^9.3",
         "spatie/laravel-permission": "^6.25",
         "tightenco/ziggy": "^2.4"
     },
