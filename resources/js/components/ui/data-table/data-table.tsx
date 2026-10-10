@@ -4,7 +4,9 @@ import * as React from "react"
 import {
     type ColumnDef,
     type ColumnFiltersState,
+    type PaginationState,
     type SortingState,
+    type Updater,
     type VisibilityState,
     flexRender,
     getCoreRowModel,
@@ -84,20 +86,31 @@ export function DataTable<TData, TValue>({
         pageSize: initialPageSize,
     })
 
+    // Server-paging options must be omitted entirely in client mode: TanStack
+    // merges options with a spread, so explicit `undefined` would clobber its
+    // default onPaginationChange and freeze pagination.
     const table = useReactTable({
         data,
         columns,
-        manualPagination: serverPaginated || undefined,
-        pageCount: serverPaginated ? pageCount : undefined,
-        onPaginationChange: serverPaginated
-            ? (updater) => {
-                  const next = typeof updater === 'function' ? updater(pagination) : updater
-                  setPagination(next)
-                  if (next.pageIndex !== pagination.pageIndex) onPageChange!(next.pageIndex + 1)
+        ...(serverPaginated
+            ? {
+                  manualPagination: true,
+                  pageCount,
+                  onPaginationChange: (updater: Updater<PaginationState>) => {
+                      const next = typeof updater === 'function' ? updater(pagination) : updater
+                      setPagination(next)
+                      if (next.pageIndex !== pagination.pageIndex) onPageChange!(next.pageIndex + 1)
+                  },
               }
-            : undefined,
+            : {
+                  getPaginationRowModel: getPaginationRowModel(),
+                  initialState: {
+                      pagination: {
+                          pageSize: initialPageSize,
+                      },
+                  },
+              }),
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: serverPaginated ? undefined : getPaginationRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
         onColumnFiltersChange: setColumnFilters,
@@ -112,11 +125,6 @@ export function DataTable<TData, TValue>({
                 const val = getNestedValue(row.original, field)
                 return val != null && String(val).toLowerCase().includes(q)
             })
-        },
-        initialState: serverPaginated ? undefined : {
-            pagination: {
-                pageSize: initialPageSize,
-            },
         },
         state: {
             sorting,
