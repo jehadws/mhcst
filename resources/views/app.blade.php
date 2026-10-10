@@ -50,12 +50,12 @@
             body { margin: 0; font-family: 'Tajawal', 'Cairo', system-ui, sans-serif; }
         </style>
 
-        {{-- LCP image: the hero banner behind the headline (hero.tsx <img src="/banner.webp">) --}}
-        <link rel="preload" as="image" href="/banner.webp" fetchpriority="high">
+        {{-- LCP image: the hero photo behind the headline (hero-section.tsx static fallback) --}}
+        <link rel="preload" as="image" href="/images/campus-hero.webp" fetchpriority="high">
 
-        {{-- Hero-critical web fonts (Tajawal 800 renders the h1); remaining faces load via CSS on demand --}}
-        <link rel="preload" as="font" type="font/woff2" href="/fonts/tajawal-v1-arabic-800.woff2" crossorigin>
-        <link rel="preload" as="font" type="font/woff2" href="/fonts/tajawal-v1-latin-800.woff2" crossorigin>
+        {{-- Hero-critical web fonts: IBM Plex Sans Arabic 600 sets the Arabic headline, Plus Jakarta Sans 600 the English one --}}
+        <link rel="preload" as="font" type="font/woff2" href="/fonts/ibm-plex-sans-arabic-v1-arabic-600.woff2" crossorigin>
+        <link rel="preload" as="font" type="font/woff2" href="/fonts/plus-jakarta-sans-v1-latin-600.woff2" crossorigin>
 
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">

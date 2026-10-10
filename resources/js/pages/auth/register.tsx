@@ -1,19 +1,17 @@
 import { AuthField, AuthPasswordField } from '@/components/auth-fields';
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
 import { useSite } from '@/context/site-context';
 import { useBrandText } from '@/hooks/use-site-settings';
 import AuthLayout from '@/layouts/auth-layout';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-interface RegisterForm {
-  name: string;
-  email: string;
-  password: string;
-  password_confirmation: string;
-}
+type RegisterForm = {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+};
 
 export default function Register() {
   const { t } = useSite();
@@ -37,11 +35,11 @@ export default function Register() {
       <Head title={t.auth.register} />
 
       <form className="flex flex-col" onSubmit={submit}>
-        <p className="text-primary mb-3.5 text-[13px] font-bold tracking-wide">{brandName}</p>
-        <h1 className="text-foreground max-w-[570px] text-2xl leading-[1.45] font-bold tracking-tight sm:text-3xl">{t.auth.registerTitle}</h1>
-        <p className="text-muted-foreground mt-3 text-[15px]">{t.auth.registerSubtitle}</p>
+        <p className="font-site-latin m-0 mb-3 text-[11px] font-bold tracking-[0.1em] text-teal-dark">{brandName}</p>
+        <h1 className="m-0 text-[25px] font-semibold tracking-[-0.04em]">{t.auth.registerTitle}</h1>
+        <p className="m-0 mt-3 text-[13px] leading-[1.9] text-ink-muted">{t.auth.registerSubtitle}</p>
 
-        <div className="mt-9 grid gap-6">
+        <div className="mt-9 grid gap-[26px]">
           <AuthField
             id="name"
             label={t.auth.fullName}
@@ -98,21 +96,21 @@ export default function Register() {
           />
         </div>
 
-        <Button
+        <button
           type="submit"
-          className="shadow-primary/20 mt-7 h-12 w-full rounded-[10px] text-sm font-bold shadow-lg"
+          className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-site-button border border-transparent bg-ink px-[21px] py-[14px] text-[13px] font-bold text-white transition-colors hover:bg-ink-2 disabled:opacity-50"
           tabIndex={5}
           disabled={processing}
         >
-          {processing && <LoaderCircle className="size-4 animate-spin" />}
+          {processing && <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />}
           {t.auth.register}
-        </Button>
+        </button>
 
-        <p className="text-muted-foreground mt-6 text-center text-sm">
+        <p className="m-0 mt-6 text-center text-[12px] text-ink-muted">
           {t.auth.haveAccount}{' '}
-          <TextLink href={route('login')} tabIndex={6} className="text-primary hover:text-primary/80 font-bold">
+          <Link href={route('login')} tabIndex={6} className="font-bold text-teal-dark underline underline-offset-4 transition-colors hover:text-coral">
             {t.auth.login}
-          </TextLink>
+          </Link>
         </p>
       </form>
     </AuthLayout>

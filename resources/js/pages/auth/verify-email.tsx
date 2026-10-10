@@ -1,11 +1,7 @@
-// Components
-import { Head, useForm } from '@inertiajs/react';
+import AuthLayout from '@/layouts/auth-layout';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
-
-import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import AuthLayout from '@/layouts/auth-layout';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     const { post, processing } = useForm({});
@@ -21,20 +17,26 @@ export default function VerifyEmail({ status }: { status?: string }) {
             <Head title="Email verification" />
 
             {status === 'verification-link-sent' && (
-                <div className="mb-4 text-center text-sm font-medium text-green-600">
+                <p className="m-0 mb-6 border border-teal px-4 py-3 text-center text-[13px] font-semibold text-teal-dark">
                     A new verification link has been sent to the email address you provided during registration.
-                </div>
+                </p>
             )}
 
-            <form onSubmit={submit} className="space-y-6 text-center">
-                <Button disabled={processing} variant="secondary">
-                    {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+            <form onSubmit={submit} className="text-center">
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-site-button border border-transparent bg-ink px-[21px] py-[14px] text-[13px] font-bold text-white transition-colors hover:bg-ink-2 disabled:opacity-50"
+                >
+                    {processing && <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />}
                     Resend verification email
-                </Button>
+                </button>
 
-                <TextLink href={route('logout')} method="post" className="mx-auto block text-sm">
-                    Log out
-                </TextLink>
+                <p className="m-0 mt-6 text-[12px] text-ink-muted">
+                    <Link href={route('logout')} method="post" className="font-bold text-teal-dark underline underline-offset-4 hover:text-coral">
+                        Log out
+                    </Link>
+                </p>
             </form>
         </AuthLayout>
     );

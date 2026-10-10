@@ -1,13 +1,8 @@
-// Components
+import { SitePassword } from '@/components/site/primitives/site-field';
+import AuthLayout from '@/layouts/auth-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
-
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
 
 export default function ConfirmPassword() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -30,30 +25,26 @@ export default function ConfirmPassword() {
             <Head title="Confirm password" />
 
             <form onSubmit={submit}>
-                <div className="space-y-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            autoComplete="current-password"
-                            value={data.password}
-                            autoFocus
-                            onChange={(e) => setData('password', e.target.value)}
-                        />
+                <SitePassword
+                    id="password"
+                    label="Password"
+                    name="password"
+                    autoComplete="current-password"
+                    value={data.password}
+                    autoFocus
+                    disabled={processing}
+                    onChange={(e) => setData('password', e.target.value)}
+                    error={errors.password}
+                />
 
-                        <InputError message={errors.password} />
-                    </div>
-
-                    <div className="flex items-center">
-                        <Button className="w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                            Confirm password
-                        </Button>
-                    </div>
-                </div>
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-site-button border border-transparent bg-ink px-[21px] py-[14px] text-[13px] font-bold text-white transition-colors hover:bg-ink-2 disabled:opacity-50"
+                >
+                    {processing && <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />}
+                    Confirm password
+                </button>
             </form>
         </AuthLayout>
     );

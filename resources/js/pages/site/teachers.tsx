@@ -1,133 +1,117 @@
 import { SeoHead } from '@/components/seo-head';
-import { CtaBanner } from '@/components/site/cta-banner';
-import { FloatingButtons } from '@/components/site/floating-buttons';
-import { PageHero } from '@/components/site/page-hero';
-import { SiteFooter } from '@/components/site/site-footer';
-import { SiteHeader } from '@/components/site/site-header';
+import { InnerHero } from '@/components/site/primitives/inner-hero';
+import { InnerSection } from '@/components/site/primitives/inner-section';
+import { CtaBand } from '@/components/site/sections/cta-band';
+import { SiteLayout } from '@/components/site/site-layout';
 import { useSite } from '@/context/site-context';
 import { useSiteSettings } from '@/hooks/use-site-settings';
-import { cn } from '@/lib/utils';
 
 interface TeacherDepartment {
-  id: number;
-  name: string;
+    id: number;
+    name: string;
 }
 
 interface PublicTeacher {
-  id: number;
-  name: string;
-  specialization?: string;
-  qualification?: string;
-  departments?: TeacherDepartment[];
+    id: number;
+    name: string;
+    specialization?: string;
+    qualification?: string;
+    departments?: TeacherDepartment[];
 }
 
 interface Props {
-  teachers?: PublicTeacher[];
+    teachers?: PublicTeacher[];
 }
 
 export default function PublicTeachersPage({ teachers = [] }: Props) {
-  const { t, locale } = useSite();
-  const { hide_instructor_names: hideInstructorNames } = useSiteSettings();
-  const isAr = locale === 'ar';
+    const { t, locale } = useSite();
+    const { hide_instructor_names: hideInstructorNames } = useSiteSettings();
+    const isAr = locale === 'ar';
 
-  return (
-    <>
-      <SeoHead
-        title={isAr ? 'أعضاء هيئة التدريس' : 'Faculty Members'}
-        description={
-          isAr
-            ? `تعرّف على أعضاء هيئة التدريس وأخصصاتهم العلمية في ${t.brandFull}.`
-            : `Meet the faculty members and their academic specializations at ${t.brandFull}.`
-        }
-      />
-      <div className="flex min-h-screen flex-col">
-        <SiteHeader />
-        <main className="flex-1">
-          <PageHero
-            title={isAr ? 'أعضاء هيئة التدريس' : 'Faculty members'}
-            description={
-              isAr
-                ? 'نخبة من الأساتذة والخبراء الأكاديميين يقودون العملية التعليمية في الكلية.'
-                : 'A distinguished group of professors and academic experts leading teaching at the college.'
-            }
-            crumbs={[{ label: isAr ? 'هيئة التدريس' : 'Faculty', href: '/teachers' }]}
-          />
+    return (
+        <>
+            <SeoHead
+                title={isAr ? 'أعضاء هيئة التدريس' : 'Faculty Members'}
+                description={
+                    isAr
+                        ? `تعرّف على أعضاء هيئة التدريس وأخصصاتهم العلمية في ${t.brandFull}.`
+                        : `Meet the faculty members and their academic specializations at ${t.brandFull}.`
+                }
+            />
+            <SiteLayout headerVariant="solid">
+                <InnerHero
+                    index="03"
+                    eyebrow={isAr ? 'هيئة التدريس' : 'Faculty'}
+                    title={isAr ? 'أعضاء هيئة التدريس' : 'Faculty members'}
+                    intro={
+                        isAr
+                            ? 'نخبة من الأساتذة والخبراء الأكاديميين يقودون العملية التعليمية في الكلية.'
+                            : 'A distinguished group of professors and academic experts leading teaching at the college.'
+                    }
+                />
 
-          {/* Faculty directory — a ledger, not a card grid. */}
-          <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
-            <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
-              <h2 className="font-display text-foreground max-w-2xl text-3xl leading-snug font-extrabold text-balance sm:text-4xl">
-                {isAr ? 'أعضاء هيئة التدريس بالكلية' : 'Meet our faculty'}
-              </h2>
-              <p className="text-muted-foreground max-w-md text-sm leading-normal sm:text-base">
-                {isAr
-                  ? `${teachers.length} عضو هيئة تدريس يدرّس حاليًا في الكلية.`
-                  : `${teachers.length} faculty members currently teaching at the college.`}
-              </p>
-            </div>
-
-            {teachers.length === 0 ? (
-              <div className="border-border bg-card mt-10 rounded-xl border border-dashed py-14 text-center shadow-sm">
-                <p className="text-foreground text-base font-semibold">
-                  {isAr ? 'لا يوجد أعضاء هيئة تدريس منشورون حاليًا.' : 'No faculty members to show right now.'}
-                </p>
-                <p className="text-muted-foreground mt-1.5 text-sm leading-normal">
-                  {isAr ? 'سيتم نشر قائمة أعضاء هيئة التدريس قريباً.' : 'The faculty directory will be published soon.'}
-                </p>
-              </div>
-            ) : (
-              <ul className="border-border mt-10 border-t">
-                {teachers.map((teacher, index) => {
-                  const name = hideInstructorNames && !teacher.name
-                    ? (isAr ? 'عضو هيئة التدريس' : 'Faculty member')
-                    : teacher.name;
-
-                  return (
-                    <li
-                      key={teacher.id}
-                      className={cn('border-border border-b py-7 sm:py-8', index % 2 === 1 && 'sm:ps-14')}
-                    >
-                      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-5 gap-y-4 sm:gap-x-8 lg:grid-cols-[auto_minmax(0,2fr)_minmax(0,1fr)]">
-                        <span className="font-display text-primary/20 pt-1 text-4xl leading-tight font-extrabold tabular-nums sm:text-5xl">
-                          {String(index + 1).padStart(2, '0')}
-                        </span>
-
-                        <div className="min-w-0">
-                          <h3 className="font-display text-foreground text-lg leading-snug font-bold sm:text-xl">{name}</h3>
-                          <p className="text-accent mt-1 text-sm leading-normal font-semibold">
-                            {teacher.specialization || (isAr ? 'عضو هيئة التدريس' : 'Faculty member')}
-                          </p>
-                          {teacher.qualification && (
-                            <p className="text-muted-foreground mt-1.5 text-sm leading-normal">
-                              {isAr ? 'المؤهل العلمي: ' : 'Qualification: '}
-                              <span className="text-foreground font-medium">{teacher.qualification}</span>
+                <InnerSection
+                    tone="cream"
+                    kicker={isAr ? 'الدليل' : 'Directory'}
+                    title={isAr ? 'من يدرّس في الكلية' : 'Who teaches here'}
+                    lead={
+                        isAr
+                            ? `${teachers.length} عضو هيئة تدريس يدرّس حاليًا في الكلية.`
+                            : `${teachers.length} faculty members currently teaching at the college.`
+                    }
+                >
+                    {teachers.length === 0 ? (
+                        <div className="border-t border-line py-[60px] text-center">
+                            <h3 className="m-0 text-[20px] font-semibold">
+                                {isAr ? 'لا يوجد أعضاء هيئة تدريس منشورون حاليًا.' : 'No faculty members to show right now.'}
+                            </h3>
+                            <p className="mt-2 text-[14px] text-ink-muted">
+                                {isAr ? 'سيتم نشر قائمة أعضاء هيئة التدريس قريباً.' : 'The faculty directory will be published soon.'}
                             </p>
-                          )}
                         </div>
+                    ) : (
+                        <div className="mt-2 grid gap-x-7 gap-y-9 site-md:grid-cols-2 site-lg:grid-cols-4">
+                            {teachers.map((teacher, index) => {
+                                const name =
+                                    hideInstructorNames && !teacher.name
+                                        ? isAr
+                                            ? 'عضو هيئة التدريس'
+                                            : 'Faculty member'
+                                        : teacher.name;
 
-                        <div className="col-span-2 flex flex-wrap gap-2 lg:col-span-1 lg:justify-end">
-                          {(teacher.departments ?? []).map((department) => (
-                            <span
-                              key={department.id}
-                              className="bg-secondary text-secondary-foreground inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold"
-                            >
-                              {department.name}
-                            </span>
-                          ))}
+                                return (
+                                    <article key={teacher.id} className="border-t border-line pt-[22px]">
+                                        <b className="font-site-latin text-[11px] font-bold text-coral" dir="ltr">
+                                            {String(index + 1).padStart(2, '0')}
+                                        </b>
+                                        <h3 className="m-[18px_0_6px] text-[18px] font-semibold leading-snug">{name}</h3>
+                                        <p className="m-0 text-[12px] leading-[1.9] font-semibold text-teal-dark">
+                                            {teacher.specialization || (isAr ? 'عضو هيئة التدريس' : 'Faculty member')}
+                                        </p>
+                                        {teacher.qualification ? (
+                                            <p className="m-0 mt-2 text-[12px] leading-[1.9] text-ink-muted">
+                                                {isAr ? 'المؤهل: ' : 'Qualification: '}
+                                                {teacher.qualification}
+                                            </p>
+                                        ) : null}
+                                        {(teacher.departments ?? []).length > 0 ? (
+                                            <div className="mt-4 flex flex-wrap gap-[7px]">
+                                                {teacher.departments!.map((department) => (
+                                                    <span key={department.id} className="border border-line px-[9px] py-1 text-[10px] text-ink-muted">
+                                                        {department.name}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        ) : null}
+                                    </article>
+                                );
+                            })}
                         </div>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </section>
+                    )}
+                </InnerSection>
 
-          <CtaBanner />
-        </main>
-        <SiteFooter />
-        <FloatingButtons />
-      </div>
-    </>
-  );
+                <CtaBand />
+            </SiteLayout>
+        </>
+    );
 }

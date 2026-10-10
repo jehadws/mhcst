@@ -1,223 +1,166 @@
 import { SeoHead } from '@/components/seo-head';
-import { CtaBanner } from '@/components/site/cta-banner';
-import { FloatingButtons } from '@/components/site/floating-buttons';
-import { PageHero } from '@/components/site/page-hero';
-import { SiteFooter } from '@/components/site/site-footer';
-import { SiteHeader } from '@/components/site/site-header';
-import { Testimonials, type TestimonialItem } from '@/components/site/testimonials';
+import { CtaBand } from '@/components/site/sections/cta-band';
+import { TestimonialsBand, type TestimonialItem } from '@/components/site/sections/testimonials-band';
+import { InnerHero } from '@/components/site/primitives/inner-hero';
+import { InnerSection } from '@/components/site/primitives/inner-section';
+import { Reveal } from '@/components/site/primitives/reveal';
+import { SiteLayout } from '@/components/site/site-layout';
 import { useSite } from '@/context/site-context';
-import { cn } from '@/lib/utils';
 import { aboutIcon } from '@/lib/about-icons';
 import type { AboutItemContent, AboutMilestoneContent, AboutPageContent } from '@/types';
+import { useMemo } from 'react';
 
 interface Props {
-  testimonials?: TestimonialItem[];
-  aboutContent?: AboutPageContent | null;
+    testimonials?: TestimonialItem[];
+    aboutContent?: AboutPageContent | null;
 }
 
+const resolveImage = (image: string) => (image.startsWith('http') || image.startsWith('/') ? image : `/storage/${image}`);
+
 export default function PublicAboutPage({ testimonials, aboutContent }: Props) {
-  const { t, locale } = useSite();
-  const isAr = locale === 'ar';
+    const { t, locale, tr } = useSite();
+    const isAr = locale === 'ar';
 
-  const fallbackPillars: AboutItemContent[] = [
-    {
-      icon: 'target',
-      title: isAr ? 'رسالتنا' : 'Our Mission',
-      title_ar: isAr ? 'رسالتنا' : 'Our Mission',
-      body: isAr
-        ? 'تقديم برامج تدريبية احترافية معتمدة تُمكّن الأفراد والمؤسسات من تطوير مهاراتهم والارتقاء بأدائهم المهني.'
-        : 'Deliver accredited professional training that empowers individuals and organisations to develop skills and elevate performance.',
-      body_ar: isAr
-        ? 'تقديم برامج تدريبية احترافية معتمدة تُمكّن الأفراد والمؤسسات من تطوير مهاراتهم والارتقاء بأدائهم المهني.'
-        : 'Deliver accredited professional training that empowers individuals and organisations to develop skills and elevate performance.',
-    },
-    {
-      icon: 'eye',
-      title: isAr ? 'رؤيتنا' : 'Our Vision',
-      title_ar: isAr ? 'رؤيتنا' : 'Our Vision',
-      body: isAr
-        ? 'أن نكون المرجع الأول في التدريب المهني المعتمد في ليبيا والمنطقة.'
-        : 'To be the premier reference for accredited professional training in Libya and the region.',
-      body_ar: isAr
-        ? 'أن نكون المرجع الأول في التدريب المهني المعتمد في ليبيا والمنطقة.'
-        : 'To be the premier reference for accredited professional training in Libya and the region.',
-    },
-    {
-      icon: 'lightbulb',
-      title: isAr ? 'رسالة الإدارة' : 'Leadership Message',
-      title_ar: isAr ? 'رسالة الإدارة' : 'Leadership Message',
-      body: isAr
-        ? 'نحمل حلماً بأن يجد كل متعلم تدريباً احترافياً يثق به ويحصل من خلاله على شهادة تُغيّر مساره المهني.'
-        : 'We believe every learner deserves training they can trust — and a certificate that changes their career path.',
-      body_ar: isAr
-        ? 'نحمل حلماً بأن يجد كل متعلم تدريباً احترافياً يثق به ويحصل من خلاله على شهادة تُغيّر مساره المهني.'
-        : 'We believe every learner deserves training they can trust — and a certificate that changes their career path.',
-    },
-  ];
+    const fallback = useMemo(
+        () => ({
+            pillars: [
+                {
+                    icon: 'target',
+                    title: 'Deliver accredited professional training that empowers individuals and organisations.',
+                    title_ar: 'تقديم برامج تدريبية احترافية معتمدة تُمكّن الأفراد والمؤسسات من تطوير مهاراتهم.',
+                    body: 'Our programs combine accredited curricula with applied practice so that graduates are ready for the labour market.',
+                    body_ar: 'جمع مناهجنا بين الاعتماد والتطبيق العملي ليخرج المتدرب جاهزاً لسوق العمل.',
+                },
+                {
+                    icon: 'eye',
+                    title: 'To be the premier reference for accredited professional training in Libya and the region.',
+                    title_ar: 'أن نكون المرجع الأول في التدريب المهني المعتمد في ليبيا والمنطقة.',
+                    body: 'We measure that ambition by the quality of our instructors, our facilities, and the outcomes of our graduates.',
+                    body_ar: 'نقيس هذا الطموح بجودة المدربين والمنشآت ومخرجات المتخرجين.',
+                },
+                {
+                    icon: 'lightbulb',
+                    title: 'A message from the college leadership',
+                    title_ar: 'رسالة من إدارة الكلية',
+                    body: 'We believe every learner deserves training they can trust — and a certificate that changes their career path.',
+                    body_ar: 'نؤمن بأن كل متعلم يستحق تدريباً يثق به وشهادة تُغيّر مساره المهني.',
+                },
+            ] as AboutItemContent[],
+            values: [
+                { icon: 'shield-check', title: 'Accredited & recognized', title_ar: 'الاعتماد والجودة', body: 'Certificates recognized by employers and professional bodies.', body_ar: 'شهادات معتمدة ومعترف بها إقليمياً ودولياً.' },
+                { icon: 'users', title: 'Expert instructors', title_ar: 'مدربون من الخبراء', body: 'Practitioners with real-world expertise.', body_ar: 'نخبة من الممارسين الحقيقيين في مجالاتهم.' },
+                { icon: 'graduation-cap', title: 'Flexible learning', title_ar: 'مرونة التعلم', body: 'Onsite, online, and blended options.', body_ar: 'حضوري وعبر الإنترنت ومدمج.' },
+                { icon: 'award', title: 'Practical application', title_ar: 'التطبيق العملي', body: 'Real projects for your portfolio.', body_ar: 'مشاريع حقيقية لمعرض أعمالك.' },
+            ] as AboutItemContent[],
+            milestones: [
+                { year: '2010', label: 'Founded', label_ar: 'التأسيس' },
+                { year: '2016', label: 'First Accreditation', label_ar: 'أول اعتماد' },
+                { year: '2019', label: '5,000+ Graduates', label_ar: '٥٠٠+ خريج' },
+                { year: '2023', label: 'Digital Expansion', label_ar: 'توسّع رقمي' },
+                { year: '2025', label: '20,000+ Learners', label_ar: '٢٠٠٠+ متدرب' },
+            ] as AboutMilestoneContent[],
+        }),
+        [],
+    );
 
-  const fallbackValues: AboutItemContent[] = [
-    {
-      icon: 'shield-check',
-      title: isAr ? 'الاعتماد والجودة' : 'Accreditation & Quality',
-      title_ar: isAr ? 'الاعتماد والجودة' : 'Accreditation & Quality',
-      body: isAr ? 'شهادات معتمدة ومعترف بها إقليمياً ودولياً' : 'Regionally and internationally recognized certificates',
-      body_ar: isAr ? 'شهادات معتمدة ومعترف بها إقليمياً ودولياً' : 'Regionally and internationally recognized certificates',
-    },
-    {
-      icon: 'users',
-      title: isAr ? 'مدربون من الخبراء' : 'Expert Instructors',
-      title_ar: isAr ? 'مدربون من الخبراء' : 'Expert Instructors',
-      body: isAr ? 'نخبة من الممارسين الحقيقيين في مجالاتهم' : 'Practitioners with real-world expertise',
-      body_ar: isAr ? 'نخبة من الممارسين الحقيقيين في مجالاتهم' : 'Practitioners with real-world expertise',
-    },
-    {
-      icon: 'graduation-cap',
-      title: isAr ? 'مرونة التعلم' : 'Flexible Learning',
-      title_ar: isAr ? 'مرونة التعلم' : 'Flexible Learning',
-      body: isAr ? 'حضوري وعبر الإنترنت ومدمج' : 'Onsite, online, and blended options',
-      body_ar: isAr ? 'حضوري وعبر الإنترنت ومدمج' : 'Onsite, online, and blended options',
-    },
-    {
-      icon: 'award',
-      title: isAr ? 'التطبيق العملي' : 'Practical Application',
-      title_ar: isAr ? 'التطبيق العملي' : 'Practical Application',
-      body: isAr ? 'مشاريع حقيقية لمعرض أعمالك' : 'Real projects for your portfolio',
-      body_ar: isAr ? 'مشاريع حقيقية لمعرض أعمالك' : 'Real projects for your portfolio',
-    },
-  ];
+    const pillars = aboutContent?.pillars?.length ? aboutContent.pillars : fallback.pillars;
+    const values = aboutContent?.values?.length ? aboutContent.values : fallback.values;
+    const milestones = aboutContent?.milestones?.length ? aboutContent.milestones : fallback.milestones;
 
-  const fallbackMilestones: AboutMilestoneContent[] = [
-    { year: '2010', label: isAr ? 'التأسيس' : 'Founded', label_ar: isAr ? 'التأسيس' : 'Founded' },
-    { year: '2016', label: isAr ? 'أول اعتماد' : 'First Accreditation', label_ar: isAr ? 'أول اعتماد' : 'First Accreditation' },
-    { year: '2019', label: isAr ? '5000+ خريج' : '5,000+ Graduates', label_ar: isAr ? '5000+ خريج' : '5,000+ Graduates' },
-    { year: '2023', label: isAr ? 'توسّع رقمي' : 'Digital Expansion', label_ar: isAr ? 'توسّع رقمي' : 'Digital Expansion' },
-    { year: '2025', label: isAr ? '20,000+ متدرب' : '20,000+ Learners', label_ar: isAr ? '20,000+ متدرب' : '20,000+ Learners' },
-  ];
+    const hero = aboutContent?.hero;
+    const heroTitle = tr({ en: hero?.title || t.about.title, ar: hero?.title_ar || t.about.title });
+    const heroIntro = tr({ en: hero?.description || t.about.body, ar: hero?.description_ar || hero?.description || t.about.body });
+    const campusImage = resolveImage(hero?.image || '/images/research.webp');
 
-  const pillars = aboutContent?.pillars?.length ? aboutContent.pillars : fallbackPillars;
-  const values = aboutContent?.values?.length ? aboutContent.values : fallbackValues;
-  const milestones = aboutContent?.milestones?.length ? aboutContent.milestones : fallbackMilestones;
+    return (
+        <>
+            <SeoHead title={isAr ? 'من نحن' : 'About Us'} description={heroIntro} />
+            <SiteLayout headerVariant="solid">
+                <InnerHero index="01" eyebrow={t.nav.about} title={heroTitle} intro={heroIntro} />
 
-  const hero = aboutContent?.hero;
-  const heroTitle = hero ? (isAr ? hero.title_ar : hero.title) : isAr ? 'قصتنا ورحلتنا' : 'Our story & journey';
-  const heroDescription = hero
-    ? isAr
-      ? hero.description_ar || hero.description || ''
-      : hero.description || ''
-    : isAr
-      ? 'أكثر من عقد من الخبرة في بناء مهارات المهنيين عبر برامج تدريبية معتمدة.'
-      : 'Over a decade of experience building professional skills through accredited training.';
+                <InnerSection tone="cream" kicker={t.nav.about}>
+                    <div className="mt-2 grid gap-x-4 site-md:grid-cols-3">
+                        {pillars.map((pillar, index) => (
+                            <article key={index} className="border-t border-line pt-[22px]">
+                                <span className="font-site-latin text-[11px] font-bold text-coral" dir="ltr">
+                                    {String(index + 1).padStart(2, '0')}
+                                </span>
+                                <h3 className="m-[22px_0_8px] text-[20px] font-semibold leading-snug tracking-[-0.03em]">
+                                    {tr({ en: pillar.title, ar: pillar.title_ar })}
+                                </h3>
+                                <p className="m-0 text-[13px] leading-[1.95] text-ink-muted">{tr({ en: pillar.body, ar: pillar.body_ar })}</p>
+                            </article>
+                        ))}
+                    </div>
+                </InnerSection>
 
-  const campusImage = (() => {
-    const image = hero?.image || '/banner.webp';
-
-    if (image.startsWith('http') || image.startsWith('/')) {
-      return image;
-    }
-
-    return `/storage/${image}`;
-  })();
-
-  return (
-    <>
-      <SeoHead
-        title={isAr ? 'من نحن' : 'About Us'}
-        description={isAr ? pillars[0]?.body_ar || heroDescription : pillars[0]?.body || heroDescription}
-      />
-      <div className="flex min-h-screen flex-col">
-        <SiteHeader />
-        <main className="flex-1">
-          <PageHero title={heroTitle} description={heroDescription} crumbs={[{ label: t.nav.about, href: '/about' }]} />
-
-          {/* Pillars — one hairline register, not three boxed cards. */}
-          <section className="py-20">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="bg-border grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border md:grid-cols-3">
-                {pillars.map((pillar, index) => {
-                  const title = isAr ? pillar.title_ar : pillar.title;
-                  const body = isAr ? pillar.body_ar : pillar.body;
-
-                  return (
-                    <article key={title} className="bg-card flex flex-col gap-3 p-6 sm:p-8">
-                      <span className="font-display text-primary/20 text-3xl leading-tight font-extrabold tabular-nums">
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-                      <h2 className="font-display text-foreground text-xl leading-snug font-extrabold">{title}</h2>
-                      <p className="text-muted-foreground text-sm leading-normal sm:text-base">{body}</p>
-                    </article>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-
-          <section className="bg-secondary py-20">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="grid items-center gap-12 lg:grid-cols-2">
-                <div className="border-border bg-card overflow-hidden rounded-2xl border shadow-xl">
-                  <img src={campusImage} alt={`${t.campus.title} ${t.campus.titleAccent}`} className="aspect-[4/3] w-full object-cover" />
-                </div>
-
-                <div>
-                  <p className="text-accent text-xs font-extrabold tracking-widest uppercase">{isAr ? 'قيمنا' : 'Our values'}</p>
-                  <h2 className="text-foreground font-display mt-2 text-3xl leading-snug font-extrabold">{t.about.title}</h2>
-                  <p className="text-muted-foreground mt-4 text-base leading-normal sm:text-lg">{t.about.body}</p>
-
-                  <div className="divide-border border-border bg-card mt-8 divide-y rounded-xl border shadow-sm">
-                    {values.map((value) => {
-                      const Icon = aboutIcon(value.icon);
-                      const title = isAr ? value.title_ar : value.title;
-                      const body = isAr ? value.body_ar : value.body;
-
-                      return (
-                        <div key={title} className="flex items-start gap-4 p-5">
-                          <div className="bg-accent/10 text-accent flex size-9 shrink-0 items-center justify-center rounded-md">
-                            <Icon className="size-4.5" aria-hidden="true" />
-                          </div>
-                          <div>
-                            <h3 className="font-display text-base leading-snug font-extrabold">{title}</h3>
-                            <p className="text-muted-foreground mt-1.5 text-sm leading-normal">{body}</p>
-                          </div>
+                <section className="bg-ink text-white">
+                    <div className="site-container grid items-center site-lg:grid-cols-[1.1fr_0.9fr]">
+                        <div className="relative h-[320px] overflow-hidden site-md:h-[460px] site-lg:h-[560px]">
+                            <img src={campusImage} alt={t.campus.title} loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover" />
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+                        <Reveal className="p-[35px] site-md:p-[60px]">
+                            <span className="font-site-latin text-[10px] font-bold tracking-[0.13em] text-kicker-light">{t.campus.label}</span>
+                            <h2 className="m-[18px_0_25px] text-[clamp(2.1rem,5vw,3.4rem)] leading-[1.24] font-semibold tracking-[-0.06em]">
+                                {t.campus.title} <span className="text-coral">{t.campus.titleAccent}</span>
+                            </h2>
+                            <p className="m-0 max-w-[470px] text-[15px] leading-[2.05] text-white/[0.64]">{t.campus.description}</p>
 
-          {/* Milestones — one hairline timeline strip, not five tiles. */}
-          <section className="py-20">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
-                <h2 className="font-display text-foreground max-w-2xl text-3xl leading-snug font-extrabold text-balance sm:text-4xl">
-                  {isAr ? 'محطات مسيرتنا' : 'Our milestones'}
-                </h2>
-                <p className="text-muted-foreground max-w-md text-sm leading-normal sm:text-base">
-                  {isAr ? 'من التأسيس إلى اليوم — محطات صنعت الكلية.' : 'From founding day to today — the milestones that shaped the college.'}
-                </p>
-              </div>
+                            <div className="mt-9 grid gap-7 site-md:grid-cols-2">
+                                {t.campus.cards.map((card, index) => (
+                                    <article key={card.name} className="border-t border-white/15 pt-[18px]">
+                                        <b className="font-site-latin text-[11px] font-bold text-coral" dir="ltr">
+                                            {String(index + 1).padStart(2, '0')}
+                                        </b>
+                                        <h3 className="m-[18px_0_8px] text-[17px] font-semibold">{card.name}</h3>
+                                        <p className="m-0 text-[12px] leading-[1.95] text-white/[0.55]">{card.desc}</p>
+                                    </article>
+                                ))}
+                            </div>
+                        </Reveal>
+                    </div>
+                </section>
 
-              <div className="border-border mt-10 grid grid-cols-2 gap-x-6 gap-y-10 border-t pt-10 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-8">
-                {milestones.map((milestone, index) => (
-                  <article key={milestone.year} className={cn(index > 0 && 'lg:border-s lg:border-border lg:ps-8')}>
-                    <p className="font-display text-primary/20 text-4xl leading-tight font-extrabold tabular-nums">{milestone.year}</p>
-                    <p className="text-foreground mt-2 text-sm font-semibold leading-normal">
-                      {isAr ? milestone.label_ar : milestone.label}
-                    </p>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </section>
+                <InnerSection tone="paper" kicker={t.whyUs.groupTitle} title={t.whyUs.titlePrefix} accent={t.whyUs.titleAccent} lead={t.whyUs.description}>
+                    <ul className="m-0 grid list-none gap-0 p-0 site-md:grid-cols-2">
+                        {values.map((value, index) => {
+                            const Icon = aboutIcon(value.icon);
+                            return (
+                                <li key={index} className="flex items-start gap-4 border-b border-line py-[22px] site-md:odd:pe-8 site-md:even:border-s site-md:even:ps-8">
+                                    <span className="bg-cream text-teal-dark grid size-[38px] shrink-0 place-items-center rounded-[2px]">
+                                        <Icon className="size-[17px]" aria-hidden="true" />
+                                    </span>
+                                    <div className="min-w-0">
+                                        <h3 className="m-0 text-[16px] font-semibold">{tr({ en: value.title, ar: value.title_ar })}</h3>
+                                        <p className="m-0 mt-1.5 text-[13px] leading-[1.9] text-ink-muted">{tr({ en: value.body, ar: value.body_ar })}</p>
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </InnerSection>
 
-          <Testimonials items={testimonials} />
-          <CtaBanner />
-        </main>
-        <SiteFooter />
-        <FloatingButtons />
-      </div>
-    </>
-  );
+                <InnerSection
+                    tone="cream"
+                    kicker={t.statsBar.founded}
+                    title={isAr ? 'محطات مسيرتنا' : 'Our milestones'}
+                    lead={isAr ? 'من التأسيس إلى اليوم — محطات صنعت الكلية.' : 'From founding day to today — the milestones that shaped the college.'}
+                >
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-9 site-md:grid-cols-3 site-lg:grid-cols-5">
+                        {milestones.map((milestone, index) => (
+                            <article key={milestone.year} className={index > 0 ? 'site-lg:border-s site-lg:border-line site-lg:ps-7' : undefined}>
+                                <p className="font-site-latin m-0 text-[34px] leading-none font-extrabold tracking-[-0.05em] text-teal-dark" dir="ltr">
+                                    {milestone.year}
+                                </p>
+                                <p className="mt-2 text-[13px] font-semibold text-ink-muted">{tr({ en: milestone.label, ar: milestone.label_ar })}</p>
+                            </article>
+                        ))}
+                    </div>
+                </InnerSection>
+
+                <TestimonialsBand items={testimonials} />
+                <CtaBand />
+            </SiteLayout>
+        </>
+    );
 }

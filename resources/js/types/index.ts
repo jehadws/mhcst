@@ -168,6 +168,7 @@ export interface SiteSettings {
         instagram?: string;
         linkedin?: string;
         twitter?: string;
+        youtube?: string;
     };
     footer_text?: string;
     meta_description?: string;

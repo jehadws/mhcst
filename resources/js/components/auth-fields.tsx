@@ -1,39 +1,53 @@
-import InputError from '@/components/input-error';
-import { Input } from '@/components/ui/input';
 import { useSite } from '@/context/site-context';
 import { cn } from '@/lib/utils';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 
-const authInputClass =
-  'h-[50px] rounded-[10px] border-input bg-card px-4 text-sm transition-colors hover:border-muted-foreground/40 focus-visible:border-primary focus-visible:bg-background focus-visible:ring-4 focus-visible:ring-primary/10 focus-visible:ring-offset-0';
+const fieldClass =
+  'w-full border-0 border-b border-line bg-transparent px-0 py-[10px] text-[14px] text-ink outline-none transition-colors placeholder:text-ink-muted/70 focus:border-coral disabled:opacity-50';
 
 interface AuthFieldProps extends React.ComponentProps<'input'> {
   label: string;
   error?: string;
 }
 
-function AuthFieldLabel({ htmlFor, label, required }: { htmlFor?: string; label: string; required?: boolean }) {
+function AuthFieldShell({
+  id,
+  label,
+  required,
+  error,
+  className,
+  children,
+}: {
+  id?: string;
+  label: string;
+  required?: boolean;
+  error?: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <label className="text-foreground text-sm font-bold" htmlFor={htmlFor}>
-      {label}
-      {required && (
-        <span aria-hidden="true" className="text-destructive">
-          {' '}
-          *
-        </span>
-      )}
-    </label>
+    <div className={cn('min-w-0', className)}>
+      <label htmlFor={id} className="mb-2 block text-[12px] text-ink-muted">
+        {label}
+        {required && (
+          <span aria-hidden="true" className="text-coral">
+            {' '}
+            *
+          </span>
+        )}
+      </label>
+      {children}
+      {error && <p className="m-0 mt-2 text-[11px] font-semibold text-coral">{error}</p>}
+    </div>
   );
 }
 
 export function AuthField({ label, error, id, required, className, ...props }: AuthFieldProps) {
   return (
-    <div className="flex flex-col gap-2">
-      <AuthFieldLabel htmlFor={id} label={label} required={required} />
-      <Input id={id} required={required} className={cn(authInputClass, className)} {...props} />
-      <InputError message={error} />
-    </div>
+    <AuthFieldShell id={id} label={label} required={required} error={error} className={className}>
+      <input id={id} required={required} className={fieldClass} {...props} />
+    </AuthFieldShell>
   );
 }
 
@@ -42,21 +56,19 @@ export function AuthPasswordField({ label, error, id, required, className, ...pr
   const [visible, setVisible] = useState(false);
 
   return (
-    <div className="flex flex-col gap-2">
-      <AuthFieldLabel htmlFor={id} label={label} required={required} />
+    <AuthFieldShell id={id} label={label} required={required} error={error} className={className}>
       <div className="relative">
-        <Input id={id} required={required} type={visible ? 'text' : 'password'} className={cn(authInputClass, 'pe-12', className)} {...props} />
+        <input id={id} required={required} type={visible ? 'text' : 'password'} className={cn(fieldClass, 'pe-10')} {...props} />
         <button
           type="button"
-          className="text-muted-foreground hover:text-foreground focus-visible:ring-ring absolute inset-y-0 end-0 flex w-12 items-center justify-center rounded-[10px] transition-colors focus-visible:ring-2 focus-visible:outline-none"
+          className="absolute inset-y-0 end-0 grid w-9 place-items-center text-ink-muted transition-colors hover:text-coral"
           onClick={() => setVisible((current) => !current)}
           aria-label={visible ? t.auth.hidePassword : t.auth.showPassword}
           aria-pressed={visible}
         >
-          {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+          {visible ? <EyeOff className="size-4" aria-hidden="true" /> : <Eye className="size-4" aria-hidden="true" />}
         </button>
       </div>
-      <InputError message={error} />
-    </div>
+    </AuthFieldShell>
   );
 }

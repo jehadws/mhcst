@@ -154,6 +154,169 @@
   --breakpoint-lg: 64rem;   /* 1024px */
   --breakpoint-xl: 80rem;   /* 1280px */
   --breakpoint-2xl: 96rem;  /* 1536px */
+
+  /* ── Public site redesign (Manus kit) ──────────────────────────
+     Authority: redesign/01_DESIGN_SYSTEM.md. Fixed hex values, NOT
+     :root var() links, so the dashboard dark-mode palette is
+     unaffected — public pages stay light-scheme by design. */
+  --font-site: 'IBM Plex Sans Arabic', 'Tajawal', system-ui, sans-serif;
+  --font-site-latin: 'Plus Jakarta Sans', 'IBM Plex Sans Arabic', 'Tajawal', system-ui, sans-serif;
+
+  --color-ink: #11223b;
+  --color-ink-2: #1d3150;
+  --color-cream: #f3f0e8;
+  --color-paper: #fbfaf7;
+  /* Manus "--muted" renamed to ink-muted: --color-muted is already a
+     dashboard surface color and must keep that meaning. */
+  --color-ink-muted: #687486;
+  --color-line: #d8d9d3;
+  --color-teal: #23766e;
+  --color-teal-dark: #1a5a55;
+  --color-coral: #db7756;
+  --color-coral-hover: #c96547;
+
+  /* Supporting accents from the Manus source (04_MANUS_SOURCE_HANDOFF §1.1) */
+  --color-mint: #8fcdc1;          /* trust-band index labels */
+  --color-note: #acb0b0;          /* very low-emphasis section note */
+  --color-eyebrow-light: #c8dbd2; /* eyebrow label on navy */
+  --color-kicker-light: #b6d6cc;  /* inner-page kicker on dark */
+
+  /* Manus breakpoints (the only two in the reference): mobile <760px,
+     tablet <1050px. Used mobile-first as site-md:/site-lg: variants. */
+  --breakpoint-site-md: 47.5rem;    /* 760px */
+  --breakpoint-site-lg: 65.625rem;  /* 1050px */
+
+  /* Square system: buttons 2px; the one decorative arch (hero image,
+     top-leading corner only). */
+  --radius-site-button: 2px;
+  --radius-site-arch: 150px 0 0 0;
+  --radius-site-arch-sm: 90px 0 0 0;
+
+  /* Shadows exist only here per the kit — no default card elevation. */
+  --shadow-hero-stamp: 0 18px 35px rgb(0 0 0 / 0.24);
+  --shadow-program-hover: 0 18px 35px rgb(17 34 59 / 0.09);
+
+  /* Fluid headline sizes (clamp from the kit's key sizes table).
+     Letter-spacing is applied per-component, never on Arabic text. */
+  --text-site-hero: clamp(2.875rem, 6vw, 5rem);
+  --text-site-hero--line-height: 1.18;
+  --text-site-h2: clamp(2.4375rem, 5vw, 3.875rem);
+  --text-site-h2--line-height: 1.25;
+  --text-site-page-title: clamp(3rem, 7vw, 5.75rem);
+  --text-site-page-title--line-height: 1.13;
+  --text-site-cta: clamp(3.375rem, 7vw, 5.375rem);
+  --text-site-cta--line-height: 1.1;
+}
+
+/* ── Public site redesign: shell container (kit §3.2) ─────────── */
+.site-container {
+  width: min(1180px, calc(100% - 80px));
+  margin-inline: auto;
+}
+@media (max-width: 1050px) {
+  .site-container { width: min(900px, calc(100% - 48px)); }
+}
+@media (max-width: 760px) {
+  .site-container { width: calc(100% - 40px); }
+}
+
+/* ── Public site redesign: scroll reveal (kit §Animations) ─────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+.reveal-delay { transition-delay: 0.12s; }
+.reveal-delay-2 { transition-delay: 0.22s; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .reveal-delay,
+  .reveal-delay-2 { transition-delay: 0s; }
+}
+
+/* ── Public site redesign: hero decorative glow + slide fade ───── */
+.site-hero-glow {
+  background:
+    radial-gradient(720px 420px at 85% 0%, rgb(35 118 110 / 0.22), transparent 65%),
+    radial-gradient(620px 380px at 10% 100%, rgb(219 119 86 / 0.12), transparent 60%);
+}
+
+/* Concentric hairline rings anchored to the trailing bottom corner of inner-page heroes. */
+.inner-ornament {
+  position: absolute;
+  inset-inline-start: -160px;
+  bottom: -260px;
+  width: 600px;
+  height: 600px;
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 72px rgb(255 255 255 / 0.02),
+    0 0 0 145px rgb(255 255 255 / 0.018);
+  pointer-events: none;
+}
+
+/* ── Public site redesign: CMS article body (no typography plugin) ─ */
+.article-body {
+  max-width: 680px;
+  color: var(--color-ink-muted);
+  font-size: 15px;
+  line-height: 2.05;
+}
+.article-body > * + * { margin-top: 1.4em; }
+.article-body h2,
+.article-body h3,
+.article-body h4 {
+  color: var(--color-ink);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.45;
+  margin-top: 2em;
+}
+.article-body h2 { font-size: 26px; }
+.article-body h3 { font-size: 20px; }
+.article-body h4 { font-size: 16px; }
+.article-body strong { color: var(--color-ink); }
+.article-body a {
+  color: var(--color-teal-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.article-body a:hover { color: var(--color-coral); }
+.article-body ul,
+.article-body ol { padding-inline-start: 22px; }
+.article-body li { margin-top: 0.5em; }
+.article-body img { width: 100%; height: auto; }
+.article-body blockquote {
+  border-inline-start: 2px solid var(--color-coral);
+  color: var(--color-ink);
+  font-weight: 600;
+  margin-inline-start: 0;
+  padding-inline-start: 20px;
+}
+.article-body table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.article-body th,
+.article-body td { border: 1px solid var(--color-line); padding: 8px 10px; text-align: start; }
+
+@keyframes site-hero-fade {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════

@@ -1,127 +1,117 @@
 import { SeoHead } from '@/components/seo-head';
-import { CtaBanner } from '@/components/site/cta-banner';
-import { NewsCard } from '@/components/site/news-card';
-import { PageHero } from '@/components/site/page-hero';
-import { SiteFooter } from '@/components/site/site-footer';
-import { SiteHeader } from '@/components/site/site-header';
+import { InnerHero } from '@/components/site/primitives/inner-hero';
+import { InnerSection, Prose } from '@/components/site/primitives/inner-section';
+import { TextLink } from '@/components/site/primitives/text-link';
+import { ArticleCard } from '@/components/site/sections/article-card';
+import { CtaBand } from '@/components/site/sections/cta-band';
+import { SiteLayout } from '@/components/site/site-layout';
 import { useSite } from '@/context/site-context';
-import { formatNewsDate, newsExcerpt, newsImage, newsSeoDescription, newsSeoTitle, newsTagKey, newsTitle, newsVideoUrl, type NewsPost } from '@/lib/news';
-import { Link } from '@inertiajs/react';
-import { ArrowLeft, ArrowRight, CalendarDays } from 'lucide-react';
+import {
+    formatNewsDate,
+    newsExcerpt,
+    newsImage,
+    newsSeoDescription,
+    newsSeoTitle,
+    newsTagKey,
+    newsTitle,
+    newsVideoUrl,
+    type NewsPost,
+} from '@/lib/news';
+import { cn } from '@/lib/utils';
 
 interface Props {
-  post: NewsPost & {
-    content?: string;
-    content_ar?: string;
-    content_en?: string;
-    reading_time?: number;
-    cover_video?: string;
-  };
-  related: NewsPost[];
+    post: NewsPost & {
+        content?: string;
+        content_ar?: string;
+        content_en?: string;
+        reading_time?: number;
+        cover_video?: string;
+    };
+    related: NewsPost[];
 }
 
 export default function BlogShow({ post, related = [] }: Props) {
-  const { t, locale, isRTL } = useSite();
-  const Arrow = isRTL ? ArrowLeft : ArrowRight;
+    const { t, locale } = useSite();
+    const isAr = locale === 'ar';
 
-  const content = post.content || (locale === 'ar' ? post.content_ar : post.content_en) || post.content_ar || '';
-  const excerpt = newsExcerpt(post);
-  const coverImage = post.cover_image ? newsImage(post) : undefined;
-  const videoUrl = newsVideoUrl(post);
-  const tag = t.news.tags[newsTagKey(post)];
+    const content = post.content || (isAr ? post.content_ar : post.content_en) || post.content_ar || '';
+    const excerpt = newsExcerpt(post);
+    const coverImage = post.cover_image ? newsImage(post) : undefined;
+    const videoUrl = newsVideoUrl(post);
+    const tag = t.news.tags[newsTagKey(post)];
 
-  return (
-    <>
-      <SeoHead
-        title={newsSeoTitle(post)}
-        description={newsSeoDescription(post)}
-        image={coverImage}
-        type="article"
-        url={`/blog-posts/${post.slug}`}
-        publishedTime={post.published_at ?? undefined}
-        modifiedTime={post.updated_at ?? undefined}
-      />
-      <div className="flex min-h-screen flex-col">
-        <SiteHeader />
-        <main className="flex-1">
-          <PageHero
-            title={newsTitle(post)}
-            description={excerpt || undefined}
-            crumbs={[
-              { label: t.news.viewAll, href: '/blog-posts' },
-              { label: newsTitle(post), href: `/blog-posts/${post.slug}` },
-            ]}
-          />
+    return (
+        <>
+            <SeoHead
+                title={newsSeoTitle(post)}
+                description={newsSeoDescription(post)}
+                image={coverImage}
+                type="article"
+                url={`/blog-posts/${post.slug}`}
+                publishedTime={post.published_at ?? undefined}
+                modifiedTime={post.updated_at ?? undefined}
+            />
+            <SiteLayout headerVariant="solid">
+                <InnerHero index="06" eyebrow={post.category || tag} title={newsTitle(post)} intro={excerpt || undefined} />
 
-          <article className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-            {videoUrl ? (
-              <div className="border-border relative mb-10 overflow-hidden rounded-2xl border shadow-lg">
-                <video
-                  src={videoUrl}
-                  controls
-                  preload="metadata"
-                  poster={coverImage}
-                  className="aspect-[16/9] w-full bg-black object-contain"
-                />
-                <span className="bg-accent text-accent-foreground absolute end-4 top-4 rounded-full px-3 py-1 text-xs font-bold">
-                  {post.category || tag}
-                </span>
-              </div>
-            ) : post.cover_image ? (
-              <div className="border-border relative mb-10 overflow-hidden rounded-2xl border shadow-lg">
-                <img src={newsImage(post)} alt={newsTitle(post)} className="aspect-[16/9] w-full object-cover" />
-                <span className="bg-accent text-accent-foreground absolute end-4 top-4 rounded-full px-3 py-1 text-xs font-bold">
-                  {post.category || tag}
-                </span>
-              </div>
-            ) : null}
+                <article className="bg-paper py-[75px] site-md:py-[110px]">
+                    <div className="site-container">
+                        <div className="relative mb-10 overflow-hidden rounded-ss-[70px]">
+                            {videoUrl ? (
+                                <video
+                                    src={videoUrl}
+                                    controls
+                                    preload="metadata"
+                                    poster={coverImage}
+                                    className="aspect-[16/9] w-full bg-ink object-contain"
+                                />
+                            ) : coverImage ? (
+                                <img src={coverImage} alt={newsTitle(post)} className="aspect-[16/9] w-full object-cover" />
+                            ) : (
+                                <div className="bg-cream text-teal-dark grid aspect-[16/9] w-full place-items-center text-[13px]">
+                                    {isAr ? 'لا توجد صورة للمقال' : 'No cover image'}
+                                </div>
+                            )}
+                        </div>
 
-            <div className="text-muted-foreground mb-8 flex flex-wrap items-center gap-4 text-xs">
-              <span className="inline-flex items-center gap-1.5">
-                <CalendarDays className="size-4" aria-hidden="true" />
-                {formatNewsDate(post.published_at, locale)}
-              </span>
-              {!post.cover_image && (
-                <span className="bg-accent/15 text-accent rounded-full px-3 py-1 text-xs font-bold">{tag}</span>
-              )}
-            </div>
+                        <div className="mb-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] text-ink-muted">
+                            <span>{formatNewsDate(post.published_at, locale)}</span>
+                            <span className="font-site-latin font-bold tracking-[0.1em] text-coral">{tag}</span>
+                            {post.reading_time ? (
+                                <span>
+                                    {post.reading_time} {isAr ? 'دقيقة قراءة' : 'min read'}
+                                </span>
+                            ) : null}
+                        </div>
 
-            <div className="prose prose-lg dark:prose-invert prose-headings:font-bold prose-p:leading-relaxed prose-p:text-muted-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline max-w-none text-start">
-              {content ? (
-                <div dangerouslySetInnerHTML={{ __html: content }} />
-              ) : (
-                <p className="text-muted-foreground italic">
-                  {locale === 'ar' ? 'محتوى المقال غير متوفر حالياً.' : 'Article content is not available yet.'}
-                </p>
-              )}
-            </div>
+                        {content ? (
+                            <Prose className="article-body">
+                                <div dangerouslySetInnerHTML={{ __html: content }} />
+                            </Prose>
+                        ) : (
+                            <p className="max-w-[680px] text-[15px] leading-[2] text-ink-muted italic">
+                                {isAr ? 'محتوى المقال غير متوفر حالياً.' : 'Article content is not available yet.'}
+                            </p>
+                        )}
 
-            <div className="mt-10 flex justify-start">
-              <Link
-                href="/blog-posts"
-                className="text-accent hover:text-primary inline-flex items-center gap-1.5 text-sm font-bold"
-              >
-                {t.news.backToNews}
-                <Arrow className="size-4" aria-hidden="true" />
-              </Link>
-            </div>
+                        <div className="mt-12 border-t border-line pt-8">
+                            <TextLink href="/blog-posts">{t.news.backToNews}</TextLink>
+                        </div>
+                    </div>
+                </article>
 
-            {related.length > 0 && (
-              <div className="border-border mt-16 border-t pt-12">
-                <h2 className="text-primary mb-8 text-2xl font-extrabold">{t.news.relatedTitle}</h2>
-                <div className="grid gap-6 md:grid-cols-3">
-                  {related.map((p, idx) => (
-                    <NewsCard key={p.id} post={p} index={idx} />
-                  ))}
-                </div>
-              </div>
-            )}
-          </article>
+                {related.length > 0 && (
+                    <InnerSection tone="cream" kicker={t.news.pageTitle} title={t.news.relatedTitle}>
+                        <div className={cn('mt-2 grid gap-4 site-md:grid-cols-2', related.length > 2 && 'site-lg:grid-cols-3')}>
+                            {related.slice(0, 3).map((p, idx) => (
+                                <ArticleCard key={p.id} post={p} index={idx} />
+                            ))}
+                        </div>
+                    </InnerSection>
+                )}
 
-          <CtaBanner />
-        </main>
-        <SiteFooter />
-      </div>
-    </>
-  );
+                <CtaBand />
+            </SiteLayout>
+        </>
+    );
 }
